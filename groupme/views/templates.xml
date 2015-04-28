@@ -4,6 +4,7 @@
     <template id="assets_frontend" inherit_id="website.assets_frontend" name="Groupme">
       <xpath expr="." position="inside">
           <link type="text/less" href="/groupme/static/src/less/groupme.less" rel="stylesheet" t-ignore="true"/>
+          <script type="text/javascript" src="/groupme/static/src/js/scripts.js"></script>
       </xpath>
     </template>
 
@@ -15,34 +16,92 @@
         </li>
       </xpath>
     </template>
-    <!-- <template id="groupmeheader">
-      <div class="navbar navbar-default mt8">
-        <div class="container-fluid">
-          <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-              <span class="sr-only">Toggle navigation</span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="#"><span t-field="user.company_name"/></a>
-          </div>
-          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav">
-              <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>
-              <li><a href="#">Link</a></li>
-            </ul>
+
+  <template id="networksheader">
+      <section class="jumbotron s_button mb0">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-9 col-xs-9 text-muted">
+              <p class="mb0">
+                <strong class="o_default_snippet_text">50,000+ companies use Groupme!</strong>
+              </p>
+              <p class="mb0 o_default_snippet_text">
+                        Join us and make your company a better place.
+                    </p>
+            </div>
           </div>
         </div>
-      </div>
-    </template> -->
+      </section>
+  </template>
+    
+    <template id="newmodal">
+              <div id="newnewtworkmodal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h3 class="modal-title">Create New Group</h3>
+                    </div>
+                    <div class="oe_slides_upload_loading text-center" style="display:none">
+                        <h4><i class='fa fa-spinner fa-spin'></i> Create New Group...  </h4>
+                    </div>
+                   <form action="/networks/save" method="post" class="clearfix form-horizontal">
+    
+                    <div class="modal-body">
+                            <div class="form-group">
+                                <label for="name" class="control-label col-sm-2">Name</label>
+                                <div class="col-sm-10">
+                                    <input name="name" id="name" placeholder="Name" class="form-control" required="required"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="name" class="control-label col-sm-2">Code</label>
+                                <div class="col-sm-10">
+                                    <input  name="code" placeholder="Code" class="form-control" required="required"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="category_id" class="control-label col-sm-2">Category</label>
+                                <div class="controls col-sm-10">
+                                      <select name="category" class="selectpicker form-control">
+                                        <t t-foreach="categories" t-as="category">
+                                          <option t-att-value="category.name"><t t-esc="category.name"/></option>
+                                        </t>
+                                      </select>
+                               </div>
+                            </div>
+    
+                    </div>
+                    <div class="modal-footer">
+                                              <canvas id="data_canvas" style="display: none;"></canvas>
+                            <button type="submit" id="saveasdraft" data-loading-text="Loading..." class="btn btn-primary">Save as Draft</button>
+                            <button type="submit" data-loading-text="Loading..." data-published="true" class="btn btn-primary">Save and Publish</button>
+                        or
+                        <a href="#" data-dismiss="modal" aria-hidden="true">Discard</a>
+                    </div>
+                                        </form>
+    
+                </div>
+            </div>
+        </div>
+
+    </template>
 
     <template id="networks">
       <t t-call="website.layout">
-        <div class="oe_structure"/>
-
+        <t t-call="groupme.newmodal"/>
+        <t t-call="groupme.networksheader"/>
         <div class="container">
-          <div class="raw">
+          <button onClick="$('#newnewtworkmodal').modal('show');" style="margin-top:10px;margin-left:20px;" class="pull-right btn btn-primary"> <span class=" glyphicon glyphicon-plus"></span> Create Group</button>
+        <form method="get" action="/networks/search">
+          <div style="margin-top:10px;" class="input-append form-inline col-md-offset-7 input-group">
+              <input name="search" placeholder="Search" class="span1 form-control"/>
+              <span class="input-group-addon">
+                <i class="fa fa-search"></i>
+              </span>
+          </div>
+        </form>
+          <div class="row">
             <div class="mt16">
               <div t-foreach="networks" t-as="network" class="col-sm-3 col-md-3">
                 <t t-call="groupme.network-item"/>
@@ -50,15 +109,13 @@
             </div>
           </div>
         </div>
-
         <div class="oe_structure"/>
       </t>
     </template>
-
     <template id="network-item">
       <div class="thumbnail">
         <a t-attf-href="/network/#{network.id}">
-          <img t-attf-src="/website/image/groupme.network/#{network.id}/image_thumb" t-att-alt="network.name" class="img img-responsive" style="width:100%;"/>
+          <img t-field="network.image" t-attf-src="/website/image/groupme.network/#{network.id}/image_thumb" t-att-alt="network.name" class="img img-responsive" style="width:100%;"/>
         </a>
         <div class="caption">
           <h3 style="margin-top: 5px;"><span t-field="network.name"/></h3>
@@ -75,13 +132,13 @@
             </t>
           </p>
 
-          <div class="pull-right">
+<!--           <div class="pull-right">
             <t t-call="website.publish_management">
               <t t-set="object" t-value="network"/>
               <t t-set="publish_edit" t-value="True"/>
             </t>
           </div>
-        </div>
+ -->        </div>
       </div>
     </template>
 
@@ -140,13 +197,10 @@
 
     <template id="network_view">
       <t t-call="website.layout">
-        <div t-field="network.title"/>
-
         <div class="container">
-          <div class="raw">
+          <div class="row">
             <div class="col-md-3">
               <img t-attf-src="/website/image/groupme.network/#{network.id}/image_thumb" t-att-alt="network.name" class="img img-responsive img-rounded" style="width:100%;"/>
-
               <h3><span t-field="network.name"/></h3>
               <p style="border-bottom: 1px solid #eee;padding-bottom: 5px;"><span t-esc="network.code"/></p>
 
