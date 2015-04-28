@@ -5,9 +5,6 @@ from openerp import SUPERUSER_ID
 from openerp.tools.misc import ustr
 from openerp.addons.web.http import request
 from openerp.tools.mail import html2plaintext
-from openerp.Debugger import Debugg
-logger = Debugg
-
 
 class GroupMe(http.Controller):
 
@@ -62,7 +59,6 @@ class GroupMe(http.Controller):
     @http.route('/networks/save', auth='public', type='http', website=True)
     def group_save(self, **post):
         group_obj = request.env['groupme.network']
-        logger.info(post)
         rec = {
             'name': post.get('name'),
             'code': post.get('code'),
