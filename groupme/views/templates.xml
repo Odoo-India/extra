@@ -1,0 +1,188 @@
+<openerp>
+  <data>
+
+    <template id="assets_frontend" inherit_id="website.assets_frontend" name="Groupme">
+      <xpath expr="." position="inside">
+          <link type="text/less" href="/groupme/static/src/less/groupme.less" rel="stylesheet" t-ignore="true"/>
+      </xpath>
+    </template>
+
+
+    <template id="header_footer_custom" inherit_id="website.footer_default" name="Footer News Blog Link">
+      <xpath expr="//ul[@id='products']" position="inside">
+        <li>
+          <a href="/networks">Groups</a>
+        </li>
+      </xpath>
+    </template>
+    <!-- <template id="groupmeheader">
+      <div class="navbar navbar-default mt8">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#"><span t-field="user.company_name"/></a>
+          </div>
+          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>
+              <li><a href="#">Link</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </template> -->
+
+    <template id="networks">
+      <t t-call="website.layout">
+        <div class="oe_structure"/>
+
+        <div class="container">
+          <div class="raw">
+            <div class="mt16">
+              <div t-foreach="networks" t-as="network" class="col-sm-3 col-md-3">
+                <t t-call="groupme.network-item"/>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="oe_structure"/>
+      </t>
+    </template>
+
+    <template id="network-item">
+      <div class="thumbnail">
+        <a t-attf-href="/network/#{network.id}">
+          <img t-attf-src="/website/image/groupme.network/#{network.id}/image_thumb" t-att-alt="network.name" class="img img-responsive" style="width:100%;"/>
+        </a>
+        <div class="caption">
+          <h3 style="margin-top: 5px;"><span t-field="network.name"/></h3>
+          <div class="text-muted clearfix">
+            <small class="pull-left"><i class="fa fa-star" t-if="network.star"/><span t-esc="len(network.member_ids)"/> members</small>
+            <small class="pull-right"><span t-esc="network.create_date"/></small>
+          </div>
+
+          <p t-if="network.tag_ids" style="padding-top: 5px;">
+            <t t-foreach="network.tag_ids" t-as="tag">
+              <a t-attf-href="networks/tag/#{slug(tag)}">
+                <span t-attf-class="label label-default #{tag and tag.name == tag.name and 'label-primary' ''} text-muted" t-field="tag.name"/>
+              </a>
+            </t>
+          </p>
+
+          <div class="pull-right">
+            <t t-call="website.publish_management">
+              <t t-set="object" t-value="network"/>
+              <t t-set="publish_edit" t-value="True"/>
+            </t>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <template id="networks_create">
+      <t t-call="website.layout">
+        <div class="container">
+          <div class="raw">
+            <div class="page-header">
+              <h1>Create Network
+                <small t-if="not is_public_user">
+                  <a href="/networks"><i class="fa fa-arrow-left"></i> Back</a>
+                </small>
+              </h1>
+            </div>
+
+            <div class="col-md-12">
+              <form class="form" role="form" method="post" action="/networks/save">
+                <div class="col-lg-3">
+                  <div class="thumbnail">
+                    <img src="http://placehold.it/242x200" widget="image" name="groupLogo" alt="..." class="img img-responsive oe_avatar"/>
+                    <input type="file" widget="image" name="groupLogo" />
+                  </div>
+                </div>
+                <div class="col-lg-9">
+
+                  <div class="form-group">
+                    <label for="name">Group Name:</label>
+                    <input type="text" required="true" class="form-control" name="name" id="name" placeholder="Group Name" />
+                  </div>
+
+                  <div class="form-group">
+                    <label for="code">Code :</label>
+                    <input type="text" required="true" class="form-control" name="code" id="code" placeholder="Group Unique Internal Code" />
+                  </div>
+
+                  <div class="form-group">
+                    <label for="author">Visibility : </label>
+                    <select name="visibility" class="form-control" >
+                      <option value="public">Public</option>
+                      <option value="private">Private</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">        
+                    <button type="submit" class="btn btn-primary">Create</button>
+                    <button type="reset" class="btn btn-default">Reset</button>
+                  </div>
+
+                </div>
+              </form>                    
+            </div>
+          </div>
+        </div>
+      </t>
+    </template>
+
+    <template id="network_view">
+      <t t-call="website.layout">
+        <div t-field="network.title"/>
+
+        <div class="container">
+          <div class="raw">
+            <div class="col-md-3">
+              <img t-attf-src="/website/image/groupme.network/#{network.id}/image_thumb" t-att-alt="network.name" class="img img-responsive img-rounded" style="width:100%;"/>
+
+              <h3><span t-field="network.name"/></h3>
+              <p style="border-bottom: 1px solid #eee;padding-bottom: 5px;"><span t-esc="network.code"/></p>
+
+              <p><i class="fa fa-user text-muted"></i> <span t-esc="network.author_id.name"/>, is group owner</p>
+              <p><i class="fa fa-map-marker text-muted"></i> <span t-esc="network.location"/></p>
+              <p><i class="fa fa-globe text-muted"></i> <a t-attf-href="network.author_id.website" target="_new"><span t-esc="network.author_id.website"/></a></p>
+              <p><i class="fa fa-clock-o text-muted"></i> <span t-esc="network.create_date"/></p>
+              <p><i class="fa fa-users text-muted"></i> <span t-esc="len(network.member_ids)"/> members</p>
+              <p style="border-bottom: 1px solid #eee;padding-bottom: 5px;"><i class="fa fa-comments-o text-muted"></i> <span t-esc="network.message_per_day"/> message / day</p>
+
+              <p><i t-attf-class="fa #{network.category_id.icon} text-muted"></i> <span t-esc="network.category_id.name"/></p>
+              <p t-if="network.tag_ids">
+                <i class="fa fa-tags text-muted"></i>
+                <t t-foreach="network.tag_ids" t-as="tag">
+                  <a t-attf-href="networks/tag/#{slug(tag)}">
+                    <span t-attf-class="label label-default #{tag and tag.name == tag.name and 'label-primary' ''} text-muted" t-field="tag.name"/>
+                  </a>
+                </t>
+              </p>
+
+              <div class="pull-right">
+              <t t-call="website.publish_management">
+                <t t-set="object" t-value="network"/>
+                <t t-set="publish_edit" t-value="True"/>
+              </t>
+            </div>
+
+            </div>
+
+            <div class="col-md-9">
+              <div t-field="network.description"/>
+            </div>
+          </div>
+        </div>
+      </t>
+    </template>
+
+  </data>
+</openerp>

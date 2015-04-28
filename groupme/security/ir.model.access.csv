@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_groupme_network,access_groupme_network,model_groupme_network,,1,0,0,0
+access_groupme_network_category,access_groupme_network_category,model_groupme_network_category,,1,0,0,0
+access_groupme_network_tag,access_groupme_network_tag,model_groupme_network_tag,,1,0,0,0
