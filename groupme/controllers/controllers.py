@@ -1,53 +1,96 @@
 # -*- coding: utf-8 -*-
 
+import werkzeug
+
 from openerp import http
 from openerp import SUPERUSER_ID
 from openerp.tools.misc import ustr
 from openerp.addons.web.http import request
 from openerp.tools.mail import html2plaintext
-from openerp.Debugger import Debugg
-logger = Debugg
-
 
 class GroupMe(http.Controller):
 
-    @http.route(['/networks', '/networks/<string:search>'], auth='public', type='http', website=True)
-    def network(self, search="", **post):
+    @http.route('/networks', auth='public', type='http', website=True)
+    def network(self, search_key=False, **post):
         network_obj = request.env['groupme.network']
-        partner_obj = request.env['res.partner']
-        category_obj = request.env['groupme.network.category']
 
         res_user = request.env.user
         public_user = request.website.user_id
-        user_obj = False
         domain = []
-        if public_user != res_user:
-            domain = [('author_id', '=', res_user.id)]
-            user_obj = partner_obj.browse(res_user)
 
-        if search:
-            search = request.httprequest.query_string.split("=")[1]
-            domain = [("name", "ilike", search)]
+        if public_user != res_user:
+            domain += [('author_id', '=', res_user.id)]
+
+        if search_key:
+            domain += [("name", "ilike", search_key)]
 
         networks = network_obj.search(domain)
-        categories = category_obj.search([])
+
         return request.render('groupme.networks', {
             'networks': networks,
-            'categories': categories,
             'is_public_user': res_user == public_user,
-            'user': user_obj
+            'search': search_key
         })
 
-    @http.route('/network/<model("groupme.network"):network_id>', auth='public', type='http', website=True)
+    @http.route('/networks/network/<model("groupme.network"):network_id>', auth='public', type='http', website=True)
     def group_details(self, network_id):
         res_user = request.env.user
         public_user = request.website.user_id
-
+        
         return request.render('groupme.network_view', {
             'user': res_user,
             'network': network_id,
-            'is_public_user': res_user == public_user
+            'is_public_user': res_user == public_user,
+            'comments': network_id.website_message_ids or []
         })
+
+    @http.route('/networks/network/<model("groupme.network"):network_id>/comment', type='http', auth="public", methods=['POST'], website=True)
+    def group_comment(self, network_id, **post):
+        """ Controller for message_post. Public user can post; their name and
+        email is used to find or create a partner and post as admin with the
+        right partner. Their comments are not published by default. Logged
+        users can post as usual. """
+        # TDE TODO :
+        # - fix _find_partner_from_emails -> is an api.one + strange results + should work as public user
+        # - subscribe partner instead of user writing the message ?
+        # - public user -> cannot create mail.message ?
+        if not post.get('comment'):
+            return werkzeug.utils.redirect(request.httprequest.referrer + "#discuss")
+        # public user: check or find author based on email, do not subscribe public user
+        # and do not publish their comments by default to avoid direct spam
+        if request.uid == request.website.user_id.id:
+            if not post.get('email'):
+                return werkzeug.utils.redirect(request.httprequest.referrer + "#discuss")
+            # TDE FIXME: public user has no right to create mail.message, should
+            # be investigated - using SUPERUSER_ID meanwhile
+            contextual_slide = network_id.sudo().with_context(mail_create_nosubcribe=True)
+            # TDE FIXME: check in mail_thread, find partner from emails should maybe work as public user
+            partner_id = network_id.sudo()._find_partner_from_emails([post.get('email')])[0][0]
+            if partner_id:
+                partner = request.env['res.partner'].sudo().browse(partner_id)
+            else:
+                partner = request.env['res.partner'].sudo().create({
+                    'name': post.get('name', post['email']),
+                    'email': post['email']
+                })
+            post_kwargs = {
+                'author_id': partner.id,
+                'website_published': False,
+                'email_from': partner.email,
+            }
+        # logged user: as usual, published by default
+        else:
+            contextual_slide = network_id
+            post_kwargs = {}
+
+        contextual_slide.message_post(
+            body=post['comment'],
+            type='comment',
+            subtype='mt_comment',
+            **post_kwargs
+        )
+        return werkzeug.utils.redirect(request.httprequest.referrer + "#discuss")
+
 
     @http.route('/networks/new', auth='public', type='http', website=True)
     def group_create(self):
@@ -75,14 +118,4 @@ class GroupMe(http.Controller):
             return request.redirect(url)
         else:
             # TODO: move to error page if new group not created
-            pass
-
-        # @http.route('/website/image/groupme.network/#{network.id}/image_thumb', auth='public', type='http', website=True)
-        # def imageServing(self, id, **post):
-        #     return
-        #     pass
-
-        @http.route('/networks/search', auth='public', type='http', website=True)
-        def searchNetwork(self, **post):
-            print post
             pass

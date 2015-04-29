@@ -1,24 +1,17 @@
 <openerp>
   <data>
 
+    <!-- frontend assets -->
     <template id="assets_frontend" inherit_id="website.assets_frontend" name="Groupme">
       <xpath expr="." position="inside">
-          <link type="text/less" href="/groupme/static/src/less/groupme.less" rel="stylesheet" t-ignore="true"/>
-          <script type="text/javascript" src="/groupme/static/src/js/scripts.js"></script>
+        <link type="text/less" href="/groupme/static/src/less/groupme.less" rel="stylesheet" t-ignore="true"/>
+        <script type="text/javascript" src="/groupme/static/src/js/scripts.js"></script>
       </xpath>
     </template>
 
-
-    <template id="header_footer_custom" inherit_id="website.footer_default" name="Footer News Blog Link">
-      <xpath expr="//ul[@id='products']" position="inside">
-        <li>
-          <a href="/networks">Groups</a>
-        </li>
-      </xpath>
-    </template>
-
-  <template id="networksheader">
-      <section class="jumbotron s_button mb0">
+    <!-- header for the network list and category -->
+    <template id="networksheader">
+      <section class="jumbotron s_button mb16">
         <div class="container">
           <div class="row">
             <div class="col-md-9 col-xs-9 text-muted">
@@ -26,81 +19,101 @@
                 <strong class="o_default_snippet_text">50,000+ companies use Groupme!</strong>
               </p>
               <p class="mb0 o_default_snippet_text">
-                        Join us and make your company a better place.
-                    </p>
+                Join us and make your company a better place.
+              </p>
             </div>
           </div>
         </div>
       </section>
-  </template>
-    
-    <template id="newmodal">
-              <div id="newnewtworkmodal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                        <h3 class="modal-title">Create New Group</h3>
-                    </div>
-                    <div class="oe_slides_upload_loading text-center" style="display:none">
-                        <h4><i class='fa fa-spinner fa-spin'></i> Create New Group...  </h4>
-                    </div>
-                   <form action="/networks/save" method="post" class="clearfix form-horizontal">
-    
-                    <div class="modal-body">
-                            <div class="form-group">
-                                <label for="name" class="control-label col-sm-2">Name</label>
-                                <div class="col-sm-10">
-                                    <input name="name" id="name" placeholder="Name" class="form-control" required="required"/>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="name" class="control-label col-sm-2">Code</label>
-                                <div class="col-sm-10">
-                                    <input  name="code" placeholder="Code" class="form-control" required="required"/>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="category_id" class="control-label col-sm-2">Category</label>
-                                <div class="controls col-sm-10">
-                                      <select name="category" class="selectpicker form-control">
-                                        <t t-foreach="categories" t-as="category">
-                                          <option t-att-value="category.name"><t t-esc="category.name"/></option>
-                                        </t>
-                                      </select>
-                               </div>
-                            </div>
-    
-                    </div>
-                    <div class="modal-footer">
-                                              <canvas id="data_canvas" style="display: none;"></canvas>
-                            <button type="submit" id="saveasdraft" data-loading-text="Loading..." class="btn btn-primary">Save as Draft</button>
-                            <button type="submit" data-loading-text="Loading..." data-published="true" class="btn btn-primary">Save and Publish</button>
-                        or
-                        <a href="#" data-dismiss="modal" aria-hidden="true">Discard</a>
-                    </div>
-                                        </form>
-    
-                </div>
-            </div>
-        </div>
-
     </template>
 
+    <!-- move this code to /static/src/xml/view.xml -->
+    <template id="newmodal">
+      <div id="newnewtworkmodal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+              <h3 class="modal-title">Create New Group</h3>
+            </div>
+            <div class="oe_slides_upload_loading text-center" style="display:none">
+              <h4><i class='fa fa-spinner fa-spin'></i> Create New Group...  </h4>
+            </div>
+            <form action="/networks/save" method="post" class="clearfix form-horizontal">
+
+              <div class="modal-body">
+                <div class="form-group">
+                  <label for="name" class="control-label col-sm-2">Name</label>
+                  <div class="col-sm-10">
+                    <input name="name" id="name" placeholder="Name" class="form-control" required="required"/>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="name" class="control-label col-sm-2">Code</label>
+                  <div class="col-sm-10">
+                    <input  name="code" placeholder="Code" class="form-control" required="required"/>
+                  </div>
+                </div>
+                <!-- <div class="form-group">
+                  <label for="category_id" class="control-label col-sm-2">Category</label>
+                  <div class="controls col-sm-10">
+                    <select name="category" class="selectpicker form-control">
+                      <t t-foreach="categories" t-as="category">
+                        <option t-att-value="category.name"><t t-esc="category.name"/></option>
+                      </t>
+                    </select>
+                  </div>
+                </div> -->
+              </div>
+              <div class="modal-footer">
+                <canvas id="data_canvas" style="display: none;"></canvas>
+                <button type="submit" id="saveasdraft" data-loading-text="Loading..." class="btn btn-primary">Save as Draft</button>
+                <button type="submit" data-loading-text="Loading..." data-published="true" class="btn btn-primary">Save and Publish</button>
+                or
+                <a href="#" data-dismiss="modal" aria-hidden="true">Discard</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <!-- display list of groups -->
     <template id="networks">
       <t t-call="website.layout">
         <t t-call="groupme.newmodal"/>
         <t t-call="groupme.networksheader"/>
         <div class="container">
-          <button onClick="$('#newnewtworkmodal').modal('show');" style="margin-top:10px;margin-left:20px;" class="pull-right btn btn-primary"> <span class=" glyphicon glyphicon-plus"></span> Create Group</button>
-        <form method="get" action="/networks/search">
-          <div style="margin-top:10px;" class="input-append form-inline col-md-offset-7 input-group">
-              <input name="search" placeholder="Search" class="span1 form-control"/>
-              <span class="input-group-addon">
-                <i class="fa fa-search"></i>
-              </span>
+
+          <div class="row" >
+            <div class="col-md-8">
+              <button type="button" class="btn btn-default" aria-label="Left Align">
+                <i class="fa fa-university"></i> Clubs
+              </button>
+              <button type="button" class="btn btn-default" aria-label="Left Align">
+                <i class="fa fa-building-o"></i> Schools &amp; Colleges
+              </button>
+              <button type="button" class="btn btn-default" aria-label="Left Align">
+                <i class="fa fa-suitcase"></i> Business
+              </button>
+            </div>
+            <div class="col-md-4">
+              <form method="get" action="/networks">
+                <div class="input-group">
+                  <input type="search" class="form-control" name="search" t-attf-placeholder="Search for groups" t-att-value="search"/>
+                  <span class="input-group-btn">
+                    <button class="btn btn-primary" type="submit">
+                      <i class="fa fa-search"></i>
+                    </button>
+                    <a onClick="$('#newnewtworkmodal').modal('show');" class="btn btn-success">
+                      <i class="fa fa-plus"></i> Create Group
+                    </a>
+                  </span>
+                </div>
+              </form>
+            </div>
           </div>
-        </form>
+          
           <div class="row">
             <div class="mt16">
               <div t-foreach="networks" t-as="network" class="col-sm-3 col-md-3">
@@ -112,37 +125,37 @@
         <div class="oe_structure"/>
       </t>
     </template>
+
+    <!-- group detail on list view -->
     <template id="network-item">
       <div class="thumbnail">
-        <a t-attf-href="/network/#{network.id}">
-          <img t-field="network.image" t-attf-src="/website/image/groupme.network/#{network.id}/image_thumb" t-att-alt="network.name" class="img img-responsive" style="width:100%;"/>
+        <a t-attf-href="/networks/network/#{network.id}">
+          <img t-attf-src="/website/image/groupme.network/#{network.id}/image_thumb" t-att-alt="network.name" class="img img-responsive" style="width:100%;"/>
         </a>
         <div class="caption">
           <h3 style="margin-top: 5px;"><span t-field="network.name"/></h3>
-          <div class="text-muted clearfix">
-            <small class="pull-left"><i class="fa fa-star" t-if="network.star"/><span t-esc="len(network.member_ids)"/> members</small>
+          <p class="text-muted clearfix">
+            <small class="pull-left"><span t-esc="len(network.member_ids)"/> members</small>
             <small class="pull-right"><span t-esc="network.create_date"/></small>
-          </div>
-
-          <p t-if="network.tag_ids" style="padding-top: 5px;">
+          </p>
+          <p class="text-muted clearfix">
+            <small>
+              <i t-attf-class="fa #{network.category_id.icon} text-muted"></i> <span t-esc="network.category_id.name"/>
+            </small>
+          </p>
+          <p t-if="network.tag_ids">
+            <i class="fa fa-tags text-muted"></i>
             <t t-foreach="network.tag_ids" t-as="tag">
               <a t-attf-href="networks/tag/#{slug(tag)}">
                 <span t-attf-class="label label-default #{tag and tag.name == tag.name and 'label-primary' ''} text-muted" t-field="tag.name"/>
               </a>
             </t>
           </p>
-
-<!--           <div class="pull-right">
-            <t t-call="website.publish_management">
-              <t t-set="object" t-value="network"/>
-              <t t-set="publish_edit" t-value="True"/>
-            </t>
-          </div>
- -->        </div>
+        </div>
       </div>
     </template>
 
-    <template id="networks_create">
+<!--     <template id="networks_create">
       <t t-call="website.layout">
         <div class="container">
           <div class="raw">
@@ -194,23 +207,24 @@
         </div>
       </t>
     </template>
+ -->
 
+
+    <!-- group page view -->
     <template id="network_view">
       <t t-call="website.layout">
         <div class="container">
-          <div class="row">
+          <div class="raw mt16">
             <div class="col-md-3">
               <img t-attf-src="/website/image/groupme.network/#{network.id}/image_thumb" t-att-alt="network.name" class="img img-responsive img-rounded" style="width:100%;"/>
               <h3><span t-field="network.name"/></h3>
               <p style="border-bottom: 1px solid #eee;padding-bottom: 5px;"><span t-esc="network.code"/></p>
-
               <p><i class="fa fa-user text-muted"></i> <span t-esc="network.author_id.name"/>, is group owner</p>
-              <p><i class="fa fa-map-marker text-muted"></i> <span t-esc="network.location"/></p>
-              <p><i class="fa fa-globe text-muted"></i> <a t-attf-href="network.author_id.website" target="_new"><span t-esc="network.author_id.website"/></a></p>
+              <p><i class="fa fa-map-marker text-muted"></i> <span t-field="network.location"/></p>
+              <p><i class="fa fa-globe text-muted"></i> <a t-attf-href="network.author_id.website" target="_new"><span t-field="network.author_id.website"/></a></p>
               <p><i class="fa fa-clock-o text-muted"></i> <span t-esc="network.create_date"/></p>
               <p><i class="fa fa-users text-muted"></i> <span t-esc="len(network.member_ids)"/> members</p>
               <p style="border-bottom: 1px solid #eee;padding-bottom: 5px;"><i class="fa fa-comments-o text-muted"></i> <span t-esc="network.message_per_day"/> message / day</p>
-
               <p><i t-attf-class="fa #{network.category_id.icon} text-muted"></i> <span t-esc="network.category_id.name"/></p>
               <p t-if="network.tag_ids">
                 <i class="fa fa-tags text-muted"></i>
@@ -220,18 +234,84 @@
                   </a>
                 </t>
               </p>
-
-              <div class="pull-right">
-              <t t-call="website.publish_management">
-                <t t-set="object" t-value="network"/>
-                <t t-set="publish_edit" t-value="True"/>
-              </t>
-            </div>
-
             </div>
 
             <div class="col-md-9">
-              <div t-field="network.description"/>
+              <ul class="nav nav-tabs">
+                <li role="presentation" class="active">
+                  <a href="#about" role="tab" data-toggle="tab">
+                    <i class="fa fa-home"></i> About
+                  </a>
+                </li>
+                <li role="presentation">
+                  <a href="#members" role="tab" data-toggle="tab">
+                    <i class="fa fa-users"></i> Members
+                  </a>
+                </li>
+                <li role="presentation">
+                  <a href="#messages" role="tab" data-toggle="tab">
+                    <i class="fa fa-comments-o"></i> Messages
+                  </a>
+                </li>
+
+                <li role="presentation" class="pull-right">
+                  <div>
+                    <button type="submit" class="btn btn-default"> <i class="fa fa-pencil"></i> Edit Group</button>
+                    &amp;nbsp;
+                    <t t-call="website.publish_management">
+                      <t t-set="object" t-value="network"/>
+                      <t t-set="publish_edit" t-value="True"/>
+                    </t>
+                  </div>
+                </li>
+              </ul>
+              <div class="tab-content" style="padding-top:8px;">
+                <div class="tab-pane fade" id="about">
+                  <div t-field="network.description" />
+                </div>
+                
+                <div class="tab-pane fade" id="members">
+                  #TODO: display list of members
+                </div>
+
+                <div class="tab-pane fade" id="messages">
+                  <form id="comment" t-attf-action="/networks/network/#{network.id}/comment" method="POST">
+                    <div class="media">
+                      <span class="pull-left">
+                        <img class="img img-circle media-object"
+                          t-attf-src="/website/image/res.partner/#{user_id.partner_id.id}/image"
+                          style="width: 30px"/>
+                      </span>
+                      <div class="media-body">
+                        <textarea rows="3" name="comment" class="form-control" placeholder="Write a message to broadcast to this group..."></textarea>
+                        <button type="submit" class="btn btn-primary mt8">Post</button>
+                      </div>
+                    </div>
+                  </form>
+
+                  <div class="oe_network_messages">
+                    <p class="text-muted"><span t-esc="len(comments)"/> messages sent</p>
+                    <ul class="media-list mt8">
+                      <li t-foreach="comments" t-as="message" class="media">
+                        <span class="pull-left">
+                          <img class="media-object img img-circle"
+                            t-att-src="'/website/image?model=mail.message&amp;field=author_avatar&amp;id='+str(message.id)" style="width: 30px"/>
+                        </span>
+                        <div class="media-body">
+                          <t t-call="website.publish_short">
+                            <t t-set="object" t-value="message"/>
+                          </t>
+                          <span t-field="message.author_id" style="display: inline-block;" t-field-options='{"widget": "contact", "fields": ["name"]}'/>
+                          <span class="text-muted">on<span t-field="message.date"/></span>
+                          <div t-field="message.body" class="discussion_scroll_post"></div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+
+                </div>
+              </div>
+              
             </div>
           </div>
         </div>
