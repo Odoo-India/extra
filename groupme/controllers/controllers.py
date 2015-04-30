@@ -8,11 +8,15 @@ from openerp.tools.misc import ustr
 from openerp.addons.web.http import request
 from openerp.tools.mail import html2plaintext
 
-
 class GroupMe(http.Controller):
 
-    @http.route('/networks', auth='public', type='http', website=True)
-    def network(self, search_key=False, **post):
+    _networks_per_page = 8
+
+    @http.route([
+        '/networks',
+        '/networks/page/<int:page>'
+        ], auth='public', type='http', website=True)
+    def network(self, search=False, page=1, **post):
         network_obj = request.env['groupme.network']
 
         res_user = request.env.user
@@ -21,16 +25,28 @@ class GroupMe(http.Controller):
 
         if public_user != res_user:
             domain += [('author_id', '=', res_user.id)]
+        else:
+            domain += [('website_published', '=', True)]
 
-        if search_key:
-            domain += [("name", "ilike", search_key)]
+        if search:
+            domain += [("name", "ilike", search)]
 
-        networks = network_obj.search(domain)
+        pager_url = "/networks"
+        pager_args = {}
+
+        pager_count = network_obj.search_count(domain)
+        pager = request.website.pager(url=pager_url, total=pager_count, page=page,
+                                      step=self._networks_per_page, scope=self._networks_per_page,
+                                      url_args=pager_args)
+
+        networks = network_obj.search(domain, limit=self._networks_per_page, offset=pager['offset'])
 
         return request.render('groupme.networks', {
             'networks': networks,
             'is_public_user': res_user == public_user,
-            'search': search_key
+            'search': search,
+            'pager': pager,
+            'user_id': res_user
         })
 
     @http.route('/networks/network/<model("groupme.network"):network_id>', auth='public', type='http', website=True)
@@ -87,33 +103,27 @@ class GroupMe(http.Controller):
             contextual_slide = network_id
             post_kwargs = {}
 
+        body = "%s - %s" % (post['comment'], post['link'])
         contextual_slide.message_post(
-            body=post['comment'],
+            body=body,
             type='comment',
             subtype='mt_comment',
             **post_kwargs
         )
         return werkzeug.utils.redirect(request.httprequest.referrer + "#discuss")
 
-    # @http.route('/networks/new', auth='public', type='http', website=True)
-    # def group_new(self):
-    #     res_user = request.env.user
-    #     public_user = request.website.user_id
-
-    #     return request.render('groupme.networks_create', {
-    #         'user': res_user,
-    #         'is_public_user': res_user == public_user
-    #     })
-
     @http.route(['/networks/network/add_network'], type='json', auth='user', methods=['POST'], website=True)
     def create_network(self, *args, **post):
+        category_obj = request.env['groupme.network.category']
+        network_obj = request.env['groupme.network']
 
         values = post
         values['author_id'] = request.env.uid
+        values['website_message_ids'] = [6, 0,  [request.env.uid]]
 
-        if post.get('category_id'):
-            if post['category_id'][0] == 0:
-                values['category_id'] = request.env['groupme.network.category'].create({
+        if post.get('category_id', False):
+            if post.get('category_id')[0] == 0:
+                values['category_id'] = category_objcreate({
                     'name': post['category_id'][1]['name'],
                     'description': '',
                     'icon': ''}).id
@@ -121,24 +131,8 @@ class GroupMe(http.Controller):
                 values['category_id'] = post['category_id'][0]
 
         try:
-            network_id = request.env['groupme.network'].create(values)
+            network_id = network_obj.sudo()(values)
         except Exception as e:
-            return {'error': _('Internal server error, please try again later or contact administrator.\nHere is the error message: %s' % e.message)}
+            return {'error': 'Internal server error, please try again later or contact administrator.\nHere is the error message: %s' % e.message}
+        
         return {'url': "/networks/network/%s" % (network_id.id)}
-
-    # @http.route('/networks/save', auth='public', type='http', website=True)
-    # def group_save(self, **post):
-    #     group_obj = request.env['groupme.network']
-    #     rec = {
-    #         'name': post.get('name'),
-    #         'code': post.get('code'),
-    #         'visibility': post.get('visibility'),
-    #         'author_id': request.env.user.id
-    #     }
-    #     rec_id = group_obj.create(rec)
-    #     if rec_id:
-    #         url = '/network/%s' % (rec_id.id)
-    #         return request.redirect(url)
-    #     else:
-    # TODO: move to error page if new group not created
-    #         pass
