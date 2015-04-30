@@ -122,7 +122,6 @@ class GroupMe(http.Controller):
 
         values = post
         values['author_id'] = request.env.uid
-        # values['website_message_ids'] = [0, 0, {'res_id', request.env.uid}]
 
         if post.get('category_id', False):
             if post.get('category_id')[0] == 0:
@@ -134,7 +133,8 @@ class GroupMe(http.Controller):
                 values['category_id'] = post['category_id'][0]
 
         try:
-            network_id = network_obj.create(values)
+            network_id = network_obj.sudo().create(values)
+            network_obj.message_subscribe([network_id], [request.env.uid])
         except Exception as e:
             return {'error': 'Internal server error, please try again later or contact administrator.\nHere is the error message: %s' % e.message}
         return {'url': "/networks/network/%s" % (network_id.id)}

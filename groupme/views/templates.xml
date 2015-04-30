@@ -211,6 +211,30 @@
                 </div>
 
                 <div class="tab-pane" id="members">
+                  <div class="row mb16">
+                    <div class="col-md-6">
+
+                    </div>
+                    <div class="col-md-6">
+                      <form method="get" action="/networks">
+                        <div class="input-group">
+                          <input type="search" class="form-control" name="search" t-attf-placeholder="Search for members" t-att-value="search"/>
+                          <span class="input-group-btn">
+                            <a class="btn btn-danger" href="/networks" t-if="search">
+                              <i class="fa fa-times"></i>
+                            </a>
+
+                            <button class="btn btn-primary" type="submit">
+                              <i class="fa fa-search"></i>
+                            </button>
+                            <a class="btn btn-success oe_js_network_new" title="Invite Members">
+                              <i class="fa fa-plus"></i> Invite
+                            </a>
+                          </span>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
                   <div class="col-xs-4" t-foreach="network.sudo().message_follower_ids" t-as="user">
                     <div class="row well" style="padding: 5px;margin-right: 1px;">
                       <div class="col-xs-3" style="height:60px;width:60px;padding: 0px;overflow: hidden;">
@@ -220,7 +244,7 @@
                         <a a-attf-href="/networks/user/#{user.id}"><span t-field="user.name"/></a>
                         <span src="/website/image/res.partner/#{user.id}/image"></span>
                         <div>
-                          <b> Badges:</b>
+                          <span t-field="user.email" class="text-muted"/>
                         </div>
                       </div>
                     </div>
@@ -279,7 +303,6 @@
                   </div>
                 </div>
               </div>              
-=======
                 </div> -->
               </div>
             </div>

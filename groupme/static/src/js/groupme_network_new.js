@@ -8,6 +8,7 @@ odoo.define('groupme.network.new', function (require) {
     var _t = core._t;
 
     $(document).ready(function () {
+        website.add_template_file('/groupme/static/src/xml/groupme_network_new.xml');
         var NetworkDialog = Widget.extend({
             template: 'groupme.network_new',
             events: {
@@ -36,7 +37,7 @@ odoo.define('groupme.network.new', function (require) {
                 width: '100%',
                 placeholder: tag,
                 allowClear: true,
-                formatNoMatches: _.str.sprintf(_t("No matches found in %s"), tag),
+                formatNoMatches: _.str.sprintf(_t("No matches found. Type to create new %s"), tag),
                 multiple: multi,
                 selection_data: false,
                 fetch_rpc_fnc : fetch_fnc,
@@ -47,13 +48,12 @@ odoo.define('groupme.network.new', function (require) {
                     return data.text;
                 },
                 createSearchChoice: function (term) {
-                    if( tag == "Tags")
-                        return {
-                            id: _.uniqueId('tag_'),
-                            create: true,
-                            tag: term,
-                            text: _.str.sprintf(_t("Create New %s '%s'"), tag, term)
-                        };
+                    return {
+                        id: _.uniqueId('tag_'),
+                        create: true,
+                        tag: term,
+                        text: _.str.sprintf(_t("Create New %s '%s'"), tag, term)
+                    };
                 },
                 fill_data: function (query, data) {
                     var that = this,
@@ -159,7 +159,6 @@ odoo.define('groupme.network.new', function (require) {
                 }
                 $('.oe_network_creating').show();
                 $('.modal-footer, .modal-body').hide();
-                console.log("===== jsonRpc Starts..........", values);
                 ajax.jsonRpc("/networks/network/add_network", 'call', values).then(function (data) {
                     if (data.error) {
                         self.display_alert(data.error);
@@ -178,13 +177,8 @@ odoo.define('groupme.network.new', function (require) {
         });
 
         $('.oe_js_network_new').on('click', function () {
-            var self = this;
             console.log("=============== Button Click ================");
-            website.add_template_file('/groupme/static/src/xml/groupme_network_new.xml').done(function() {
-                var $net_new = new NetworkDialog(self).appendTo(document.body);                
-                $('#s2id_tag_ids').addClass('form-control');
-                $('#s2id_category_id').addClass('form-control');
-            });
+            var $net_new = new NetworkDialog(this).appendTo(document.body);
         });
     });
 });
