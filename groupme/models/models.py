@@ -38,7 +38,8 @@ class Tag(models.Model):
 class Network(models.Model):
     _name = 'groupme.network'
     _description = 'Network'
-    _inherit = ['mail.thread', 'website.seo.metadata', 'website.published.mixin']
+    _inherit = [
+        'mail.thread', 'website.seo.metadata', 'website.published.mixin']
 
     category_id = fields.Many2one('groupme.network.category', 'Category')
     tag_ids = fields.Many2many(
@@ -68,7 +69,8 @@ class Network(models.Model):
     message_per_day = fields.Integer('Message per Day', default=10)
     website_message_ids = fields.One2many(
         'mail.message', 'res_id',
-        domain=lambda self: [('model', '=', self._name), ('type', '=', 'comment')],
+        domain=lambda self: [
+            ('model', '=', self._name), ('type', '=', 'comment')],
         string='Website Messages', help="Website communication history")
 
     @api.depends('image')

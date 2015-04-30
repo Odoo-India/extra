@@ -3,10 +3,11 @@
 import werkzeug
 
 from openerp import http
-from openerp import SUPERUSER_ID
+# from openerp import SUPERUSER_ID
 from openerp.tools.misc import ustr
 from openerp.addons.web.http import request
 from openerp.tools.mail import html2plaintext
+
 
 class GroupMe(http.Controller):
 
@@ -36,7 +37,7 @@ class GroupMe(http.Controller):
     def group_details(self, network_id):
         res_user = request.env.user
         public_user = request.website.user_id
-        
+
         return request.render('groupme.network_view', {
             'user': res_user,
             'network': network_id,
@@ -63,9 +64,12 @@ class GroupMe(http.Controller):
                 return werkzeug.utils.redirect(request.httprequest.referrer + "#discuss")
             # TDE FIXME: public user has no right to create mail.message, should
             # be investigated - using SUPERUSER_ID meanwhile
-            contextual_slide = network_id.sudo().with_context(mail_create_nosubcribe=True)
-            # TDE FIXME: check in mail_thread, find partner from emails should maybe work as public user
-            partner_id = network_id.sudo()._find_partner_from_emails([post.get('email')])[0][0]
+            contextual_slide = network_id.sudo().with_context(
+                mail_create_nosubcribe=True)
+            # TDE FIXME: check in mail_thread, find partner from emails should
+            # maybe work as public user
+            partner_id = network_id.sudo()._find_partner_from_emails(
+                [post.get('email')])[0][0]
             if partner_id:
                 partner = request.env['res.partner'].sudo().browse(partner_id)
             else:
@@ -91,30 +95,50 @@ class GroupMe(http.Controller):
         )
         return werkzeug.utils.redirect(request.httprequest.referrer + "#discuss")
 
+    # @http.route('/networks/new', auth='public', type='http', website=True)
+    # def group_new(self):
+    #     res_user = request.env.user
+    #     public_user = request.website.user_id
 
-    @http.route('/networks/new', auth='public', type='http', website=True)
-    def group_create(self):
-        res_user = request.env.user
-        public_user = request.website.user_id
+    #     return request.render('groupme.networks_create', {
+    #         'user': res_user,
+    #         'is_public_user': res_user == public_user
+    #     })
 
-        return request.render('groupme.networks_create', {
-            'user': res_user,
-            'is_public_user': res_user == public_user
-        })
+    @http.route(['/networks/network/add_network'], type='json', auth='user', methods=['POST'], website=True)
+    def create_network(self, *args, **post):
 
-    @http.route('/networks/save', auth='public', type='http', website=True)
-    def group_save(self, **post):
-        group_obj = request.env['groupme.network']
-        rec = {
-            'name': post.get('name'),
-            'code': post.get('code'),
-            'visibility': post.get('visibility'),
-            'author_id': request.env.user.id
-        }
-        rec_id = group_obj.create(rec)
-        if rec_id:
-            url = '/network/%s' % (rec_id.id)
-            return request.redirect(url)
-        else:
-            # TODO: move to error page if new group not created
-            pass
+        values = post
+        values['author_id'] = request.env.uid
+
+        if post.get('category_id'):
+            if post['category_id'][0] == 0:
+                values['category_id'] = request.env['groupme.network.category'].create({
+                    'name': post['category_id'][1]['name'],
+                    'description': '',
+                    'icon': ''}).id
+            else:
+                values['category_id'] = post['category_id'][0]
+
+        try:
+            network_id = request.env['groupme.network'].create(values)
+        except Exception as e:
+            return {'error': _('Internal server error, please try again later or contact administrator.\nHere is the error message: %s' % e.message)}
+        return {'url': "/networks/network/%s" % (network_id.id)}
+
+    # @http.route('/networks/save', auth='public', type='http', website=True)
+    # def group_save(self, **post):
+    #     group_obj = request.env['groupme.network']
+    #     rec = {
+    #         'name': post.get('name'),
+    #         'code': post.get('code'),
+    #         'visibility': post.get('visibility'),
+    #         'author_id': request.env.user.id
+    #     }
+    #     rec_id = group_obj.create(rec)
+    #     if rec_id:
+    #         url = '/network/%s' % (rec_id.id)
+    #         return request.redirect(url)
+    #     else:
+    # TODO: move to error page if new group not created
+    #         pass
