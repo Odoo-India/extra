@@ -20,9 +20,12 @@
       <section class="jumbotron s_button mb16">
         <div class="container">
           <div class="row">
-            <div class="col-md-12 col-xs-12">
+            <div class="col-md-8 col-xs-8">
               <p class="mb0">
-                <strong class="o_default_snippet_text">50,000 people use GroupMe.in</strong>, <i>Create a free group. we do not sale advertise.</i>
+                <strong class="o_default_snippet_text">Thousands of people use Groupme.in</strong>
+              </p>
+              <p class="mb0 o_default_snippet_text text-muted">
+                Create a free group for family, friends, business, clubs, schools and colleges.
               </p>
             </div>
           </div>
