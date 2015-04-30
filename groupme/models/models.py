@@ -85,9 +85,6 @@ class Network(models.Model):
                 record.image_medium = False
                 record.iamge_thumb = False
 
-    def save(self, **post):
-        logger.info(post)
-
 
 class res_partner(models.Model):
     _inherit = 'res.partner'

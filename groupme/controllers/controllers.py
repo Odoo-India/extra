@@ -8,6 +8,7 @@ from openerp.tools.misc import ustr
 from openerp.addons.web.http import request
 from openerp.tools.mail import html2plaintext
 
+
 class GroupMe(http.Controller):
 
     _networks_per_page = 8
@@ -15,7 +16,7 @@ class GroupMe(http.Controller):
     @http.route([
         '/networks',
         '/networks/page/<int:page>'
-        ], auth='public', type='http', website=True)
+    ], auth='public', type='http', website=True)
     def network(self, search=False, page=1, **post):
         network_obj = request.env['groupme.network']
 
@@ -39,7 +40,8 @@ class GroupMe(http.Controller):
                                       step=self._networks_per_page, scope=self._networks_per_page,
                                       url_args=pager_args)
 
-        networks = network_obj.search(domain, limit=self._networks_per_page, offset=pager['offset'])
+        networks = network_obj.search(
+            domain, limit=self._networks_per_page, offset=pager['offset'])
 
         return request.render('groupme.networks', {
             'networks': networks,
@@ -112,18 +114,19 @@ class GroupMe(http.Controller):
         )
         return werkzeug.utils.redirect(request.httprequest.referrer + "#discuss")
 
-    @http.route(['/networks/network/add_network'], type='json', auth='user', methods=['POST'], website=True)
+    @http.route(['/networks/network/add_network'], type='json',
+                auth='user', methods=['POST'], website=True)
     def create_network(self, *args, **post):
         category_obj = request.env['groupme.network.category']
         network_obj = request.env['groupme.network']
 
         values = post
         values['author_id'] = request.env.uid
-        values['website_message_ids'] = [6, 0,  [request.env.uid]]
+        # values['website_message_ids'] = [0, 0, {'res_id', request.env.uid}]
 
         if post.get('category_id', False):
             if post.get('category_id')[0] == 0:
-                values['category_id'] = category_objcreate({
+                values['category_id'] = category_obj.create({
                     'name': post['category_id'][1]['name'],
                     'description': '',
                     'icon': ''}).id
@@ -131,8 +134,7 @@ class GroupMe(http.Controller):
                 values['category_id'] = post['category_id'][0]
 
         try:
-            network_id = network_obj.sudo()(values)
+            network_id = network_obj.create(values)
         except Exception as e:
             return {'error': 'Internal server error, please try again later or contact administrator.\nHere is the error message: %s' % e.message}
-        
         return {'url': "/networks/network/%s" % (network_id.id)}

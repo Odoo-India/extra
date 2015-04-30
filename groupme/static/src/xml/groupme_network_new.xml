@@ -4,7 +4,9 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <a class="close" data-dismiss="modal" aria-hidden="true">
+                            <span class="fa fa-times"></span>
+                        </a>
                         <h3 class="modal-title">Create Group</h3>
                     </div>
                     <div class="oe_network_creating text-center" style="display:none">
@@ -14,26 +16,35 @@
                     <div class="modal-body">
                         <form class="clearfix form-horizontal">                            
                             <div class="form-group">
-                                <label for="name" class="control-label col-sm-2">Name</label>
-                                <div class="col-sm-10">
+                                <label for="name" class="control-label col-sm-2 pr0">Name</label>
+                                <div class="col-sm-10 pl8">
                                     <input id="name" name="name" placeholder="Title" class="form-control" required="required"/>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="code" class="control-label col-sm-2">Code</label>
-                                <div class="controls col-sm-10">
+                                <label for="code" class="control-label col-sm-2 pr0">Code</label>
+                                <div class="controls col-sm-10 pl8">
                                     <input id="code" name="code" placeholder="Code" class="form-control" required="required"/>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="tag_ids" class="control-label col-sm-2">Tags</label>
-                                <div class="controls col-sm-10">
+                                <label for="visibility" class="control-label col-sm-2 pr0">Visible</label>
+                                <div class="controls col-sm-10 pl8">
+                                    <select name="visibility" id="visibility" required="required" class="form-control">
+                                        <option value="public">Public</option>
+                                        <option value="private">Private</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="tag_ids" class="control-label col-sm-2 pr0">Tags</label>
+                                <div class="controls col-sm-10 pl8">
                                     <input id="tag_ids" type="hidden"/>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="category_id" class="control-label col-sm-2">Category</label>
-                                <div class="controls col-sm-10">
+                                <label for="category_id" class="control-label col-sm-2 pr0">Category</label>
+                                <div class="controls col-sm-10 pl8">
                                     <input id="category_id" type="hidden"/>
                                 </div>
                             </div>
