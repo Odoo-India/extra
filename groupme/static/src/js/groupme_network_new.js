@@ -326,7 +326,7 @@ odoo.define('groupme.network.new', function (require) {
         $('.oe_js_invite').on('click', function () {
             $('.nav-tabs a[href="#members"]').tab('show');
             website.add_template_file('/groupme/static/src/xml/groupme_network_invite.xml').done(function() {
-                var network_id = $('.oe_js_invite').data('network_id');                
+                var network_id = $('.oe_js_invite').data('network_id');
                 var $invite_people = new InvitationDialog(self, network_id).appendTo(document.body);
             });
         });

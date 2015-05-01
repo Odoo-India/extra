@@ -227,7 +227,7 @@
                 <a href="#members" role="tab" data-toggle="tab">
                   <i class="fa fa-users text-muted"></i> <span t-esc="len(network.sudo().message_follower_ids)"/> members
                 </a>
-                <a class="btn btn-success btn-xs pull-right" type="button" t-if="not is_public_user">Invite</a>
+                <a class="btn btn-success btn-xs pull-right oe_js_invite" type="button" t-if="not is_public_user" t-attf-data-network_id="#{network.id}">Invite</a>
               </p>
               <p style="border-bottom: 1px solid #eee;padding-bottom: 5px;"><i class="fa fa-comments-o text-muted"></i> <span t-esc="network.message_per_day"/> message / day</p>
               <p><i t-attf-class="fa #{network.category_id.icon} text-muted"></i> <span t-esc="network.category_id.name"/></p>
@@ -278,10 +278,6 @@
 
                 <li role="presentation" class="pull-right" t-if="not is_public_user">
                   <div>
-                    <a class="btn btn-primary oe_js_invite" t-attf-data-network_id="#{network.id}" title="Invite Members">
-                              <i class="fa fa-plus"></i> Invite
-                            </a>
-                    &amp;nbsp;
                     <button type="submit" class="btn btn-default"> <i class="fa fa-pencil"></i> Edit Group</button>
                     &amp;nbsp;
                     <t t-call="website.publish_management">
