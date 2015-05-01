@@ -131,3 +131,9 @@ class GroupMe(http.Controller):
         except Exception as e:
             return {'error': 'Internal server error, please try again later or contact administrator.\nHere is the error message: %s' % e.message}
         return {'url': "/networks/network/%s" % (network_id.id)}
+
+    @http.route(['/networks/network/invite_people'], type='json',
+                auth='user', methods=['POST'], website=True)
+    def invite_people(self, *args, **post):
+        print "=========== Invited Members (Post) : ", post
+        return {'result': 'true'}

@@ -260,17 +260,17 @@
 
             <div class="col-md-9" t-if="not is_public_user">
               <ul class="nav nav-tabs">
-                <li role="presentation" class="active">
+                <li class="active">
                   <a href="#about" role="tab" data-toggle="tab">
                     <i class="fa fa-home"></i> About
                   </a>
                 </li>
-                <li role="presentation">
+                <li>
                   <a href="#members" role="tab" data-toggle="tab">
                     <i class="fa fa-users"></i> Members
                   </a>
                 </li>
-                <li role="presentation">
+                <li>
                   <a href="#messages" role="tab" data-toggle="tab">
                     <i class="fa fa-comments-o"></i> Messages
                   </a>
@@ -278,6 +278,10 @@
 
                 <li role="presentation" class="pull-right" t-if="not is_public_user">
                   <div>
+                    <a class="btn btn-primary oe_js_invite" t-attf-data-network_id="#{network.id}" title="Invite Members">
+                              <i class="fa fa-plus"></i> Invite
+                            </a>
+                    &amp;nbsp;
                     <button type="submit" class="btn btn-default"> <i class="fa fa-pencil"></i> Edit Group</button>
                     &amp;nbsp;
                     <t t-call="website.publish_management">
@@ -294,8 +298,32 @@
                 </div>
 
                 <div class="tab-pane" id="members">
+                  <!-- <div class="row mb16">
+                    <div class="col-md-6">
 
-                  <div class="col-md-4" t-foreach="network.sudo().message_follower_ids" t-as="user">
+                    </div>
+                    <div class="col-md-6">
+                      <form method="get" action="/networks">
+                        <div class="input-group">
+                          <input type="search" class="form-control" name="search" t-attf-placeholder="Search for members" t-att-value="search"/>
+                          <span class="input-group-btn">
+                            <a class="btn btn-danger" href="/networks" t-if="search">
+                              <i class="fa fa-times"></i>
+                            </a>
+
+                            <button class="btn btn-primary" type="submit">
+                              <i class="fa fa-search"></i>
+                            </button>
+                            <a class="btn btn-success oe_js_network_new" title="Invite Members">
+                              <i class="fa fa-plus"></i> Invite
+                            </a>
+                          </span>
+                        </div>
+                      </form>
+                    </div>
+                  </div> -->
+
+                  <div class="col-xs-4" t-foreach="network.sudo().message_follower_ids" t-as="user">
                     <t t-call="groupme.user_card"/>
                   </div>
                 </div>
