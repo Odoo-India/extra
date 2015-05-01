@@ -56,8 +56,6 @@ class Network(models.Model):
     image_thumb = fields.Binary('Thumbnail', compute="_get_image", store=True)
 
     author_id = fields.Many2one('res.users', 'Admin')
-    member_ids = fields.Many2many(
-        'res.partner', 'rel_network_users', 'network_id', 'user_id', string='Members')
 
     star = fields.Boolean('Star Group')
     active = fields.Boolean('Active', default=True)
@@ -72,6 +70,7 @@ class Network(models.Model):
         domain=lambda self: [
             ('model', '=', self._name), ('type', '=', 'comment')],
         string='Website Messages', help="Website communication history")
+    view_message = fields.Boolean('Message Visible', default=False)
 
     @api.depends('image')
     def _get_image(self):
@@ -86,10 +85,13 @@ class Network(models.Model):
                 record.iamge_thumb = False
 
 
+class MailMessage(models.Model):
+    _inherit = 'mail.message'
+
+    active = fields.Boolean('Active', default=True)
+
+
 class res_partner(models.Model):
     _inherit = 'res.partner'
 
-    network_ids = fields.Many2many(
-        'res.partner', 'rel_network_users', 'user_id', 'network_id', string='Members')
-    company_name = fields.Char('Company')
     devicekey = fields.Char('Device Key')

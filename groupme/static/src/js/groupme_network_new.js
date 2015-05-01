@@ -8,7 +8,7 @@ odoo.define('groupme.network.new', function (require) {
     var _t = core._t;
 
     $(document).ready(function () {
-        website.add_template_file('/groupme/static/src/xml/groupme_network_new.xml');
+        //website.add_template_file('/groupme/static/src/xml/groupme_network_new.xml');
         var NetworkDialog = Widget.extend({
             template: 'groupme.network_new',
             events: {
@@ -177,8 +177,13 @@ odoo.define('groupme.network.new', function (require) {
         });
 
         $('.oe_js_network_new').on('click', function () {
-            console.log("=============== Button Click ================");
-            var $net_new = new NetworkDialog(this).appendTo(document.body);
+            website.add_template_file('/groupme/static/src/xml/groupme_network_new.xml').done(function() {
+                var $net_new = new NetworkDialog(self).appendTo(document.body);                
+                $('#s2id_tag_ids').addClass('form-control');
+
+                $('#s2id_category_id').addClass('form-control');
+                $('#s2id_category_id a').css('height', '30px').children('span').css('margin-top','2px');
+            });
         });
     });
 });

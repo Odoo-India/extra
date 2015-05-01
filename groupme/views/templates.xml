@@ -83,7 +83,7 @@
                     <button class="btn btn-primary" type="submit">
                       <i class="fa fa-search"></i>
                     </button>
-                    <a class="btn btn-success oe_js_network_new" title="Create Group">
+                    <a class="btn btn-success oe_js_network_new" title="Create Group" t-if="not is_public_user">
                       <i class="fa fa-plus"></i> Create
                     </a>
                   </span>
@@ -136,6 +136,26 @@
       </div>
     </template>
 
+    <!-- user card -->
+    <template id="user_card">
+      <div class="row well" style="padding: 5px;margin-right: 1px;">
+        <div class="col-xs-3" style="height:60px;width:60px;padding: 0px;overflow: hidden;">
+          <img class="img img-avatar" t-attf-src="/website/image/res.partner/#{user.id}/image" style="padding: 0px;width:100%"/>
+        </div>
+        <div class="col-xs-9">
+          <i class="fa fa-circle text-success"></i> <a a-attf-href="/networks/user/#{user.id}"><span t-field="user.name"/></a>
+          <span src="/website/image/res.partner/#{user.id}/image"></span>
+          <div>
+            <small t-field="user.email" class="text-muted"/>
+          </div>
+          <div>
+            <!-- <i t-attf-class="fa fa-circle #{user.state == 'active' and 'text-success' 'text-danger'}"></i> Active -->
+             <small class="text-muted">Last seen, 20 minutes ago</small>
+          </div>
+        </div>
+      </div>
+    </template>
+
     <!-- group page view -->
     <template id="network_view">
       <t t-call="website.layout">
@@ -145,6 +165,7 @@
               <div class="group-image">
                 <span itemprop="image" t-field="network.image" t-field-options='{"widget": "image", "class": "img img-responsive img-rounded"}' style="width:100%"/>
               </div>
+              <small class="text-muted" t-if="not is_public_user">Required image resolution is 250px X 200px</small>
 
               <h3><span t-field="network.name"/></h3>
               <p style="border-bottom: 1px solid #eee;padding-bottom: 5px;">
@@ -235,24 +256,19 @@
                       </form>
                     </div>
                   </div>
+
                   <div class="col-xs-4" t-foreach="network.sudo().message_follower_ids" t-as="user">
-                    <div class="row well" style="padding: 5px;margin-right: 1px;">
-                      <div class="col-xs-3" style="height:60px;width:60px;padding: 0px;overflow: hidden;">
-                        <img class="img img-avatar" t-attf-src="/website/image/res.partner/#{user.id}/image" style="padding: 0px;width:100%"/>
-                      </div>
-                      <div class="col-xs-9">
-                        <a a-attf-href="/networks/user/#{user.id}"><span t-field="user.name"/></a>
-                        <span src="/website/image/res.partner/#{user.id}/image"></span>
-                        <div>
-                          <span t-field="user.email" class="text-muted"/>
-                        </div>
-                      </div>
-                    </div>
+                    <t t-call="groupme.user_card"/>
                   </div>
                 </div>
 
                 <div class="tab-pane" id="messages">
-                  <div class="alert alert-danger alert-dismissable mb16">
+                  <div class="alert alert-danger alert-dismissable mb16" t-if="not network.view_message">
+                    <p>
+                      We do not store any message sent by you or any of your group members in our system, without your permission <a href="#">click here</a> to enable to track all message sent in this group
+                    </p>
+                  </div>
+                  <div class="alert alert-success alert-dismissable mb16" t-if="network.view_message">
                     <p>
                       We do not store any message sent by you or any of your group members in our system, without your permission <a href="#">click here</a> to enable to track all message sent in this group
                     </p>
@@ -282,9 +298,7 @@
                       </div>
                     </form>
                   </div>
-                </div>
-
-                  <!-- <div class="oe_network_messages mt16" t-if="comments">
+                  <div class="oe_network_messages mt16" t-if="comments">
                     <h4 class="text-muted" style="border-bottom: 1px solid #ccc;padding-bottom: 5px;"><span t-esc="len(comments)"/> Messages sent</h4>
 
                     <ul class="media-list mt8">
@@ -302,8 +316,6 @@
                     </ul>
                   </div>
                 </div>
-              </div>              
-                </div> -->
               </div>
             </div>
         </div>

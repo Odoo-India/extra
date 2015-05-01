@@ -11,7 +11,7 @@ from openerp.tools.mail import html2plaintext
 
 class GroupMe(http.Controller):
 
-    _networks_per_page = 8
+    _networks_per_page = 12
 
     @http.route([
         '/networks',
@@ -110,12 +110,12 @@ class GroupMe(http.Controller):
             body=body,
             type='comment',
             subtype='mt_comment',
+            active=network_id.view_message,
             **post_kwargs
         )
         return werkzeug.utils.redirect(request.httprequest.referrer + "#discuss")
 
-    @http.route(['/networks/network/add_network'], type='json',
-                auth='user', methods=['POST'], website=True)
+    @http.route(['/networks/network/add_network'], type='json', auth='user', methods=['POST'], website=True)
     def create_network(self, *args, **post):
         category_obj = request.env['groupme.network.category']
         network_obj = request.env['groupme.network']
@@ -124,17 +124,10 @@ class GroupMe(http.Controller):
         values['author_id'] = request.env.uid
 
         if post.get('category_id', False):
-            if post.get('category_id')[0] == 0:
-                values['category_id'] = category_obj.create({
-                    'name': post['category_id'][1]['name'],
-                    'description': '',
-                    'icon': ''}).id
-            else:
-                values['category_id'] = post['category_id'][0]
+            values['category_id'] = post['category_id'][0]
 
         try:
-            network_id = network_obj.sudo().create(values)
-            network_obj.message_subscribe([network_id], [request.env.uid])
+            network_id = network_obj.create(values)
         except Exception as e:
             return {'error': 'Internal server error, please try again later or contact administrator.\nHere is the error message: %s' % e.message}
         return {'url': "/networks/network/%s" % (network_id.id)}
