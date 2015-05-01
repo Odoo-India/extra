@@ -16,6 +16,58 @@
     </template>
 
     <!-- header for the network list and category -->
+    <template id="state_counter">
+      <section class="jumbotron s_button mb16" style="padding: 0px">
+        <div class="container">
+          <div class="row">
+
+            <div class="col-md-4 text-center">
+              <h1><i class="fa fa-users"></i></h1>
+              <div class="text">
+                <p class="lead">4k Groups</p>
+              </div>
+            </div>
+
+            <div class="col-md-4 text-center">
+              <h1><i class="fa fa-smile-o"></i></h1>
+              <div class="text">
+                <p class="lead">12k Members</p>
+              </div>
+            </div>
+
+            <div class="col-md-4 text-center">
+              <h1><i class="fa fa-comments-o"></i></h1>
+              <div class="text">
+                <p class="lead">120k Messages</p>
+              </div>
+            </div>
+<!-- 
+            <div class="col-md-2 text-center">
+              <h1>40k</h1>
+              <div class="text">
+                <p class="lead">Groups</p>
+              </div>
+            </div>
+
+            <div class="col-md-2 text-center">
+              <h1>12k</h1>
+              <div class="text">
+                <p class="lead">Members</p>
+              </div>
+            </div>
+
+            <div class="col-md-2 text-center">
+              <h1>120k</h1>
+              <div class="text">
+                <p class="lead">Messages</p>
+              </div>
+            </div> -->
+
+          </div>
+        </div>
+      </section>
+    </template>
+
     <template id="networksheader">
       <section class="jumbotron s_button mb16">
         <div class="container">
@@ -55,21 +107,11 @@
     <!-- display list of groups -->
     <template id="networks">
       <t t-call="website.layout">
-        <t t-call="groupme.networksheader"/>
+        <t t-call="groupme.state_counter"/>
         <div class="container">
           <div class="row" style="border-bottom: 1px solid #eee;padding-bottom: 15px;">
             <div class="col-md-8">
-<!--               <button type="button" class="btn btn-default" aria-label="Left Align">
-                <i class="fa fa-university"></i> Clubs
-              </button>
-              <button type="button" class="btn btn-default" aria-label="Left Align">
-                <i class="fa fa-building-o"></i> Schools &amp; Colleges
-              </button>
-              <button type="button" class="btn btn-default" aria-label="Left Align">
-                <i class="fa fa-suitcase"></i> Business
-              </button> -->
               <t t-call="website.pager" style="margin: auto;"/>
-              <!-- <span style="font-size: x-large;">500 groups, 5000 users, 200K messages</span> -->
             </div>
             <div class="col-md-4">
               <form method="get" action="/networks">
@@ -109,11 +151,10 @@
       <div class="thumbnail">
         <a t-attf-href="/networks/network/#{network.id}">
           <div class="group-image" t-attf-style="background: url('/website/image/groupme.network/#{network.id}/image_thumb');">
-            <!-- <img t-attf-src="/website/image/groupme.network/#{network.id}/image_thumb" t-att-alt="network.name" class="img img-responsive" style="width:100%;"/> -->
           </div>
         </a>
         <div class="caption">
-          <h3 style="margin-top: 5px;" class="oe_textoverflow"><span t-field="network.name"/></h3>
+          <h4 style="margin-top: 5px;" class="oe_group_ellipsis"><span t-field="network.name"/></h4>
           <p class="text-muted clearfix">
             <small class="pull-left"><span t-esc="len(network.message_follower_ids)"/> members</small>
             <small class="pull-right"><timeago class="timeago" t-att-datetime="network.create_date"></timeago></small>
@@ -143,14 +184,14 @@
           <img class="img img-avatar" t-attf-src="/website/image/res.partner/#{user.id}/image" style="padding: 0px;width:100%"/>
         </div>
         <div class="col-xs-9">
-          <i class="fa fa-circle text-success"></i> <a a-attf-href="/networks/user/#{user.id}"><span t-field="user.name"/></a>
-          <span src="/website/image/res.partner/#{user.id}/image"></span>
+          <div class="text-success">
+            <i class="fa fa-circle"></i> <strong t-field="user.name"/>
+          </div>
           <div>
             <small t-field="user.email" class="text-muted"/>
           </div>
           <div>
-            <!-- <i t-attf-class="fa fa-circle #{user.state == 'active' and 'text-success' 'text-danger'}"></i> Active -->
-             <small class="text-muted">Last seen, 20 minutes ago</small>
+             <small class="text-muted">Last seen, now</small>
           </div>
         </div>
       </div>
@@ -161,17 +202,20 @@
       <t t-call="website.layout">
         <t t-call="groupme.networksheader"/>
         <div class="container">
-            <div class="col-md-3 pl0">
+          <div class="row">
+            <div class="col-md-3">
               <div class="group-image">
                 <span itemprop="image" t-field="network.image" t-field-options='{"widget": "image", "class": "img img-responsive img-rounded"}' style="width:100%"/>
               </div>
               <small class="text-muted" t-if="not is_public_user">Required image resolution is 250px X 200px</small>
 
+              
               <h3><span t-field="network.name"/></h3>
               <p style="border-bottom: 1px solid #eee;padding-bottom: 5px;">
-                <code><span t-esc="network.code"/> </code>
+                <code class="strong"><strong t-esc="network.code"/> </code>
                 <button class="btn btn-success btn-xs pull-right" type="button" t-if="network.visibility!='private'">Join Group</button>
               </p>
+
               <p t-if="network.visibility=='private'">
                 <i class="fa fa-lock text-muted"></i> Private Group
               </p>
@@ -179,7 +223,12 @@
               <p><i class="fa fa-map-marker text-muted"></i> <span t-field="network.location"/></p>
               <p><i class="fa fa-globe text-muted"></i> <a t-attf-href="network.sudo().author_id.website" target="_new"><span t-field="network.sudo().author_id.website"/></a></p>
               <p><i class="fa fa-clock-o text-muted"></i> <timeago class="timeago" t-att-datetime="network.create_date"/></p>
-              <p><i class="fa fa-users text-muted"></i> <span t-esc="len(network.sudo().message_follower_ids)"/> members</p>
+              <p>
+                <a href="#members" role="tab" data-toggle="tab">
+                  <i class="fa fa-users text-muted"></i> <span t-esc="len(network.sudo().message_follower_ids)"/> members
+                </a>
+                <a class="btn btn-success btn-xs pull-right" type="button" t-if="not is_public_user">Invite</a>
+              </p>
               <p style="border-bottom: 1px solid #eee;padding-bottom: 5px;"><i class="fa fa-comments-o text-muted"></i> <span t-esc="network.message_per_day"/> message / day</p>
               <p><i t-attf-class="fa #{network.category_id.icon} text-muted"></i> <span t-esc="network.category_id.name"/></p>
               <p t-if="network.tag_ids">
@@ -190,9 +239,22 @@
                   </a>
                 </t>
               </p>
+              <p style="border-bottom: 1px solid #eee;padding-bottom: 5px;"/>
+
+              <div>
+                <p class="o_default_snippet_text">
+                  Share
+                  <a target="_Blank" class="oe_share_facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Flocalhost%3A8069%2Fnetworks%2Fnetwork%2Fodoo-employees-1"><i class="fa fa-facebook-square"></i></a>
+                  <a target="_Blank" class="oe_share_twitter" href="https://twitter.com/intent/tweet?text=network_view %7C localhost&amp;url=http%3A%2F%2Flocalhost%3A8069%2Fnetworks%2Fnetwork%2Fodoo-employees-1"><i class="fa fa-twitter"></i></a>
+                  <a target="_Blank" class="oe_share_linkedin" href="http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Flocalhost%3A8069%2Fnetworks%2Fnetwork%2Fodoo-employees-1&amp;title=network_view %7C localhost&amp;"><i class="fa fa-linkedin"></i></a>
+                  <a target="_Blank" class="oe_share_google" href="https://plus.google.com/share?url=http%3A%2F%2Flocalhost%3A8069%2Fnetworks%2Fnetwork%2Fodoo-employees-1"><i class="fa fa-google-plus-square"></i></a>
+                  <a href="mailto:?body=http%3A%2F%2Flocalhost%3A8069%2Fnetworks%2Fnetwork%2Fodoo-employees-1&amp;subject=network_view %7C localhost"><i class="fa fa-envelope-o"></i></a>
+                </p>
+              </div>
+
             </div>
 
-            <div class="col-md-9 pr0" t-if="is_public_user">
+            <div class="col-md-9" t-if="is_public_user">
               <div t-field="network.description" />
             </div>
 
@@ -232,32 +294,8 @@
                 </div>
 
                 <div class="tab-pane" id="members">
-                  <div class="row mb16">
-                    <div class="col-md-6">
 
-                    </div>
-                    <div class="col-md-6">
-                      <form method="get" action="/networks">
-                        <div class="input-group">
-                          <input type="search" class="form-control" name="search" t-attf-placeholder="Search for members" t-att-value="search"/>
-                          <span class="input-group-btn">
-                            <a class="btn btn-danger" href="/networks" t-if="search">
-                              <i class="fa fa-times"></i>
-                            </a>
-
-                            <button class="btn btn-primary" type="submit">
-                              <i class="fa fa-search"></i>
-                            </button>
-                            <a class="btn btn-success oe_js_network_new" title="Invite Members">
-                              <i class="fa fa-plus"></i> Invite
-                            </a>
-                          </span>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-
-                  <div class="col-xs-4" t-foreach="network.sudo().message_follower_ids" t-as="user">
+                  <div class="col-md-4" t-foreach="network.sudo().message_follower_ids" t-as="user">
                     <t t-call="groupme.user_card"/>
                   </div>
                 </div>
@@ -277,10 +315,10 @@
                   <div class="mb16">
                     <form id="comment" t-attf-action="/networks/network/#{network.id}/comment" method="POST" t-if="network.website_published">
                       <div class="media">
-                        <span class="pull-left">
-                          <img class="img img-circle media-object"
+                        <span class="pull-left" style="height:60px;width:60px;padding: 0px;overflow: hidden;">
+                          <img class="img media-object"
                             t-attf-src="/website/image/res.partner/#{user_id.partner_id.id}/image"
-                            style="width: 30px"/>
+                            style="padding: 0px;width:100%"/>  
                         </span>
                         <div class="media-body">
                             <textarea rows="3" name="comment" class="form-control" placeholder="Write a message to broadcast to this group..."></textarea>
@@ -291,7 +329,7 @@
                             </p>
                           <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-link"></i></span>
-                            <input type="text" name="link" class="form-control" aria-label="Amount (to the nearest dollar)"></input>
+                            <input type="text" name="link" class="form-control" placeholder="Past link to media, to send along with message" aria-label="Meaid link"></input>
                           </div>
                           <button type="submit" class="btn btn-primary mt8">Send Message</button>
                         </div>
@@ -301,11 +339,12 @@
                   <div class="oe_network_messages mt16" t-if="comments">
                     <h4 class="text-muted" style="border-bottom: 1px solid #ccc;padding-bottom: 5px;"><span t-esc="len(comments)"/> Messages sent</h4>
 
-                    <ul class="media-list mt8">
-                      <li t-foreach="comments" t-as="message" class="media">
-                        <span class="pull-left">
-                          <img class="media-object img img-circle"
-                            t-att-src="'/website/image?model=mail.message&amp;field=author_avatar&amp;id='+str(message.id)" style="width: 30px"/>
+                    <ul class="media-list mb8 oe-message-scroll">
+                      <li t-foreach="comments" t-as="message" class="media well" style="padding: 5px;">
+                        <span class="pull-left" style="height:60px;width:60px;padding: 0px;overflow: hidden;">
+                          <img class="img media-object"
+                            t-att-src="'/website/image?model=mail.message&amp;field=author_avatar&amp;id='+str(message.id)"
+                            style="padding: 0px;width:100%"/>  
                         </span>
                         <div class="media-body">
                           <span t-field="message.author_id" style="display: inline-block;" t-field-options='{"widget": "contact", "fields": ["name"]}'/>
@@ -318,6 +357,7 @@
                 </div>
               </div>
             </div>
+          </div>
         </div>
       </t>
     </template>
