@@ -148,6 +148,7 @@ odoo.define('groupme.network.new', function (require) {
                 this.$('#code').closest('.form-group').addClass('has-error');
                 return false;
             }
+
             return true;
         },
         save: function (ev) {
@@ -172,18 +173,42 @@ odoo.define('groupme.network.new', function (require) {
         },
         cancel: function () {
             this.trigger("cancel");
-        }
-        
+        },
         });
-
+ 
+ 
         $('.oe_js_network_new').on('click', function () {
             website.add_template_file('/groupme/static/src/xml/groupme_network_new.xml').done(function() {
-                var $net_new = new NetworkDialog(self).appendTo(document.body);                
-                $('#s2id_tag_ids').addClass('form-control');
+                    var $net_new = new NetworkDialog(self).appendTo(document.body);
+                    $('#s2id_tag_ids').addClass('form-control');
 
-                $('#s2id_category_id').addClass('form-control');
-                $('#s2id_category_id a').css('height', '30px').children('span').css('margin-top','2px');
+                    $('#s2id_category_id').addClass('form-control');
+                    $('#s2id_category_id a').css('height', '30px').children('span').css('margin-top','2px');
+
+                    $('#code').on('input',function(){
+                        var resss= ajax.jsonRpc("/web/dataset/call_kw", 'call', {
+                            model: 'groupme.network',
+                            method: 'search_read',
+                            args: [],
+                            kwargs: {
+                                fields: ['name'],
+                                domain: [['code', '=', self.code.value]],
+                                context: website.get_context()
+                            }
+                        }).then(function (data) {
+                            if(data.length!=0){
+                                $("#code").closest('.form-group').removeClass('has-success').addClass('has-error');
+                                $("#codestatus").removeClass("fa-check").addClass("fa-times");
+                                $("#ErrorMessages").css("display", "block");
+                            }else{
+                                $("#code").closest('.form-group').removeClass('has-error').addClass('has-success');
+                                $("#codestatus").removeClass("fa-times").addClass("fa-check");
+                                $("#ErrorMessages").css("display", "none");
+                            }
+                         });
+                    });
             });
         });
+
     });
 });
