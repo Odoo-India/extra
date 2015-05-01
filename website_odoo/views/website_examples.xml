@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem name="Website List" id="menu_websites_list"/>
+    <menuitem name="Website List" id="menu_websites_list_sub" parent="menu_websites_list"/>
+
+    <record model="ir.ui.view" id="view_website_examples_list">
+        <field name="name">website.examples.tree</field>
+        <field name="model">website.examples</field>
+        <field name="arch" type="xml">
+            <tree string="Website List">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_website_examples_form">
+        <field name="name">website.examples.form</field>
+        <field name="model">website.examples</field>
+        <field name="arch" type="xml">
+            <form string="Blog">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="image" widget="image"/>
+                        <field name="image_mobile" widget="image"/>
+                        <field name="description"/>
+                        <field name="url"/>
+                        <field name="is_odoo"/>
+                        <field name="version_info"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                    <field name="message_ids" widget="mail_thread" options='{"thread_level": 1}'/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_website_examples">
+        <field name="name">Website Examples</field>
+        <field name="res_model">website.examples</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_websites_list_main" parent="menu_websites_list_sub" name="Website Example" action="action_website_examples"/>
+
+</odoo>
