@@ -84,6 +84,14 @@ class Network(models.Model):
                 record.image_medium = False
                 record.iamge_thumb = False
 
+    def invite_members(self, emails):
+        partner_ids = []
+        partner_obj = self.env['res.partner']
+
+
+        for group in self:
+            new_follower_ids = [p.id for p in wizard.partner_ids if p not in document.message_follower_ids]
+            model_obj.message_subscribe(cr, uid, [wizard.res_id], new_follower_ids, context=context)
 
 class MailMessage(models.Model):
     _inherit = 'mail.message'
