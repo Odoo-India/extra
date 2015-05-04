@@ -154,7 +154,7 @@
           </div>
         </a>
         <div class="caption">
-          <h4 style="margin-top: 5px;" class="oe_group_ellipsis"><span t-field="network.name"/></h4>
+          <h4 style="margin-top: 5px;" class="oe_textoverflow"><span t-field="network.name"/></h4>
           <p class="text-muted clearfix">
             <small class="pull-left"><span t-esc="len(network.message_follower_ids)"/> members</small>
             <small class="pull-right"><timeago class="timeago" t-att-datetime="network.create_date"></timeago></small>
