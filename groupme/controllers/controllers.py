@@ -4,6 +4,7 @@ import werkzeug
 
 from openerp import http
 # from openerp import SUPERUSER_ID
+from psycopg2 import IntegrityError
 from openerp.tools.misc import ustr
 from openerp.addons.web.http import request
 from openerp.tools.mail import html2plaintext
@@ -17,7 +18,9 @@ class GroupMe(http.Controller):
         '/networks',
         '/networks/page/<int:page>',
         '/networks/category/<model("groupme.network.category"):category_obj>',
-        '/networks/tag/<model("groupme.network.tag"):tag_obj>'
+        '/networks/category/<model("groupme.network.category"):category_obj>/page/<int:page>',
+        '/networks/tag/<model("groupme.network.tag"):tag_obj>',
+        '/networks/tag/<model("groupme.network.tag"):tag_obj>/page/<int:page>'
     ], auth='public', type='http', website=True)
     def network(self, search=False, category_obj=False, tag_obj=False,
                 page=1, **post):
@@ -32,15 +35,17 @@ class GroupMe(http.Controller):
         else:
             domain += [('website_published', '=', True)]
 
+        pager_url = "/networks"
+        pager_args = {}
+
         if search:
             domain += [("name", "ilike", search)]
         if category_obj:
             domain += [("category_id", "=", category_obj.id)]
+            pager_url += "/category/%s" % category_obj.id
         elif tag_obj:
             domain += [('tag_ids.id', '=', tag_obj.id)]
-
-        pager_url = "/networks"
-        pager_args = {}
+            pager_url += "/tag/%s" % tag_obj.id
 
         pager_count = network_obj.search_count(domain)
         pager = request.website.pager(url=pager_url, total=pager_count, page=page,
@@ -128,6 +133,7 @@ class GroupMe(http.Controller):
         network_obj = request.env['groupme.network']
 
         values = post
+        values['code'] = post['code'].lower()
         values['author_id'] = request.env.uid
 
         if post.get('category_id', False):
@@ -135,6 +141,8 @@ class GroupMe(http.Controller):
 
         try:
             network_id = network_obj.create(values)
+        except IntegrityError:
+            return {'error': 'Integrity Error, Code must be unique!'}
         except Exception as e:
             return {'error': 'Internal server error, please try again later or contact administrator.\nHere is the error message: %s' % e.message}
         return {'url': "/networks/network/%s" % (network_id.id)}

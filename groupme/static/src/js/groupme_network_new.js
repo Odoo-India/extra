@@ -4,6 +4,7 @@ odoo.define('groupme.network.new', function(require) {
     var core = require('web.core');
     var Widget = require('web.Widget');
     var website = require('website.website');
+    var network = require('groupme.network');
 
     var _t = core._t;
 
@@ -12,6 +13,7 @@ odoo.define('groupme.network.new', function(require) {
         var NetworkDialog = Widget.extend({
             template: 'groupme.network_new',
             events: {
+                'hidden.bs.modal': 'destroy',
                 'click button.save': 'save',
                 'click button[data-dismiss="modal"]': 'cancel'
             },
@@ -19,15 +21,46 @@ odoo.define('groupme.network.new', function(require) {
                 this.index_content = "";
             },
             start: function() {
-                this.$el.modal({
+                var self = this;
+                self.$el.modal({
                     backdrop: 'static'
                 });
-                this.set_category_id();
-                this.set_tag_ids();
+                self.set_category_id();
+                self.set_tag_ids();
+                self.checkCode();
             },
             display_alert: function(message) {
-                this.$('.alert-warning').remove();
+                var self=this;
+                self.$('.alert-warning').remove();
                 $('<div class="alert alert-warning" role="alert">' + message + '</div>').insertBefore(this.$('form'));
+            },
+            checkCode: function(){
+                var codecheckResponse = function(data) {
+                    $("#codestatus").removeClass("fa-spin");
+                    if (data.length != 0) {
+                        $("#code").closest('.form-group').removeClass('has-success').addClass('has-error');
+                        $("#codestatus").removeClass("fa-check").addClass("fa-times");
+                        $("#codestatus").addClass("fa-spin");
+                    } else {
+                        $("#code").closest('.form-group').removeClass('has-error').addClass('has-success');
+                        $("#codestatus").removeClass("fa-times").addClass("fa-check");
+                    }
+                }
+                var codecheckRequest = function() {
+                    ajax.jsonRpc("/web/dataset/call_kw", 'call', {
+                        model: 'groupme.network',
+                        method: 'search_read',
+                        args: [],
+                        kwargs: {
+                            fields: ['name'],
+                            domain: [
+                                ['code', '=', self.code.value.toLowerCase()]
+                            ],
+                            context: website.get_context()
+                        }
+                    }).then(codecheckResponse);
+                }
+                $("#code").on('input', codecheckRequest);
             },
             select2_wrapper: function(tag, multi, fetch_fnc) {
                 return {
@@ -137,23 +170,25 @@ odoo.define('groupme.network.new', function(require) {
             },
             // Values and save
             get_value: function() {
-                var canvas = this.$('#data_canvas')[0],
+                var self = this;
+                var canvas = self.$('#data_canvas')[0],
                     values = {
-                        'name': this.$('#name').val(),
-                        'code': this.$('#code').val(),
-                        'tag_ids': this.get_tag_ids(),
-                        'category_id': this.get_category_id()
+                        'name': self.$('#name').val(),
+                        'code': self.$('#code').val(),
+                        'tag_ids': self.get_tag_ids(),
+                        'category_id': self.get_category_id()
                     };
                 return values;
             },
             validate: function() {
-                this.$('.form-group').removeClass('has-error');
-                if (!this.$('#name').val()) {
-                    this.$('#name').closest('.form-group').addClass('has-error');
+                var self=this;
+                self.$('.form-group').removeClass('has-error');
+                if (!self.$('#name').val()) {
+                    self.$('#name').closest('.form-group').addClass('has-error');
                     return false;
                 }
-                if (!this.$('#code').val()) {
-                    this.$('#code').closest('.form-group').addClass('has-error');
+                if (!self.$('#code').val()) {
+                    self.$('#code').closest('.form-group').addClass('has-error');
                     return false;
                 }
                 if ($("#codestatus").hasClass("fa-times")) {
@@ -165,9 +200,9 @@ odoo.define('groupme.network.new', function(require) {
                 return true;
             },
             save: function(ev) {
-                // var self = this;
-                if (this.validate()) {
-                    var values = this.get_value();
+                var self = this;
+                if (self.validate()) {
+                    var values = self.get_value();
                     if ($(ev.target).data('published')) {
                         values.website_published = true;
                     }
@@ -175,7 +210,7 @@ odoo.define('groupme.network.new', function(require) {
                     $('.modal-footer, .modal-body').hide();
                     ajax.jsonRpc("/networks/network/add_network", 'call', values).then(function(data) {
                         if (data.error) {
-                            this.display_alert(data.error);
+                            self.display_alert(data.error);
                             $('.oe_network_creating').hide();
                             $('.modal-footer, .modal-body').show();
                         } else {
@@ -184,45 +219,22 @@ odoo.define('groupme.network.new', function(require) {
                     });
                 }
             },
-            cancel: function() {
+            cancel: function() {                
                 this.trigger("cancel");
+            },
+            destroy: function() {                
+                
             }
         });
 
         $('.oe_js_network_new').on('click', function() {
             website.add_template_file('/groupme/static/src/xml/groupme_network_new.xml').done(function() {
-                var $net_new = new NetworkDialog(self).appendTo(document.body);
+                // var $net_new = new NetworkDialog(self).appendTo(document.body);
+                network.page_widgets['network'] = new NetworkDialog(self).appendTo(document.body);
                 $('#s2id_tag_ids').addClass('form-control');
 
                 $('#s2id_category_id').addClass('form-control');
                 $('#s2id_category_id a').css('height', '30px').children('span').css('margin-top', '2px');
-                var codecheckResponse = function(data) {
-                    $("#codestatus").removeClass("fa-spin");
-                    if (data.length != 0) {
-                        $("#code").closest('.form-group').removeClass('has-success').addClass('has-error');
-                        $("#codestatus").removeClass("fa-check").addClass("fa-times");
-                        $("#codestatus").addClass("fa-spin");
-
-                    } else {
-                        $("#code").closest('.form-group').removeClass('has-error').addClass('has-success');
-                        $("#codestatus").removeClass("fa-times").addClass("fa-check");
-                    }
-                }
-                var codecheckRequest = function() {
-                    ajax.jsonRpc("/web/dataset/call_kw", 'call', {
-                        model: 'groupme.network',
-                        method: 'search_read',
-                        args: [],
-                        kwargs: {
-                            fields: ['name'],
-                            domain: [
-                                ['code', '=', self.code.value]
-                            ],
-                            context: website.get_context()
-                        }
-                    }).then(codecheckResponse);
-                }
-                $("#code").on('input', codecheckRequest); //send an ajaxRpc request
             });
         });
 
@@ -347,15 +359,15 @@ odoo.define('groupme.network.new', function(require) {
                 return true;
             },
             save: function(ev) {
-                // var self = this;
-                if (this.validate()) {
-                    var values = this.get_value();
+                var self = this;
+                if (self.validate()) {
+                    var values = self.get_value();
 
                     $('.oe_people_inviting').show();
                     $('.modal-footer, .modal-body').hide();
                     ajax.jsonRpc("/networks/network/invite_people", 'call', values).then(function(data) {
                         if (data.error) {
-                            this.display_alert(data.error);
+                            self.display_alert(data.error);
                             $('.oe_people_inviting').hide();
                             $('.modal-footer, .modal-body').show();
                         } else {
@@ -375,7 +387,7 @@ odoo.define('groupme.network.new', function(require) {
             $('.nav-tabs a[href="#members"]').tab('show');
             website.add_template_file('/groupme/static/src/xml/groupme_network_invite.xml').done(function() {
                 var network_id = $('.oe_js_invite').data('network_id');
-                var $invite_people = new InvitationDialog(self, network_id).appendTo(document.body);
+                var invite_people = new InvitationDialog(self, network_id).appendTo(document.body);
             });
         });
     });

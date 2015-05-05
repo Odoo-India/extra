@@ -2,6 +2,9 @@ odoo.define('groupme.network', function (require) {
 	"use strict";
       var ajax = require('web.ajax');
 	var time = require('web.time');
+
+
+      var page_widgets = {};
       var characters = 200;
 
 	$(document).ready(function () {
@@ -61,4 +64,8 @@ odoo.define('groupme.network', function (require) {
                       $("#counter").css("color","inherit");
             });
 	});
+      
+      return {
+          page_widgets: page_widgets,
+      };
 });

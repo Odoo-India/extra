@@ -111,7 +111,7 @@
         <div class="container">
           <div class="row" style="border-bottom: 1px solid #eee;padding-bottom: 15px;">
             <div class="col-md-8">
-              <t t-call="website.pager" style="margin: auto;"/>
+                <t t-call="website.pager" style="margin: auto;"/>
             </div>
             <div class="col-md-4">
               <form method="get" action="/networks">

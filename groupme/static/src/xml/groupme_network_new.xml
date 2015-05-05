@@ -40,13 +40,13 @@
                             <div class="form-group">
                                 <label for="tag_ids" class="control-label col-sm-2 pr0">Tags</label>
                                 <div class="controls col-sm-10 pl8">
-                                    <input id="tag_ids" type="hidden"/>
+                                    <input id="tag_ids" type="text" class="form-control"/>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label for="category_id" class="control-label col-sm-2 pr0">Category</label>
                                 <div class="controls col-sm-10 pl8">
-                                    <input id="category_id" type="hidden"/>
+                                    <input id="category_id" type="text" class="form-control"/>
                                 </div>
                             </div>
                             <div class="alert alert-warning" id="codeErrorMessage" style="display:none" role="alert"></div>

@@ -46,7 +46,7 @@ class Network(models.Model):
         'groupme.network.tag', 'rel_network_tag', 'network_id', 'tag_id', 'Tags')
 
     name = fields.Char('Name', translate=True, required=True)
-    code = fields.Char('Code', required=True)
+    code = fields.Char('Code', required=True, copy=False)
 
     title = fields.Html('Title', translate=True)
     description = fields.Html('Description', translate=True)
@@ -72,6 +72,10 @@ class Network(models.Model):
         string='Website Messages', help="Website communication history")
     view_message = fields.Boolean('Message Visible', default=False)
 
+    _sql_constraints = [
+        ('unique_code', 'unique(code)', 'Code must be unique!')
+    ]
+
     @api.depends('image')
     def _get_image(self):
         for record in self:
@@ -88,10 +92,12 @@ class Network(models.Model):
         partner_ids = []
         partner_obj = self.env['res.partner']
 
-
         for group in self:
-            new_follower_ids = [p.id for p in wizard.partner_ids if p not in document.message_follower_ids]
-            model_obj.message_subscribe(cr, uid, [wizard.res_id], new_follower_ids, context=context)
+            new_follower_ids = [
+                p.id for p in wizard.partner_ids if p not in document.message_follower_ids]
+            model_obj.message_subscribe(
+                cr, uid, [wizard.res_id], new_follower_ids, context=context)
+
 
 class MailMessage(models.Model):
     _inherit = 'mail.message'
