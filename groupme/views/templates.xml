@@ -168,7 +168,7 @@
           <p t-if="network.tag_ids">
             <i class="fa fa-tags text-muted"></i>
             <t t-foreach="network.tag_ids" t-as="tag">
-              <a t-attf-href="networks/tag/#{slug(tag)}">
+              <a t-attf-href="/networks/tag/#{slug(tag)}">
                 <span t-attf-class="label label-default #{tag and tag.name == tag.name and 'label-primary' ''} text-muted" t-field="tag.name"/>
               </a>
             </t>
@@ -230,11 +230,13 @@
                 <a class="btn btn-success btn-xs pull-right oe_js_invite" type="button" t-if="not is_public_user" t-attf-data-network_id="#{network.id}">Invite</a>
               </p>
               <p style="border-bottom: 1px solid #eee;padding-bottom: 5px;"><i class="fa fa-comments-o text-muted"></i> <span t-esc="network.message_per_day"/> message / day</p>
-              <p><i t-attf-class="fa #{network.category_id.icon} text-muted"></i> <span t-esc="network.category_id.name"/></p>
+              <p><i t-attf-class="fa #{network.category_id.icon} text-muted"></i> <a t-attf-href="/networks/category/#{network.category_id.id}">
+              <span t-esc="network.category_id.name"/>
+            </a></p>
               <p t-if="network.tag_ids">
                 <i class="fa fa-tags text-muted"></i>
                 <t t-foreach="network.tag_ids" t-as="tag">
-                  <a t-attf-href="networks/tag/#{slug(tag)}">
+                  <a t-attf-href="/networks/tag/#{slug(tag)}">
                     <span t-attf-class="label label-default #{tag and tag.name == tag.name and 'label-primary' ''} text-muted" t-field="tag.name"/>
                   </a>
                 </t>
@@ -325,19 +327,18 @@
                 </div>
 
                 <div class="tab-pane" id="messages">
-                  <div class="alert alert-danger alert-dismissable mb16" t-if="not network.view_message">
-                    <p>
-                      We do not store any message sent by you or any of your group members in our system, without your permission <a href="#">click here</a> to enable to track all message sent in this group
-                    </p>
-                  </div>
-                  <div class="alert alert-success alert-dismissable mb16" t-if="network.view_message">
-                    <p>
-                      We do not store any message sent by you or any of your group members in our system, without your permission <a href="#">click here</a> to enable to track all message sent in this group
-                    </p>
-                  </div>
+                  <div id="falseMsgLabel" class="alert alert-danger alert-dismissable mb16" t-attf-style="display: #{'block' if not network.view_message else 'none'}">
+                     <p>We do not store any message sent by you or any of your group members in our system, without your permission. <a href="#" class='js_active_msg' data-active_msg="false" t-att-data-network_id="network.id">Click here</a> to enable to track all message sent in this group.
+                     </p>
+                   </div>
+                  <div id="trueMsgLabel" class="alert alert-success alert-dismissable mb16" t-attf-style="display: #{'block' if network.view_message else 'none'}">
+                     <p>Message history is currently enabled. <a href="#" class='js_active_msg' data-active_msg="true" t-att-data-network_id="network.id">Click here</a> to disable message tracking for this group.
+                     </p>
+                   </div>
+
 
                   <div class="mb16">
-                    <form id="comment" t-attf-action="/networks/network/#{network.id}/comment" method="POST" t-if="network.website_published">
+                    <form id="comment" t-attf-action="/networks/network/#{network.id}/comment" method="POST" t-attf-style="display:#{'block' if network.website_published else 'none'}">
                       <div class="media">
                         <span class="pull-left" style="height:60px;width:60px;padding: 0px;overflow: hidden;">
                           <img class="img media-object"
@@ -345,10 +346,10 @@
                             style="padding: 0px;width:100%"/>  
                         </span>
                         <div class="media-body">
-                            <textarea rows="3" name="comment" class="form-control" placeholder="Write a message to broadcast to this group..."></textarea>
+                            <textarea rows="3" name="comment" id="txtMsg" class="form-control" placeholder="Write a message to broadcast to this group..."></textarea>
                             <p class="text-muted">
                               <small>
-                              You can send upto 200 charactor only.
+                              You can send upto 200 charactor only. <span id="counter"></span>
                               </small>
                             </p>
                           <div class="input-group">
@@ -372,7 +373,7 @@
                         </span>
                         <div class="media-body">
                           <span t-field="message.author_id" style="display: inline-block;" t-field-options='{"widget": "contact", "fields": ["name"]}'/>
-                          <span class="text-muted"> on <span t-field="message.date"/></span>
+                          <span class="text-muted"> on <timeago class="timeago" t-att-datetime="message.date"/></span>
                           <div t-field="message.body" class="discussion_scroll_post"></div>
                         </div>
                       </li>

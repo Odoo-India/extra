@@ -1,6 +1,9 @@
 odoo.define('groupme.network', function (require) {
 	"use strict";
+      var ajax = require('web.ajax');
 	var time = require('web.time');
+      var characters = 200;
+
 	$(document).ready(function () {
 		$("timeago.timeago").each(function (index, el) {
 			var datetime = $(el).attr('datetime'),
@@ -14,6 +17,48 @@ odoo.define('groupme.network', function (require) {
                   	display_str = $.timeago(datetime_obj);
                   }
                   $(el).text(display_str);
+            });
+
+
+            $("#trueMsgLabel p a, #falseMsgLabel p a").click(function(ev){
+                  ev.preventDefault();
+                  var active_msg = $(this).data('active_msg');
+                  var network_id = $(this).data('network_id');
+                  var values = {
+                        'network_id': network_id,
+                        'active': !(active_msg),
+                  };
+                  ajax.jsonRpc("/networks/network/active_msg", 'call', values).then(function (data) {
+                        if (data.error) {
+                              // TODO: Error Msg
+                              console.log("ERROR : ", data.error);
+                        } else {                            
+                              if(data.result == true)
+                              {
+                                    $('#trueMsgLabel, #falseMsgLabel').toggle();
+                              }
+                        }
+                  });
+            });
+
+            $("div .js_publish_management").click(function (ev) {                  
+                  if ($(this).hasClass('css_published'))
+                        $('#comment').hide();
+                  else
+                        $('#comment').show();
+            });
+
+            // Allowed only (characters) in text-area
+            $("#txtMsg").keyup(function(){
+                if($(this).val().length > characters){
+                    $(this).val($(this).val().substr(0, characters));
+                  }
+                  var remaining = characters - $(this).val().length;
+                  $("#counter").html("You have <strong>"+remaining+"</strong> characters remaining");
+                  if(remaining <= 10)
+                      $("#counter").css("color","red");
+                  else
+                      $("#counter").css("color","inherit");
             });
 	});
 });

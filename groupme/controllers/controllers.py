@@ -15,9 +15,12 @@ class GroupMe(http.Controller):
 
     @http.route([
         '/networks',
-        '/networks/page/<int:page>'
+        '/networks/page/<int:page>',
+        '/networks/category/<model("groupme.network.category"):category_obj>',
+        '/networks/tag/<model("groupme.network.tag"):tag_obj>'
     ], auth='public', type='http', website=True)
-    def network(self, search=False, page=1, **post):
+    def network(self, search=False, category_obj=False, tag_obj=False,
+                page=1, **post):
         network_obj = request.env['groupme.network']
 
         res_user = request.env.user
@@ -31,6 +34,10 @@ class GroupMe(http.Controller):
 
         if search:
             domain += [("name", "ilike", search)]
+        if category_obj:
+            domain += [("category_id", "=", category_obj.id)]
+        elif tag_obj:
+            domain += [('tag_ids.id', '=', tag_obj.id)]
 
         pager_url = "/networks"
         pager_args = {}
@@ -157,3 +164,11 @@ class GroupMe(http.Controller):
         group.message_subscribe(partner_ids)
 
         return {'result': 'true'}
+
+    @http.route(['/networks/network/active_msg'], type='json', auth='user',
+                methods=['POST'], website=True)
+    def active_msg(self, **post):
+        network_obj = request.env[
+            'groupme.network'].browse([post['network_id']])
+        res = network_obj.write({'view_message': post['active']})
+        return {'result': res}
