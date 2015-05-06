@@ -184,7 +184,10 @@
           <img class="img img-avatar" t-attf-src="/website/image/res.partner/#{user.id}/image" style="padding: 0px;width:100%"/>
         </div>
         <div class="col-xs-9">
-          <div class="text-success">
+          <div class="text-success" t-if="user.devicekey">
+            <i class="fa fa-circle"></i> <strong t-field="user.name"/>
+          </div>
+          <div class="text-danger" t-if="not user.devicekey">
             <i class="fa fa-circle"></i> <strong t-field="user.name"/>
           </div>
           <div>
@@ -200,9 +203,9 @@
     <!-- group page view -->
     <template id="network_view">
       <t t-call="website.layout">
-        <t t-call="groupme.networksheader"/>
+        <!-- <t t-call="groupme.networksheader"/> -->
         <div class="container">
-          <div class="row">
+          <div class="row mt16">
             <div class="col-md-3">
               <div class="group-image">
                 <span itemprop="image" t-field="network.image" t-field-options='{"widget": "image", "class": "img img-responsive img-rounded"}' style="width:100%"/>
