@@ -190,6 +190,9 @@
           <div class="text-danger" t-if="not user.devicekey">
             <i class="fa fa-circle"></i> <strong t-field="user.name"/>
           </div>
+          <div class="text-danger" t-if="not user.devicekey">
+            <i class="fa fa-circle"></i> <strong t-field="user.name"/>
+          </div>
           <div class="oe_textoverflow">
             <small t-field="user.email" class="text-muted"/>
           </div>
