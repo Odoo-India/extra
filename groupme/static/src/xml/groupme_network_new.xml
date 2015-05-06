@@ -14,6 +14,8 @@
                     </div>
                     
                     <div class="modal-body">
+                        <div class="alert alert-warning" id="codeErrorMessage" style="display:none" role="alert"></div>
+
                         <form class="clearfix form-horizontal">                            
                             <div class="form-group">
                                 <label for="name" class="control-label col-sm-2 pr0">Name</label>
@@ -49,7 +51,6 @@
                                     <input id="category_id" type="text" class="form-control"/>
                                 </div>
                             </div>
-                            <div class="alert alert-warning" id="codeErrorMessage" style="display:none" role="alert"></div>
                             <canvas id="data_canvas" style="display: none;"></canvas>
                         </form>
                     </div>
