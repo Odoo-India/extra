@@ -4,6 +4,7 @@
     <!-- frontend assets -->
     <template id="assets_frontend" inherit_id="website.assets_frontend" name="Groupme">
       <xpath expr="." position="inside">
+        <link href="/web/static/src/img/favicon.ico" type="image/x-icon" rel="shortcut icon"/>
         <link type="text/less" href="/groupme/static/src/less/groupme.less" rel="stylesheet" t-ignore="true"/>
         <link rel="stylesheet" href="/web/static/lib/select2/select2.css"/>
         <link rel="stylesheet" href="/website/static/lib/select2-bootstrap-css/select2-bootstrap.css"/>
@@ -12,6 +13,7 @@
         <script type="text/javascript" src="/groupme/static/src/js/groupme_network.js"></script>
         <!-- Create Network (Manage Category, Tags)-->
         <script type="text/javascript" src="/groupme/static/src/js/groupme_network_new.js"></script>
+        <title>Group me</title>
       </xpath>
     </template>
 
@@ -106,6 +108,11 @@
 
     <!-- display list of groups -->
     <template id="networks">
+      <!-- fix -->
+       <!-- <xpath expr="//title" position="replace"> -->
+        <!-- <title>Groups</title> -->
+       <!-- </xpath> -->
+      <!-- Adding title shrinks the group search button. -->
       <t t-call="website.layout">
         <t t-call="groupme.state_counter"/>
         <div class="container">
@@ -116,7 +123,7 @@
             <div class="col-md-4">
               <form method="get" action="/networks">
                 <div class="input-group">
-                  <input type="search" class="form-control" name="search" t-attf-placeholder="Search for groups" t-att-value="search"/>
+                  <input type="text" class="form-control" name="search" t-attf-placeholder="Search for groups" t-att-value="search"/>
                   <span class="input-group-btn">
                     <a class="btn btn-danger" href="/networks" t-if="search">
                       <i class="fa fa-times"></i>
@@ -128,6 +135,8 @@
                     <a class="btn btn-success oe_js_network_new" title="Create Group" t-if="not is_public_user">
                       <i class="fa fa-plus"></i> Create
                     </a>
+                    <t t-esc="is_public_user">is_public_user</t>
+                    <div id="userlevel" t-attf-data-userlevel=""></div>
                   </span>
                 </div>
               </form>
@@ -152,9 +161,9 @@
         <a t-attf-href="/networks/network/#{network.id}">
           <div class="group-image" t-attf-style="background: url('/website/image/groupme.network/#{network.id}/image_thumb');">
           </div>
-        </a>
+         </a>
         <div class="caption">
-          <h4 style="margin-top: 5px;" class="oe_textoverflow"><span t-field="network.name"/></h4>
+          <h4 style="margin-top: 5px;" class="oe_textoverflow" t-att-title="network.name"><span t-field="network.name"/></h4>
           <p class="text-muted clearfix">
             <small class="pull-left"><span t-esc="len(network.message_follower_ids)"/> members</small>
             <small class="pull-right"><timeago class="timeago" t-att-datetime="network.create_date"></timeago></small>
@@ -177,24 +186,25 @@
       </div>
     </template>
 
-    <!-- user card -->
-    <template id="user_card">
+    <!-- follower card -->
+    <template id="follower_card">
       <div class="row well" style="padding: 5px;margin-right: 1px;">
+        <t t-if="network.author_id == user_id ">
+          <i class="fa fa-times pull-right removeMember" t-attf-data-memberid="#{follower.id}" style="opacity:0.4"></i>
+        </t>
         <div class="col-xs-3" style="height:60px;width:60px;padding: 0px;overflow: hidden;">
-          <img class="img img-avatar" t-attf-src="/website/image/res.partner/#{user.id}/image" style="padding: 0px;width:100%"/>
+          <img class="img img-avatar" t-attf-src="/website/image/res.partner/#{follower.id}/image" style="padding: 0px;width:100%"/>
         </div>
         <div class="col-xs-9">
           <div class="text-success" t-if="user.devicekey">
-            <i class="fa fa-circle"></i> <strong t-field="user.name"/>
+            <i class="fa fa-circle"></i> <strong t-field="follower.name"/>
           </div>
-          <div class="text-danger" t-if="not user.devicekey">
-            <i class="fa fa-circle"></i> <strong t-field="user.name"/>
+          <div class="text-danger oe_textoverflow" t-if="not user.devicekey" t-att-title="follower.name">
+            <i class="fa fa-circle"></i> <strong t-field="follower.name"/>
           </div>
-          <div class="text-danger" t-if="not user.devicekey">
-            <i class="fa fa-circle"></i> <strong t-field="user.name"/>
-          </div>
-          <div class="oe_textoverflow">
-            <small t-field="user.email" class="text-muted"/>
+          <div class="oe_textoverflow" t-att-title="follower.email">
+            <small t-field="follower.email" class="text-muted"/>
+            <t t-if=" not follower.email"><small class="text-muted">No Email Address</small></t>
           </div>
           <div>
              <small class="text-muted">Last seen, now</small>
@@ -205,6 +215,7 @@
 
     <!-- group page view -->
     <template id="network_view">
+      <!-- <title><t t-esc="network.name"/> | Odoo</title> -->
       <t t-call="website.layout">
         <!-- <t t-call="groupme.networksheader"/> -->
         <div class="container">
@@ -214,27 +225,59 @@
                 <span itemprop="image" t-field="network.image" t-field-options='{"widget": "image", "class": "group-image img img-responsive img-rounded"}' style="width:100%"/>
               </div>
               <small class="text-muted" t-if="not is_public_user">Required image resolution is 250px X 200px</small>
-
-              
               <h3><span t-field="network.name"/></h3>
-              <p style="border-bottom: 1px solid #eee;padding-bottom: 5px;">
-                <code class="strong"><strong t-esc="network.code"/> </code>
-                <button class="btn btn-success btn-xs pull-right" type="button" t-if="network.visibility!='private'">Join Group</button>
-              </p>
+            <div class="modal" id="joingroupmodal" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <a class="close" data-dismiss="modal" aria-hidden="true">
+                            <span class="fa fa-times"></span>
+                        </a>
+                        <h3 class="modal-title" href="">Join Group</h3>
+                    </div>
+                    <div class="oe_network_joining text-center" style="display:none">
+                        <h4><i class='fa fa-spinner fa-spin'></i> Joining Group...  </h4>
+                    </div>
 
+                    <div class="modal-body">
+                    <div class="alert alert-warning" id="resultErrorMessage" style="display:none" role="alert"></div>
+                        <form class="clearfix form-horizontal" t-attf-action="/networks/network/joingroup/#{network.id}" id="joingroupform" method="POST">
+                            <div class="form-group">
+                                <label for="name" class="control-label col-sm-2 pr0">Email Id</label>
+                                <div class="col-sm-10 pl8">
+                                <input id="email" name="email" placeholder="Email Address" class="form-control" required="required"/>
+                                </div>
+                            </div>
+                            <canvas id="data_canvas" style="display: none;"></canvas>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-loading-text="Loading..." class="btn btn-primary oe_js_joingroup" id="joingroupbutton" t-attf-data-network_id="#{network.id}">Join Group</button>
+                        or
+                        <a href="#" data-dismiss="modal" aria-hidden="true">Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+                <p style="border-bottom: 1px solid #eee;padding-bottom: 5px;">
+                  <code class="strong"><strong t-esc="network.code"/> </code>
+                  <button class="btn btn-success btn-xs pull-right joingroup" id="joingroup" type="button" t-if="network.visibility!='private'" t-attf-data-network_id="#{network.id}">Join Group</button>
+                </p>
               <p t-if="network.visibility=='private'">
                 <i class="fa fa-lock text-muted"></i> Private Group
               </p>
               <!-- <p><i class="fa fa-user text-muted"></i> <span t-esc="network.sudo().author_id.name"/>, is group owner</p> -->
               <p><i class="fa fa-map-marker text-muted"></i> <span t-field="network.location"/></p>
-              <p><i class="fa fa-globe text-muted"></i> <a t-attf-href="network.sudo().author_id.website" target="_new"><span t-field="network.sudo().author_id.website"/></a></p>
+              <p><i class="fa fa-globe text-muted"></i> <a t-attf-href="network.sudo().author_id.website" target="_new"><span t-field="network.sudo().author_id.website"/></a><t t-if='not network.sudo().author_id.website'>Not available</t></p>
               <p><i class="fa fa-clock-o text-muted"></i> <timeago class="timeago" t-att-datetime="network.create_date"/></p>
-              <p>
-                <a href="#members" role="tab" data-toggle="tab">
-                  <i class="fa fa-users text-muted"></i> <span t-esc="len(network.sudo().message_follower_ids)"/> members
-                </a>
-                <a class="btn btn-success btn-xs pull-right oe_js_invite" type="button" t-if="not is_public_user" t-attf-data-network_id="#{network.id}">Invite</a>
-              </p>
+              <t t-if="network.author_id == user_id">
+                <p>
+                  <a href="#members" role="tab" data-toggle="tab">
+                    <i class="fa fa-users text-muted"></i> <span t-esc="len(network.sudo().message_follower_ids)"/> members
+                  </a>
+                  <a class="btn btn-success btn-xs pull-right oe_js_invite" type="button" t-if="not is_public_user" t-attf-data-network_id="#{network.id}">Invite</a>
+                </p>
+              </t>
               <p style="border-bottom: 1px solid #eee;padding-bottom: 5px;"><i class="fa fa-comments-o text-muted"></i> <span t-esc="network.message_per_day"/> message / day</p>
               <p><i t-attf-class="fa #{network.category_id.icon} text-muted"></i> <a t-attf-href="/networks/category/#{network.category_id.id}">
               <span t-esc="network.category_id.name"/>
@@ -327,8 +370,9 @@
                     </div>
                   </div> -->
 
-                  <div class="col-xs-4" t-foreach="network.sudo().message_follower_ids" t-as="user">
-                    <t t-call="groupme.user_card"/>
+                  <div class="col-xs-4" t-foreach="network.sudo().message_follower_ids" t-as="follower">
+
+                    <t t-call="groupme.follower_card"/>
                   </div>
                 </div>
 
