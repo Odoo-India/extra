@@ -56,6 +56,7 @@ class GroupMe(http.Controller):
             domain, limit=self._networks_per_page, offset=pager['offset'])
 
         return request.render('groupme.networks', {
+            'title': 'Groups | Odoo',  # page title
             'networks': networks,
             'is_public_user': res_user == public_user,
             'search': search,
@@ -69,6 +70,7 @@ class GroupMe(http.Controller):
         public_user = request.website.user_id
 
         return request.render('groupme.network_view', {
+            'title': network_id.name,  # page title
             'user': res_user,
             'network': network_id,
             'is_public_user': res_user == public_user,
@@ -86,12 +88,12 @@ class GroupMe(http.Controller):
         # - subscribe partner instead of user writing the message ?
         # - public user -> cannot create mail.message ?
         if not post.get('comment'):
-            return werkzeug.utils.redirect(request.httprequest.referrer + "#discuss")
+            return werkzeug.utils.redirect(request.httprequest.referrer + "#messages")
         # public user: check or find author based on email, do not subscribe public user
         # and do not publish their comments by default to avoid direct spam
         if request.uid == request.website.user_id.id:
             if not post.get('email'):
-                return werkzeug.utils.redirect(request.httprequest.referrer + "#discuss")
+                return werkzeug.utils.redirect(request.httprequest.referrer + "#messages")
             # TDE FIXME: public user has no right to create mail.message, should
             # be investigated - using SUPERUSER_ID meanwhile
             contextual_slide = network_id.sudo().with_context(
@@ -181,3 +183,24 @@ class GroupMe(http.Controller):
     def active_msg(self, network_id, **post):
         network_id.view_message = not network_id.view_message
         return {'result': True}
+
+    @http.route(['/networks/network/active_msg'], type='json', auth='user',
+                methods=['POST'], website=True)
+    def active_msg(self, **post):
+        network_obj = request.env[
+            'groupme.network'].browse([post['network_id']])
+        res = network_obj.write({'view_message': post['active']})
+        return {'result': res}
+
+    @http.route(['/networks/network/group/<model("groupme.network"):network_id>/<int:memberid>'], type='json', auth='user',
+                methods=['POST'], website=True)
+    def removeMember(self, network_id, memberid, **post):
+        # check authenticity
+        try:
+            if network_id.author_id.id == request.env.user.id:
+                network_id.message_unsubscribe([memberid])
+                return {'result': True}
+        except:
+            pass
+            # logger.info("Exception")
+        return {'result': False}

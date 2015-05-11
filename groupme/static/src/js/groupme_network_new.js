@@ -10,6 +10,10 @@ odoo.define('groupme.network.new', function(require) {
 
     $(document).ready(function() {
 
+        var url = window.location.href;
+        var defaulttab = url.substring(url.indexOf('#'), url.length);
+        $('.nav-tabs a[href="' + defaulttab + '"]').tab('show');
+
         var NetworkDialog = Widget.extend({
             template: 'groupme.network_new',
             events: {
@@ -30,11 +34,11 @@ odoo.define('groupme.network.new', function(require) {
                 self.checkCode();
             },
             display_alert: function(message) {
-                var self=this;
+                var self = this;
                 self.$('.alert-warning').remove();
                 $('<div class="alert alert-warning" role="alert">' + message + '</div>').insertBefore(this.$('form'));
             },
-            checkCode: function(){
+            checkCode: function() {
                 var codecheckResponse = function(data) {
                     $("#codestatus").removeClass("fa-spin");
                     if (data.length != 0) {
@@ -181,7 +185,7 @@ odoo.define('groupme.network.new', function(require) {
                 return values;
             },
             validate: function() {
-                var self=this;
+                var self = this;
                 self.$('.form-group').removeClass('has-error');
                 if (!self.$('#name').val()) {
                     self.$('#name').closest('.form-group').addClass('has-error');
@@ -219,30 +223,32 @@ odoo.define('groupme.network.new', function(require) {
                     });
                 }
             },
-            cancel: function() {                
+            cancel: function() {
                 this.trigger("cancel");
             },
-            destroy: function() {                
-                
+            destroy: function() {
+
             }
         });
-
+        var networkdialog = false;
         $('.oe_js_network_new').on('click', function() {
             website.add_template_file('/groupme/static/src/xml/groupme_network_new.xml').done(function() {
                 // var $net_new = new NetworkDialog(self).appendTo(document.body);
-                network.page_widgets['network'] = new NetworkDialog(self).appendTo(document.body);
+                if (!networkdialog)
+                    networkdialog = new NetworkDialog(self);
+                network.page_widgets['network'] = networkdialog.appendTo(document.body);
                 $('#s2id_tag_ids').addClass('form-control');
 
                 $('#s2id_category_id').addClass('form-control');
                 $('#s2id_category_id a').css('height', '30px').children('span').css('margin-top', '2px');
             });
         });
-
         var InvitationDialog = Widget.extend({
             template: 'groupme.invite',
             events: {
                 'click button.save': 'save',
-                'click button[data-dismiss="modal"]': 'cancel'
+                'click button[data-dismiss="modal"]': 'cancel',
+                'input email_ids': 'set_email_ids'
             },
             init: function(el, net_id) {
                 this.network_id = net_id;
@@ -382,12 +388,60 @@ odoo.define('groupme.network.new', function(require) {
                 this.trigger("cancel");
             }
         });
-
+        var invitedialogloaded = false;
+        var network_id = false;
+        var invitedialog = false;
         $('.oe_js_invite').on('click', function() {
             $('.nav-tabs a[href="#members"]').tab('show');
-            website.add_template_file('/groupme/static/src/xml/groupme_network_invite.xml').done(function() {
-                var network_id = $('.oe_js_invite').data('network_id');
-                var invite_people = new InvitationDialog(self, network_id).appendTo(document.body);
+            if (!invitedialogloaded) {
+                website.add_template_file('/groupme/static/src/xml/groupme_network_invite.xml').done(function() {
+                    network_id = $('.oe_js_invite').data('network_id');
+                    invitedialog = new InvitationDialog(self, network_id);
+                    invitedialog.appendTo(document.body);
+                });
+                invitedialogloaded = !invitedialogloaded;
+            } else {
+                invitedialog.appendTo(document.body);
+            }
+        });
+        $('#joingroup').on('click', function() {
+            $('#joingroupmodal').modal("show");
+        });
+        $('#joingroupbutton').on('click', function() {
+            var network_id = $('.oe_js_joingroup').data('network_id');
+            var values = {
+                'email_id': $('#email').val()
+            };
+            $("#resultErrorMessage").text("").css("display", "none");
+            $('.oe_network_joining').show();
+            return ajax.jsonRpc("/networks/network/joingroup/" + network_id, 'call', values).then(function(data) {
+                $('.oe_network_joining').hide();
+                if (data.result) {
+                    $('#joingroupmodal').modal('hide');
+                    $('.nav-tabs a[href="#members"]').tab('show');
+                    var url = window.location.href;
+                    url = url.substring(0, url.indexOf('#')) + "#members";
+                    window.location.replace(url);
+                    location.reload();
+                } else {
+                    $("#resultErrorMessage").text("No such User.").css("display", "block");
+                }
+            });
+        });
+        $('.removeMember').on('click', function() {
+            var memberid = $(this).data('memberid');
+            var network_id = $('.oe_js_joingroup').data('network_id');
+            return ajax.jsonRpc("/networks/network/group/" + network_id + "/" + memberid, 'call').then(function(data) {
+                if (data.result) {
+                    $('#joingroupmodal').modal('hide');
+                    $('.nav-tabs a[href="#members"]').tab('show');
+                    var url = window.location.href;
+                    url = url.substring(0, url.indexOf('#')) + "#members";
+                    window.location.replace(url);
+                    location.reload();
+                } else {
+                    $("#resultErrorMessage").text("No such User.").css("display", "block");
+                }
             });
         });
     });

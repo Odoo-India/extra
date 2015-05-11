@@ -12,7 +12,6 @@
                     <div class="oe_people_inviting text-center" style="display:none">
                         <h4><i class='fa fa-spinner fa-spin'></i> Inviting...  </h4>
                     </div>
-                    
                     <div class="modal-body">
                         <div class="" style="">
                             <form class="clearfix form-horizontal">

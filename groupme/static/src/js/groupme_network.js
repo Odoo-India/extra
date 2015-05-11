@@ -8,6 +8,8 @@ odoo.define('groupme.network', function(require) {
       var characters = 200;
 
       $(document).ready(function() {
+
+
             $("#oe_main_menu_navbar").removeClass('navbar');
             $("#oe_main_menu_navbar").removeClass('navbar-inverse');
             $("#oe_main_menu_navbar").css('display', 'none');
