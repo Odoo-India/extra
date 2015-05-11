@@ -14,10 +14,6 @@ odoo.define('groupme.network.new', function(require) {
         var defaulttab = url.substring(url.indexOf('#'), url.length);
         $('.nav-tabs a[href="' + defaulttab + '"]').tab('show');
 
-        // Temporary Fix for title
-        // if (url.endsWith('networks')) {
-        //     document.title = "Groups | Odoo";
-        // }
         var NetworkDialog = Widget.extend({
             template: 'groupme.network_new',
             events: {

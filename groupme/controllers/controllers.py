@@ -56,6 +56,7 @@ class GroupMe(http.Controller):
             domain, limit=self._networks_per_page, offset=pager['offset'])
 
         return request.render('groupme.networks', {
+            'title': 'Groups | Odoo',  # page title
             'networks': networks,
             'is_public_user': res_user == public_user,
             'search': search,
@@ -69,6 +70,7 @@ class GroupMe(http.Controller):
         public_user = request.website.user_id
 
         return request.render('groupme.network_view', {
+            'title': network_id.name,  # page title
             'user': res_user,
             'network': network_id,
             'is_public_user': res_user == public_user,

@@ -108,11 +108,6 @@
 
     <!-- display list of groups -->
     <template id="networks">
-      <!-- fix -->
-       <!-- <xpath expr="//title" position="replace"> -->
-        <!-- <title>Groups</title> -->
-       <!-- </xpath> -->
-      <!-- Adding title shrinks the group search button. -->
       <t t-call="website.layout">
         <t t-call="groupme.state_counter"/>
         <div class="container">
@@ -215,9 +210,7 @@
 
     <!-- group page view -->
     <template id="network_view">
-      <!-- <title><t t-esc="network.name"/> | Odoo</title> -->
       <t t-call="website.layout">
-        <!-- <t t-call="groupme.networksheader"/> -->
         <div class="container">
           <div class="row mt16">
             <div class="col-md-3">
