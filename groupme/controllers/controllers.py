@@ -125,9 +125,9 @@ class GroupMe(http.Controller):
             active=network_id.view_message,
             **post_kwargs
         )
-        return werkzeug.utils.redirect(request.httprequest.referrer + "#discuss")
+        return werkzeug.utils.redirect(request.httprequest.referrer + "#messages")
 
-    @http.route(['/networks/network/add_network'], type='json', auth='user', methods=['POST'], website=True)
+    @http.route(['/networks/network/create'], type='json', auth='user', methods=['POST'], website=True)
     def create_network(self, *args, **post):
         category_obj = request.env['groupme.network.category']
         network_obj = request.env['groupme.network']
@@ -148,7 +148,11 @@ class GroupMe(http.Controller):
                     contact administrator.\nHere is the error message: % s' % e.message}
         return {'url': "/networks/network/%s" % (network_id.id)}
 
-    @http.route(['/networks/network/invite_people'], type='json', auth='user', methods=['POST'], website=True)
+    @http.route(['/networks/network/join'], type='json', auth='user', methods=['POST'], website=True)
+    def invite_people(self, **post):
+        return True
+
+    @http.route(['/networks/network/invite'], type='json', auth='user', methods=['POST'], website=True)
     def invite_people(self, **post):
         network_obj = request.env['groupme.network']
         partner_obj = request.env['res.partner']
@@ -157,7 +161,6 @@ class GroupMe(http.Controller):
         partner_ids = []
 
         for email in post.get('email_ids'):
-            print email
             if email[0] == 4:
                 partner_ids.append(email[1])
             elif email[0] == 0:
@@ -174,10 +177,7 @@ class GroupMe(http.Controller):
 
         return {'result': 'true'}
 
-    @http.route(['/networks/network/active_msg'], type='json', auth='user',
-                methods=['POST'], website=True)
-    def active_msg(self, **post):
-        network_obj = request.env[
-            'groupme.network'].browse([post['network_id']])
-        res = network_obj.write({'view_message': post['active']})
-        return {'result': res}
+    @http.route(['/networks/network/message/<model("groupme.network"):network_id>'], type='json', auth='user', methods=['POST'], website=True)
+    def active_msg(self, network_id, **post):
+        network_id.view_message = not network_id.view_message
+        return {'result': True}

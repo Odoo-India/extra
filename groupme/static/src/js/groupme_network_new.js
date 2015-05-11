@@ -208,7 +208,7 @@ odoo.define('groupme.network.new', function(require) {
                     }
                     $('.oe_network_creating').show();
                     $('.modal-footer, .modal-body').hide();
-                    ajax.jsonRpc("/networks/network/add_network", 'call', values).then(function(data) {
+                    ajax.jsonRpc("/networks/network/create", 'call', values).then(function(data) {
                         if (data.error) {
                             self.display_alert(data.error);
                             $('.oe_network_creating').hide();
@@ -365,7 +365,7 @@ odoo.define('groupme.network.new', function(require) {
 
                     $('.oe_people_inviting').show();
                     $('.modal-footer, .modal-body').hide();
-                    ajax.jsonRpc("/networks/network/invite_people", 'call', values).then(function(data) {
+                    ajax.jsonRpc("/networks/network/invite", 'call', values).then(function(data) {
                         if (data.error) {
                             self.display_alert(data.error);
                             $('.oe_people_inviting').hide();
