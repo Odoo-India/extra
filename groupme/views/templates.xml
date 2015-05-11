@@ -190,7 +190,7 @@
         <div class="col-xs-3" style="height:60px;width:60px;padding: 0px;overflow: hidden;">
           <img class="img img-avatar" t-attf-src="/website/image/res.partner/#{follower.id}/image" style="padding: 0px;width:100%"/>
         </div>
-        <div class="col-xs-9">
+        <div class="col-xs-8">
           <div class="text-success" t-if="user.devicekey">
             <i class="fa fa-circle"></i> <strong t-field="follower.name"/>
           </div>

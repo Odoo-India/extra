@@ -343,7 +343,6 @@ odoo.define('groupme.network.new', function(require) {
                             res.push([4, val.id]);
                         }
                     });
-
                 return res;
             },
 
