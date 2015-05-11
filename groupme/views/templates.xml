@@ -197,9 +197,14 @@
           <div class="text-danger oe_textoverflow" t-if="not user.devicekey" t-att-title="follower.name">
             <i class="fa fa-circle"></i> <strong t-field="follower.name"/>
           </div>
+<<<<<<< HEAD
+          <div class="oe_textoverflow">
+            <small t-field="user.email" class="text-muted"/>
+=======
           <div class="oe_textoverflow" t-att-title="follower.email">
             <small t-field="follower.email" class="text-muted"/>
             <t t-if=" not follower.email"><small class="text-muted">No Email Address</small></t>
+>>>>>>> d5ee78c43e60a51c95318c98d0880abbc18ec117
           </div>
           <div>
              <small class="text-muted">Last seen, now</small>
@@ -219,10 +224,19 @@
               </div>
               <small class="text-muted" t-if="not is_public_user">Required image resolution is 250px X 200px</small>
               <h3><span t-field="network.name"/></h3>
+<<<<<<< HEAD
                 <p style="border-bottom: 1px solid #eee;padding-bottom: 5px;">
                   <code class="strong"><strong t-esc="network.code"/> </code>
                   <button class="btn btn-success btn-xs pull-right joingroup" id="joingroup" type="button" t-if="network.visibility!='private'" t-attf-data-network_id="#{network.id}">Join Group</button>
                 </p>
+=======
+<<<<<<< HEAD
+              <p style="border-bottom: 1px solid #eee;padding-bottom: 5px;">
+                <code class="strong"><strong t-esc="network.code"/> </code>
+                <button class="btn btn-success btn-xs pull-right" type="button" t-if="network.visibility!='private' and is_public_user">Join Group</button>
+              </p>
+=======
+>>>>>>> f59d27f89ff9ea3c3766ebe3d274e3f09dc60f66
             <div class="modal" id="joingroupmodal" role="dialog" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -235,6 +249,11 @@
                     <div class="oe_network_joining text-center" style="display:none">
                         <h4><i class='fa fa-spinner fa-spin'></i> Joining Group...  </h4>
                     </div>
+<<<<<<< HEAD
+=======
+>>>>>>> d5ee78c43e60a51c95318c98d0880abbc18ec117
+
+>>>>>>> f59d27f89ff9ea3c3766ebe3d274e3f09dc60f66
                     <div class="modal-body">
                     <div class="alert alert-warning" id="resultErrorMessage" style="display:none" role="alert"></div>
                         <form class="clearfix form-horizontal" t-attf-action="/networks/network/joingroup/#{network.id}" id="joingroupform" method="POST">
