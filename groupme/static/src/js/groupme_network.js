@@ -33,18 +33,14 @@ odoo.define('groupme.network', function(require) {
                   ev.preventDefault();
                   var active_msg = $(this).data('active_msg');
                   var network_id = $(this).data('network_id');
-                  var values = {
-                        'network_id': network_id,
-                        'active': !(active_msg),
-                  };
-                  ajax.jsonRpc("/networks/network/active_msg", 'call', values).then(function(data) {
+                  var url = "/networks/network/message/" + network_id;
+
+                  ajax.jsonRpc(url, 'call', {}).then(function(data) {
+                        if (data.result == true) {
+                              $('#trueMsgLabel, #falseMsgLabel').toggle();
+                        }
                         if (data.error) {
-                              // TODO: Error Msg
                               console.log("ERROR : ", data.error);
-                        } else {
-                              if (data.result == true) {
-                                    $('#trueMsgLabel, #falseMsgLabel').toggle();
-                              }
                         }
                   });
             });

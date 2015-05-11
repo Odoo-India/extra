@@ -219,6 +219,10 @@
               </div>
               <small class="text-muted" t-if="not is_public_user">Required image resolution is 250px X 200px</small>
               <h3><span t-field="network.name"/></h3>
+                <p style="border-bottom: 1px solid #eee;padding-bottom: 5px;">
+                  <code class="strong"><strong t-esc="network.code"/> </code>
+                  <button class="btn btn-success btn-xs pull-right joingroup" id="joingroup" type="button" t-if="network.visibility!='private'" t-attf-data-network_id="#{network.id}">Join Group</button>
+                </p>
             <div class="modal" id="joingroupmodal" role="dialog" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -231,7 +235,6 @@
                     <div class="oe_network_joining text-center" style="display:none">
                         <h4><i class='fa fa-spinner fa-spin'></i> Joining Group...  </h4>
                     </div>
-
                     <div class="modal-body">
                     <div class="alert alert-warning" id="resultErrorMessage" style="display:none" role="alert"></div>
                         <form class="clearfix form-horizontal" t-attf-action="/networks/network/joingroup/#{network.id}" id="joingroupform" method="POST">
@@ -252,10 +255,6 @@
                 </div>
             </div>
         </div>
-                <p style="border-bottom: 1px solid #eee;padding-bottom: 5px;">
-                  <code class="strong"><strong t-esc="network.code"/> </code>
-                  <button class="btn btn-success btn-xs pull-right joingroup" id="joingroup" type="button" t-if="network.visibility!='private'" t-attf-data-network_id="#{network.id}">Join Group</button>
-                </p>
               <p t-if="network.visibility=='private'">
                 <i class="fa fa-lock text-muted"></i> Private Group
               </p>
