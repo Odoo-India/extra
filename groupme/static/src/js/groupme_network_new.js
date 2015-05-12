@@ -656,6 +656,7 @@ odoo.define('groupme.network.new', function(require) {
 
                         html += "</tr>";
                     });
+                    console.log(html);
                     $('#tabledata').append(html);
                     // if (data && data.length > 0) {
                     //   alert('Imported -' + data.length + '- rows successfully!');

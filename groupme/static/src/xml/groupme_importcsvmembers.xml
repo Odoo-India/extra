@@ -1,0 +1,47 @@
+<templates id="template_importcsvmembers" xml:space="preserve">
+
+    <t t-name="groupme.importcsvmembers">
+        <div class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h3 class="modal-title">Upload CSV File</h3>
+                    </div>
+                    <div class="oe_slides_upload_loading text-center" style="display:none">
+                        <h4><i class='fa fa-spinner fa-spin'></i> Uploading CSV File...  </h4>
+                    </div>
+                    <div class="modal-body">
+                        <form class="clearfix form-horizontal" id="importmembersform">
+                            <div class="form-group">
+                                <div class="col-md-12">
+                                    <ul class="list-group">
+                                        <li class="list-group-item active">
+                                            <h5 class="list-group-item-heading">
+                                                <label for="upload" class="control-label">CSV File</label>
+                                            </h5>
+                                            <input id="upload" name="file" class="form-control" accept=".csv" type="file"/>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <h5 class="list-group-item-heading">
+                                                <label for="url" class="control-label">CSV URL</label>
+                                            </h5>
+                                            <input id="url" name="url" class="form-control" placeholder="CSV URL"/>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-loading-text="Loading..." class="btn btn-primary preview">Preview</button>
+                        <button type="button" data-loading-text="Loading..." data-published="true" class="btn btn-primary save">Save</button>
+                        or
+                        <a href="#" data-dismiss="modal" aria-hidden="true">Discard</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+</templates>
