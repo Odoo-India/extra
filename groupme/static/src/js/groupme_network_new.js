@@ -11,8 +11,32 @@ odoo.define('groupme.network.new', function(require) {
     $(document).ready(function() {
 
         var url = window.location.href;
+        // console.log(url);
         var defaulttab = url.substring(url.indexOf('#'), url.length);
+        // console.log(defaulttab);
         $('.nav-tabs a[href="' + defaulttab + '"]').tab('show');
+
+        function getCurrentTab() {
+            var url = window.location.href;
+            return url.substring(url.indexOf('#'), url.length);
+        }
+
+        function createTabURL(tabname) {
+            var url = window.location.href;
+            url.substring(0, url.indexOf('#'));
+        }
+
+        function redirectUrlWithTab(tab) {
+            var url = window.location.href;
+            if (url.indexOf('#') != -1) {
+                url = url.substring(0, url.indexOf('#') + 1) + tab;
+            } else
+                url = url + "#" + tab;
+            // console.log(url);
+            window.location = url;
+            location.reload();
+        }
+
 
         var NetworkDialog = Widget.extend({
             template: 'groupme.network_new',
@@ -231,6 +255,7 @@ odoo.define('groupme.network.new', function(require) {
             }
         });
         var networkdialog = false;
+
         $('.oe_js_network_new').on('click', function() {
             website.add_template_file('/groupme/static/src/xml/groupme_network_new.xml').done(function() {
                 // var $net_new = new NetworkDialog(self).appendTo(document.body);
@@ -243,6 +268,7 @@ odoo.define('groupme.network.new', function(require) {
                 $('#s2id_category_id a').css('height', '30px').children('span').css('margin-top', '2px');
             });
         });
+
         var InvitationDialog = Widget.extend({
             template: 'groupme.invite',
             events: {
@@ -387,6 +413,302 @@ odoo.define('groupme.network.new', function(require) {
                 this.trigger("cancel");
             }
         });
+        var JoinDialog = Widget.extend({
+            template: 'groupme.joingroup',
+            events: {
+                'click button.save': 'save',
+                'click button[data-dismiss="modal"]': 'cancel',
+            },
+            init: function(el, net_id) {
+                this.network_id = net_id;
+                this.index_content = "";
+                $("#joingroupform").attr('action', '/networks/network/joingroup/' + this.network_id);
+            },
+            start: function() {
+                this.$el.modal({
+                    // backdrop: 'static'
+                });
+            },
+            display_alert: function(message) {
+                this.$('.alert-warning').remove();
+                $('<div class="alert alert-warning" role="alert">' + message + '</div>').insertBefore(this.$('form'));
+            },
+            select2_wrapper: function(tag, multi, fetch_fnc) {
+                return {
+                    width: '100%',
+                    placeholder: tag,
+                    allowClear: true,
+                    formatNoMatches: _.str.sprintf(_t("No matches found. Type to create new %s"), tag),
+                    multiple: multi,
+                    selection_data: false,
+                    fetch_rpc_fnc: fetch_fnc,
+                    formatSelection: function(data) {
+                        if (data.tag) {
+                            data.text = data.tag;
+                        }
+                        return data.text;
+                    },
+                    createSearchChoice: function(term) {
+                        return {
+                            id: _.uniqueId('tag_'),
+                            create: true,
+                            tag: term,
+                            text: _.str.sprintf(_t("Create New %s '%s'"), tag, term)
+                        };
+                    },
+                    fill_data: function(query, data) {
+                        var that = this,
+                            tags = {
+                                results: []
+                            };
+                        _.each(data, function(obj) {
+                            var joinMsg = obj.name + ' <' + obj.email + '>';
+                            if (that.matcher(query.term, joinMsg)) {
+
+                                tags.results.push({
+                                    id: obj.id,
+                                    text: joinMsg
+                                });
+                            }
+                        });
+                        query.callback(tags);
+                    },
+                    query: function(query) {
+                        var that = this;
+                        // fetch data only once and store it
+                        if (!this.selection_data) {
+                            this.fetch_rpc_fnc().then(function(data) {
+                                that.fill_data(query, data);
+                                that.selection_data = data;
+                            });
+                        } else {
+                            this.fill_data(query, this.selection_data);
+                        }
+                    }
+                };
+            },
+
+            // Values and save
+            get_value: function() {
+                var canvas = this.$('#data_canvas')[0],
+                    values = {
+                        'network_id': this.network_id,
+                        'email_id': this.get_email_id()
+                    };
+                return values;
+            },
+            get_email_id: function() {
+                return this.$('#email').val();
+            },
+            validate: function() {
+                // console.log('validate: function(');
+                this.$('.form-group').removeClass('has-error');
+                if (!this.$('#email').val()) {
+                    this.$('#email').closest('.form-group').addClass('has-error');
+                    return false;
+                }
+                return true;
+            },
+            save: function(ev) {
+                // console.log('save function');
+                var self = this;
+                if (self.validate()) {
+                    var values = self.get_value();
+
+                    $('.oe_network_joining').show();
+                    $('.modal-footer, .modal-body').hide();
+                    // console.log(this.network_id);
+                    ajax.jsonRpc("/networks/network/joingroup/" + this.network_id, 'call', values).then(function(data) {
+                        // console.log(data.result);
+                        $('.oe_network_joining').hide();
+                        if (data.result) {
+                            $('.modal').modal('hide');
+                            redirectUrlWithTab("members");
+                            // var url = window.location.href;
+                            // url = url.substring(0, url.indexOf('#'));
+                            // window.location = url + "#members";
+                            // location.reload();
+                        } else {
+                            self.display_alert(data.error);
+                            $('.oe_people_inviting').hide();
+                            $('.modal-footer, .modal-body').show();
+                        }
+                    });
+                }
+            },
+            cancel: function() {
+                this.trigger("cancel");
+            }
+        });
+
+        // ImportDialog
+        var ImportDialog = Widget.extend({
+            template: 'groupme.importcsvmembers',
+            events: {
+                'click button.save': 'save',
+                'click button.preview': 'previewCSV',
+                'click button[data-dismiss="modal"]': 'cancel',
+            },
+            init: function(el, net_id) {
+                this.network_id = net_id;
+                this.index_content = "";
+                // $('#csvinputfile').addEventListener('change', previewCSV, false);
+                $("#importmembersform").attr('action', '/networks/network/importmembers/' + this.network_id);
+            },
+            start: function() {
+                this.$el.modal({
+                    // backdrop: 'static'
+                });
+            },
+            display_alert: function(message) {
+                this.$('.alert-warning').remove();
+                $('<div class="alert alert-warning" role="alert">' + message + '</div>').insertBefore(this.$('form'));
+            },
+            select2_wrapper: function(tag, multi, fetch_fnc) {
+                return {
+                    width: '100%',
+                    placeholder: tag,
+                    allowClear: true,
+                    formatNoMatches: _.str.sprintf(_t("No matches found. Type to create new %s"), tag),
+                    multiple: multi,
+                    selection_data: false,
+                    fetch_rpc_fnc: fetch_fnc,
+                    formatSelection: function(data) {
+                        if (data.tag) {
+                            data.text = data.tag;
+                        }
+                        return data.text;
+                    },
+                    createSearchChoice: function(term) {
+                        return {
+                            id: _.uniqueId('tag_'),
+                            create: true,
+                            tag: term,
+                            text: _.str.sprintf(_t("Create New %s '%s'"), tag, term)
+                        };
+                    },
+                    fill_data: function(query, data) {
+                        var that = this,
+                            tags = {
+                                results: []
+                            };
+                        _.each(data, function(obj) {
+                            var joinMsg = obj.name + ' <' + obj.email + '>';
+                            if (that.matcher(query.term, joinMsg)) {
+
+                                tags.results.push({
+                                    id: obj.id,
+                                    text: joinMsg
+                                });
+                            }
+                        });
+                        query.callback(tags);
+                    },
+                    query: function(query) {
+                        var that = this;
+                        // fetch data only once and store it
+                        if (!this.selection_data) {
+                            this.fetch_rpc_fnc().then(function(data) {
+                                that.fill_data(query, data);
+                                that.selection_data = data;
+                            });
+                        } else {
+                            this.fill_data(query, this.selection_data);
+                        }
+                    }
+                };
+            },
+
+            // Values and save
+            get_value: function() {
+                var canvas = this.$('#data_canvas')[0],
+                    values = {
+                        'network_id': this.network_id,
+                        'email_id': this.get_email_id()
+                    };
+                return values;
+            },
+            get_email_id: function() {
+                return this.$('#email').val();
+            },
+            previewCSV: function() {
+                // console.log('preview');
+                $("#tabledata").show();
+                var data = null;
+                // var file = this.target.files[0];
+                var files = document.getElementById('upload').files[0];
+                // console.log(files[0]);
+                var reader = new FileReader();
+                reader.readAsText(files[0]);
+                reader.onload = function(event) {
+                    var csvData = event.target.result;
+                    // console.log(csvData);
+                    var html = "";
+                    var rows = csvData.split("\n");
+                    rows = rows.slice(1, rows.length)
+                    rows.forEach(function getvalues(ourrow) {
+                        html += "<tr><td class=\"bs-checkbox\"><input class=\"btSelectItem\" type=\"checkbox\"/></td>";
+                        var columns = ourrow.split(",");
+                        for (var i = 0; i <= columns.length - 1; i++) {
+                            html += "<td contenteditable=\"true\">" + columns[i] + "</td>";
+                        };
+                        html += "<td><span class =\"table-remove glyphicon glyphicon-remove\"></span> </td> </span> </td>";
+
+                        html += "</tr>";
+                    });
+                    $('#tabledata').append(html);
+                    // if (data && data.length > 0) {
+                    //   alert('Imported -' + data.length + '- rows successfully!');
+                    // } else {
+                    //   alert('No data to import!');
+                    // }
+                };
+                reader.onerror = function() {
+                    //alert('Unable to read ' + file.fileName);
+                };
+
+            },
+            validate: function() {
+                // console.log('validate: function(');
+                this.$('.form-group').removeClass('has-error');
+                if (!this.$('#email').val()) {
+                    this.$('#email').closest('.form-group').addClass('has-error');
+                    return false;
+                }
+                return true;
+            },
+            save: function(ev) {
+                // console.log('save function');
+                var self = this;
+                if (self.validate()) {
+                    var values = self.get_value();
+
+                    $('.oe_network_joining').show();
+                    $('.modal-footer, .modal-body').hide();
+                    // console.log(this.network_id);
+                    ajax.jsonRpc("/networks/network/joingroup/" + this.network_id, 'call', values).then(function(data) {
+                        // console.log(data.result);
+                        $('.oe_network_joining').hide();
+                        if (data.result) {
+                            $('.modal').modal('hide');
+                            redirectUrlWithTab("members");
+                            // var url = window.location.href;
+                            // url = url.substring(0, url.indexOf('#'));
+                            // window.location = url + "#members";
+                            // location.reload();
+                        } else {
+                            self.display_alert(data.error);
+                            $('.oe_people_inviting').hide();
+                            $('.modal-footer, .modal-body').show();
+                        }
+                    });
+                }
+            },
+            cancel: function() {
+                this.trigger("cancel");
+            }
+        });
+
         var invitedialogloaded = false;
         var network_id = false;
         var invitedialog = false;
@@ -394,7 +716,7 @@ odoo.define('groupme.network.new', function(require) {
             $('.nav-tabs a[href="#members"]').tab('show');
             if (!invitedialogloaded) {
                 website.add_template_file('/groupme/static/src/xml/groupme_network_invite.xml').done(function() {
-                    network_id = $('.oe_js_invite').data('network_id');
+                    network_id = $('#oe_networkid').data('network_id');
                     invitedialog = new InvitationDialog(self, network_id);
                     invitedialog.appendTo(document.body);
                 });
@@ -403,45 +725,40 @@ odoo.define('groupme.network.new', function(require) {
                 invitedialog.appendTo(document.body);
             }
         });
+        var joind = false;
         $('#joingroup').on('click', function() {
-            $('#joingroupmodal').modal("show");
-        });
-        $('#joingroupbutton').on('click', function() {
-            var network_id = $('.oe_js_joingroup').data('network_id');
-            var values = {
-                'email_id': $('#email').val()
-            };
-            $("#resultErrorMessage").text("").css("display", "none");
-            $('.oe_network_joining').show();
-            return ajax.jsonRpc("/networks/network/joingroup/" + network_id, 'call', values).then(function(data) {
-                $('.oe_network_joining').hide();
-                if (data.result) {
-                    $('#joingroupmodal').modal('hide');
-                    $('.nav-tabs a[href="#members"]').tab('show');
-                    var url = window.location.href;
-                    url = url.substring(0, url.indexOf('#')) + "#members";
-                    window.location.replace(url);
-                    location.reload();
-                } else {
-                    $("#resultErrorMessage").text("No such User.").css("display", "block");
-                }
-            });
+            if (!joind) {
+                website.add_template_file('/groupme/static/src/xml/groupme_joingroup.xml').done(function() {
+                    network_id = $('#oe_networkid').data('network_id');
+                    joind = new JoinDialog(self, network_id);
+                    joind.appendTo(document.body);
+                });
+            } else
+                joind.appendTo(document.body);
         });
         $('.removeMember').on('click', function() {
+            var that = this;
             var memberid = $(this).data('memberid');
-            var network_id = $('.oe_js_joingroup').data('network_id');
-            return ajax.jsonRpc("/networks/network/group/" + network_id + "/" + memberid, 'call').then(function(data) {
+            var network_id = $('#oe_networkid').data('network_id');
+            return ajax.jsonRpc("/networks/network/removemember/" + network_id + "/" + memberid, 'call').then(function(data) {
                 if (data.result) {
-                    $('#joingroupmodal').modal('hide');
-                    $('.nav-tabs a[href="#members"]').tab('show');
-                    var url = window.location.href;
-                    url = url.substring(0, url.indexOf('#')) + "#members";
-                    window.location.replace(url);
-                    location.reload();
+                    $(that).parent().parent().remove();
                 } else {
                     $("#resultErrorMessage").text("No such User.").css("display", "block");
                 }
             });
+        });
+        var importd = false;
+        $('.importbutton').on('click', function() {
+            if (!importd) {
+                website.add_template_file('/groupme/static/src/xml/groupme_importcsvmembers.xml').done(function() {
+                    network_id = $('#oe_networkid').data('network_id');
+                    // console.log('importd');
+                    importd = new ImportDialog(self, network_id);
+                    importd.appendTo(document.body);
+                });
+            } else
+                importd.appendTo(document.body);
         });
     });
 });

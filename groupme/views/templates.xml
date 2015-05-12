@@ -197,20 +197,14 @@
           <div class="text-danger oe_textoverflow" t-if="not user.devicekey" t-att-title="follower.name">
             <i class="fa fa-circle"></i> <strong t-field="follower.name"/>
           </div>
-<<<<<<< HEAD
-          <div class="oe_textoverflow">
-            <small t-field="user.email" class="text-muted"/>
-=======
           <div class="oe_textoverflow" t-att-title="follower.email">
-            <small t-field="follower.email" class="text-muted"/>
-            <t t-if=" not follower.email"><small class="text-muted">No Email Address</small></t>
->>>>>>> d5ee78c43e60a51c95318c98d0880abbc18ec117
-          </div>
-          <div>
-             <small class="text-muted">Last seen, now</small>
+              <small t-field="follower.email" class="text-muted"/>
+            <div>
+               <small class="text-muted">Last seen, now</small>
+            </div>
           </div>
         </div>
-      </div>
+      </div> 
     </template>
 
     <!-- group page view -->
@@ -224,56 +218,11 @@
               </div>
               <small class="text-muted" t-if="not is_public_user">Required image resolution is 250px X 200px</small>
               <h3><span t-field="network.name"/></h3>
-<<<<<<< HEAD
                 <p style="border-bottom: 1px solid #eee;padding-bottom: 5px;">
                   <code class="strong"><strong t-esc="network.code"/> </code>
                   <button class="btn btn-success btn-xs pull-right joingroup" id="joingroup" type="button" t-if="network.visibility!='private'" t-attf-data-network_id="#{network.id}">Join Group</button>
                 </p>
-=======
-<<<<<<< HEAD
-              <p style="border-bottom: 1px solid #eee;padding-bottom: 5px;">
-                <code class="strong"><strong t-esc="network.code"/> </code>
-                <button class="btn btn-success btn-xs pull-right" type="button" t-if="network.visibility!='private' and is_public_user">Join Group</button>
-              </p>
-=======
->>>>>>> f59d27f89ff9ea3c3766ebe3d274e3f09dc60f66
-            <div class="modal" id="joingroupmodal" role="dialog" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <a class="close" data-dismiss="modal" aria-hidden="true">
-                            <span class="fa fa-times"></span>
-                        </a>
-                        <h3 class="modal-title" href="">Join Group</h3>
-                    </div>
-                    <div class="oe_network_joining text-center" style="display:none">
-                        <h4><i class='fa fa-spinner fa-spin'></i> Joining Group...  </h4>
-                    </div>
-<<<<<<< HEAD
-=======
->>>>>>> d5ee78c43e60a51c95318c98d0880abbc18ec117
 
->>>>>>> f59d27f89ff9ea3c3766ebe3d274e3f09dc60f66
-                    <div class="modal-body">
-                    <div class="alert alert-warning" id="resultErrorMessage" style="display:none" role="alert"></div>
-                        <form class="clearfix form-horizontal" t-attf-action="/networks/network/joingroup/#{network.id}" id="joingroupform" method="POST">
-                            <div class="form-group">
-                                <label for="name" class="control-label col-sm-2 pr0">Email Id</label>
-                                <div class="col-sm-10 pl8">
-                                <input id="email" name="email" placeholder="Email Address" class="form-control" required="required"/>
-                                </div>
-                            </div>
-                            <canvas id="data_canvas" style="display: none;"></canvas>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" data-loading-text="Loading..." class="btn btn-primary oe_js_joingroup" id="joingroupbutton" t-attf-data-network_id="#{network.id}">Join Group</button>
-                        or
-                        <a href="#" data-dismiss="modal" aria-hidden="true">Cancel</a>
-                    </div>
-                </div>
-            </div>
-        </div>
               <p t-if="network.visibility=='private'">
                 <i class="fa fa-lock text-muted"></i> Private Group
               </p>
@@ -281,12 +230,14 @@
               <p><i class="fa fa-map-marker text-muted"></i> <span t-field="network.location"/></p>
               <p><i class="fa fa-globe text-muted"></i> <a t-attf-href="network.sudo().author_id.website" target="_new"><span t-field="network.sudo().author_id.website"/></a><t t-if='not network.sudo().author_id.website'>Not available</t></p>
               <p><i class="fa fa-clock-o text-muted"></i> <timeago class="timeago" t-att-datetime="network.create_date"/></p>
+              <input type="hidden" id="oe_networkid" t-attf-data-network_id="#{network.id}"/>
               <t t-if="network.author_id == user_id">
                 <p>
                   <a href="#members" role="tab" data-toggle="tab">
                     <i class="fa fa-users text-muted"></i> <span t-esc="len(network.sudo().message_follower_ids)"/> members
                   </a>
-                  <a class="btn btn-success btn-xs pull-right oe_js_invite" type="button" t-if="not is_public_user" t-attf-data-network_id="#{network.id}">Invite</a>
+                  <a class="btn btn-success btn-xs pull-right oe_js_invite" type="button" t-if="not is_public_user">Invite</a>
+                  <a class="btn btn-success btn-xs pull-right importbutton" type="button" t-if="not is_public_user" style="margin-right:7px;">Import</a>
                 </p>
               </t>
               <p style="border-bottom: 1px solid #eee;padding-bottom: 5px;"><i class="fa fa-comments-o text-muted"></i> <span t-esc="network.message_per_day"/> message / day</p>
@@ -396,7 +347,6 @@
                      <p>Message history is currently enabled. <a href="#" class='js_active_msg' data-active_msg="true" t-att-data-network_id="network.id">Click here</a> to disable message tracking for this group.
                      </p>
                    </div>
-
 
                   <div class="mb16">
                     <form id="comment" t-attf-action="/networks/network/#{network.id}/comment" method="POST" t-attf-style="display:#{'block' if network.website_published else 'none'}">

@@ -63,7 +63,7 @@ class Network(models.Model):
         [('public', 'Public'), ('private', 'Private')], string='Visiblity', default="public")
 
     create_date = fields.Datetime('Create Date')
-    location = fields.Char('Location', default="Undefine")
+    location = fields.Char('Location', default="Undefined")
     message_per_day = fields.Integer('Message per Day', default=10)
     website_message_ids = fields.One2many(
         'mail.message', 'res_id',

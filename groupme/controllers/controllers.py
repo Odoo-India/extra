@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import werkzeug
-
+import base64
 from openerp import http
 # from openerp import SUPERUSER_ID
 from psycopg2 import IntegrityError
@@ -150,10 +150,6 @@ class GroupMe(http.Controller):
                     contact administrator.\nHere is the error message: % s' % e.message}
         return {'url': "/networks/network/%s" % (network_id.id)}
 
-    @http.route(['/networks/network/join'], type='json', auth='user', methods=['POST'], website=True)
-    def invite_people(self, **post):
-        return True
-
     @http.route(['/networks/network/invite'], type='json', auth='user', methods=['POST'], website=True)
     def invite_people(self, **post):
         network_obj = request.env['groupme.network']
@@ -184,15 +180,7 @@ class GroupMe(http.Controller):
         network_id.view_message = not network_id.view_message
         return {'result': True}
 
-    @http.route(['/networks/network/active_msg'], type='json', auth='user',
-                methods=['POST'], website=True)
-    def active_msg(self, **post):
-        network_obj = request.env[
-            'groupme.network'].browse([post['network_id']])
-        res = network_obj.write({'view_message': post['active']})
-        return {'result': res}
-
-    @http.route(['/networks/network/group/<model("groupme.network"):network_id>/<int:memberid>'], type='json', auth='user',
+    @http.route(['/networks/network/removemember/<model("groupme.network"):network_id>/<int:memberid>'], type='json', auth='user',
                 methods=['POST'], website=True)
     def removeMember(self, network_id, memberid, **post):
         # check authenticity
@@ -204,3 +192,55 @@ class GroupMe(http.Controller):
             pass
             # logger.info("Exception")
         return {'result': False}
+
+    @http.route(['/networks/network/joingroup/<model("groupme.network"):network_id>'], type='json', auth='public', methods=['POST'], website=True)
+    def joingroup(self, network_id, **post):
+        try:
+            respartner = request.env['res.partner']
+            userids = respartner.sudo().search(
+                [("email", "=", post["email_id"])])  # sudo required
+            # lucas.jones@thinkbig.example.com
+            # george.wilson@thinkbig.example.com
+            # laith.jubair@axelor.example.com
+            network_id.message_subscribe([userids.id])
+            return {'result': True}
+        except Exception, e:
+            print e.message, e
+            return{'result': False, 'error': 'Email Id Not Found'}
+
+    @http.route('/networks/<model("groupme.network"):network>/importusers', auth='public', type='http', website=True)
+    def importusers(self, network, **post):
+        for c_file in request.httprequest.files.getlist('csvinputfile'):
+            post['cfile'] = c_file.read().encode('base64')
+            post = base64.b64decode(post['cfile'])
+            # print
+        # logger.info(post)
+        postD = post.split('\n')
+
+        # to ignore the line headers
+        postD = postD[1: len(postD)]
+        cdata = {}
+        for line in postD:
+            try:
+                cdata['name'], cdata['email'] = line.split(',')
+                cdata['login'] = cdata['email']
+                member_idsc = request.env['res.users'].search(
+                    [('login', '=', cdata['login'])])
+                if not member_idsc:
+                    # logger.info("No such User,Create new user")
+                    # member_idsc =
+                    request.env['res.users'].sudo().create(cdata)
+                else:
+                    pass
+                    # logger.info("Member Already Exist")
+                # logger.info(member_idsc)
+                # logger.inspectElement(member_idsc)
+                # logger.info(member_idsc.id)
+                if(member_idsc.id):
+                    network.write(
+                        {'member_ids': [(4, member_idsc.id)]})
+                # logger.info(cdata)
+            except Exception, e:
+                pass
+                # logger.info("Exception" + e)
+        return http.local_redirect('/networks/' + str(network.id))
