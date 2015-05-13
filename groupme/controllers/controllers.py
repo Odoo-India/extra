@@ -2,12 +2,15 @@
 
 import werkzeug
 import base64
+import logging
 from openerp import http
 # from openerp import SUPERUSER_ID
 from psycopg2 import IntegrityError
 from openerp.tools.misc import ustr
 from openerp.addons.web.http import request
 from openerp.tools.mail import html2plaintext
+
+logger = logging.getLogger(__name__)
 
 
 class GroupMe(http.Controller):
@@ -188,9 +191,8 @@ class GroupMe(http.Controller):
             if network_id.author_id.id == request.env.user.id:
                 network_id.message_unsubscribe([memberid])
                 return {'result': True}
-        except:
-            pass
-            # logger.info("Exception")
+        except Exception, ex:
+            logger.info(ex)
         return {'result': False}
 
     @http.route(['/networks/network/joingroup/<model("groupme.network"):network_id>'], type='json', auth='public', methods=['POST'], website=True)
@@ -208,39 +210,27 @@ class GroupMe(http.Controller):
             print e.message, e
             return{'result': False, 'error': 'Email Id Not Found'}
 
-    @http.route('/networks/<model("groupme.network"):network>/importusers', auth='public', type='http', website=True)
+    @http.route('/networks/network/importmembers/<model("groupme.network"):network>', auth='user', type='http', website=True)
     def importusers(self, network, **post):
-        for c_file in request.httprequest.files.getlist('csvinputfile'):
-            post['cfile'] = c_file.read().encode('base64')
-            post = base64.b64decode(post['cfile'])
-            # print
-        # logger.info(post)
-        postD = post.split('\n')
+        for c_file in request.httprequest.files.getlist('file'):
+            edata = c_file.read().encode('base64')
+            ddata = base64.b64decode(edata)
+        userslist = ddata.split('\n')
 
-        # to ignore the line headers
-        postD = postD[1: len(postD)]
-        cdata = {}
-        for line in postD:
-            try:
-                cdata['name'], cdata['email'] = line.split(',')
-                cdata['login'] = cdata['email']
-                member_idsc = request.env['res.users'].search(
-                    [('login', '=', cdata['login'])])
-                if not member_idsc:
-                    # logger.info("No such User,Create new user")
-                    # member_idsc =
-                    request.env['res.users'].sudo().create(cdata)
-                else:
-                    pass
-                    # logger.info("Member Already Exist")
-                # logger.info(member_idsc)
-                # logger.inspectElement(member_idsc)
-                # logger.info(member_idsc.id)
-                if(member_idsc.id):
-                    network.write(
-                        {'member_ids': [(4, member_idsc.id)]})
-                # logger.info(cdata)
-            except Exception, e:
-                pass
-                # logger.info("Exception" + e)
-        return http.local_redirect('/networks/' + str(network.id))
+        # to ignore the line headers,if any
+        userslist = userslist[1: len(userslist)]
+        user = {}
+        importids = []
+        for userrecord in userslist:
+            # try:
+            user['name'], user['email'] = userrecord.split(',')
+            member_idsc = request.env['res.partner'].search(
+                [('email', '=', user['email'])])
+            if member_idsc:
+                importids.append(member_idsc.id)
+            else:
+                logger.info(user['email'] + " Not Found")
+            # except Exception, e:
+            # logger.info("Exception" + str(e))
+        network.message_subscribe(importids)
+        return http.local_redirect('/networks/network/' + str(network.id))

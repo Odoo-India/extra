@@ -11,28 +11,15 @@ odoo.define('groupme.network.new', function(require) {
     $(document).ready(function() {
 
         var url = window.location.href;
-        // console.log(url);
         var defaulttab = url.substring(url.indexOf('#'), url.length);
-        // console.log(defaulttab);
         $('.nav-tabs a[href="' + defaulttab + '"]').tab('show');
-
-        function getCurrentTab() {
-            var url = window.location.href;
-            return url.substring(url.indexOf('#'), url.length);
-        }
-
-        function createTabURL(tabname) {
-            var url = window.location.href;
-            url.substring(0, url.indexOf('#'));
-        }
 
         function redirectUrlWithTab(tab) {
             var url = window.location.href;
-            if (url.indexOf('#') != -1) {
+            if (url.indexOf('#') != -1)
                 url = url.substring(0, url.indexOf('#') + 1) + tab;
-            } else
+            else
                 url = url + "#" + tab;
-            // console.log(url);
             window.location = url;
             location.reload();
         }
@@ -422,7 +409,7 @@ odoo.define('groupme.network.new', function(require) {
             init: function(el, net_id) {
                 this.network_id = net_id;
                 this.index_content = "";
-                $("#joingroupform").attr('action', '/networks/network/joingroup/' + this.network_id);
+                // $("#joingroupform").attr('action', '/networks/network/joingroup/' + this.network_id);
             },
             start: function() {
                 this.$el.modal({
@@ -501,7 +488,7 @@ odoo.define('groupme.network.new', function(require) {
                 return this.$('#email').val();
             },
             validate: function() {
-                // console.log('validate: function(');
+
                 this.$('.form-group').removeClass('has-error');
                 if (!this.$('#email').val()) {
                     this.$('#email').closest('.form-group').addClass('has-error');
@@ -510,16 +497,16 @@ odoo.define('groupme.network.new', function(require) {
                 return true;
             },
             save: function(ev) {
-                // console.log('save function');
+
                 var self = this;
                 if (self.validate()) {
                     var values = self.get_value();
 
                     $('.oe_network_joining').show();
                     $('.modal-footer, .modal-body').hide();
-                    // console.log(this.network_id);
+
                     ajax.jsonRpc("/networks/network/joingroup/" + this.network_id, 'call', values).then(function(data) {
-                        // console.log(data.result);
+
                         $('.oe_network_joining').hide();
                         if (data.result) {
                             $('.modal').modal('hide');
@@ -552,13 +539,12 @@ odoo.define('groupme.network.new', function(require) {
             init: function(el, net_id) {
                 this.network_id = net_id;
                 this.index_content = "";
-                // $('#csvinputfile').addEventListener('change', previewCSV, false);
-                $("#importmembersform").attr('action', '/networks/network/importmembers/' + this.network_id);
             },
             start: function() {
                 this.$el.modal({
                     // backdrop: 'static'
                 });
+                $("#importmembersform").prop('action', "/networks/network/importmembers/" + this.network_id);
             },
             display_alert: function(message) {
                 this.$('.alert-warning').remove();
@@ -632,37 +618,42 @@ odoo.define('groupme.network.new', function(require) {
                 return this.$('#email').val();
             },
             previewCSV: function() {
-                // console.log('preview');
-                $("#tabledata").show();
+                if (!self.validate()) {
+                    return false;
+                }
+                $("#tabledata").removeClass("hidden");
+                $('.bs-checkbox').closest('tr').remove();
                 var data = null;
-                // var file = this.target.files[0];
                 var files = document.getElementById('upload').files[0];
-                // console.log(files[0]);
                 var reader = new FileReader();
-                reader.readAsText(files[0]);
+                reader.readAsText(files);
                 reader.onload = function(event) {
                     var csvData = event.target.result;
-                    // console.log(csvData);
+                    // var html = " <div style=\"height:600px; overflow:scroll;\">";
                     var html = "";
                     var rows = csvData.split("\n");
-                    rows = rows.slice(1, rows.length)
+                    rows = rows.slice(1, rows.length);
                     rows.forEach(function getvalues(ourrow) {
-                        html += "<tr><td class=\"bs-checkbox\"><input class=\"btSelectItem\" type=\"checkbox\"/></td>";
+                        // html += "<tr><td class=\"bs-checkbox\"><input class=\"btSelectItem\" type=\"checkbox\"/></td>";
+                        html += "<tr><td></td>";
                         var columns = ourrow.split(",");
                         for (var i = 0; i <= columns.length - 1; i++) {
-                            html += "<td contenteditable=\"true\">" + columns[i] + "</td>";
+                            // html += "<td contenteditable=\"true\">" + columns[i] + "</td>";
+                            html += "<td>" + columns[i] + "</td>";
                         };
-                        html += "<td><span class =\"table-remove glyphicon glyphicon-remove\"></span> </td> </span> </td>";
-
+                        // html += "<td><span class =\"table-remove fa fa-times\"></span> </td> </span> </td>";
+                        html += "<td> </td>";
                         html += "</tr>";
                     });
-                    console.log(html);
+                    // html = html + "</div>";
                     $('#tabledata').append(html);
-                    // if (data && data.length > 0) {
-                    //   alert('Imported -' + data.length + '- rows successfully!');
-                    // } else {
-                    //   alert('No data to import!');
-                    // }
+                    //for future needs 
+                    // $(".btSelectAll").on('click', function() {
+                    //     $('.btSelectItem').prop('checked', $('.btSelectAll').prop('checked'));
+                    // });
+                    // $(".table-remove").on('click', function() {
+                    //     $(this).closest("tr").remove();
+                    // });
                 };
                 reader.onerror = function() {
                     //alert('Unable to read ' + file.fileName);
@@ -670,39 +661,20 @@ odoo.define('groupme.network.new', function(require) {
 
             },
             validate: function() {
-                // console.log('validate: function(');
                 this.$('.form-group').removeClass('has-error');
-                if (!this.$('#email').val()) {
-                    this.$('#email').closest('.form-group').addClass('has-error');
+                if (!this.$('#upload').val()) {
+                    this.$('#upload').closest('.form-group').addClass('has-error');
                     return false;
                 }
                 return true;
             },
             save: function(ev) {
-                // console.log('save function');
                 var self = this;
                 if (self.validate()) {
                     var values = self.get_value();
-
-                    $('.oe_network_joining').show();
+                    $('.oe_members_upload_loading').show();
                     $('.modal-footer, .modal-body').hide();
-                    // console.log(this.network_id);
-                    ajax.jsonRpc("/networks/network/joingroup/" + this.network_id, 'call', values).then(function(data) {
-                        // console.log(data.result);
-                        $('.oe_network_joining').hide();
-                        if (data.result) {
-                            $('.modal').modal('hide');
-                            redirectUrlWithTab("members");
-                            // var url = window.location.href;
-                            // url = url.substring(0, url.indexOf('#'));
-                            // window.location = url + "#members";
-                            // location.reload();
-                        } else {
-                            self.display_alert(data.error);
-                            $('.oe_people_inviting').hide();
-                            $('.modal-footer, .modal-body').show();
-                        }
-                    });
+                    $("#importmembersform").submit();
                 }
             },
             cancel: function() {
@@ -754,7 +726,6 @@ odoo.define('groupme.network.new', function(require) {
             if (!importd) {
                 website.add_template_file('/groupme/static/src/xml/groupme_importcsvmembers.xml').done(function() {
                     network_id = $('#oe_networkid').data('network_id');
-                    // console.log('importd');
                     importd = new ImportDialog(self, network_id);
                     importd.appendTo(document.body);
                 });

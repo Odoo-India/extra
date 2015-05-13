@@ -8,11 +8,11 @@
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                         <h3 class="modal-title">Upload CSV File</h3>
                     </div>
-                    <div class="oe_slides_upload_loading text-center" style="display:none">
+                    <div class="oe_members_upload_loading text-center" style="display:none">
                         <h4><i class='fa fa-spinner fa-spin'></i> Uploading CSV File...  </h4>
                     </div>
                     <div class="modal-body">
-                        <form class="clearfix form-horizontal" id="importmembersform">
+                        <form class="clearfix form-horizontal" enctype="multipart/form-data"  method="post" id="importmembersform">
                             <div class="form-group">
                                 <div class="col-md-12">
                                     <ul class="list-group">
@@ -22,16 +22,30 @@
                                             </h5>
                                             <input id="upload" name="file" class="form-control" accept=".csv" type="file"/>
                                         </li>
-                                        <li class="list-group-item">
-                                            <h5 class="list-group-item-heading">
-                                                <label for="url" class="control-label">CSV URL</label>
-                                            </h5>
-                                            <input id="url" name="url" class="form-control" placeholder="CSV URL"/>
-                                        </li>
                                     </ul>
                                 </div>
                             </div>
                         </form>
+                    </div>
+                    <div class="table-responsive">
+                      <table data-toggle="table" data-cache="false"  class="table table-hover hidden" data-click-to-select="true" data-height="299" data-select-item-name="radioName" id="tabledata" >
+                        <thead>
+                          <tr>
+                            <th style="width:36px;">
+                              <div class="th-inner">
+                                
+                              </div>
+                            </th>
+                            <th style="text-align: left;">
+                              <div class="th-inner ">UserName</div>
+                            </th>
+                            <th style="text-align: ; ">
+                              <div class="th-inner ">EMAIL</div>
+                              <div class="fht-cell"/>
+                            </th>
+                          </tr>
+                        </thead>
+                     </table>
                     </div>
                     <div class="modal-footer">
                         <button type="button" data-loading-text="Loading..." class="btn btn-primary preview">Preview</button>
