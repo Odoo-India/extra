@@ -23,7 +23,13 @@
                 <img t-attf-src="http://#{odoo_website.url}/logo.png" class="img img-responsive"/>
                 <h2 t-esc="odoo_website.name"/>
                 <p t-esc="odoo_website.description"/>
-                <p t-esc="odoo_website.version"/>
+
+                <div class="alert alert-info" role="alert">
+                  <i class="fa fa-info-circle"></i>
+                  <span class="sr-only">Information:</span>
+                  We are processing your website for Google PageSpeed Insights, Please check after some times.
+                </div>
+
               </div>
               <div class="col-md-6">
                 <img t-attf-src="/website/image/odoo.website/#{odoo_website.id}/image" class="img img-responsive" style="width: 100%;"/>
@@ -76,19 +82,11 @@
                 <h1 class="text-center o_default_snippet_text">They use odoo cms in production </h1>
                 <h3 class="text-muted text-center o_default_snippet_text">thousands of beautiful websites</h3>
               </div>
-
-              <div id="owl-demo" class="col-md-12 mt32">
-                <div class="item"><img src="http://placehold.it/350x150/EF5350/FFFFFF" alt="Owl Image"/></div>
-                <div class="item"><img src="http://placehold.it/350x150/EC407A/FFFFFF" alt="Owl Image"/></div>
-                <div class="item"><img src="http://placehold.it/350x150/AB47BC/FFFFFF" alt="Owl Image"/></div>
-                <div class="item"><img src="http://placehold.it/350x150/7E57C2/FFFFFF" alt="Owl Image"/></div>
-                <div class="item"><img src="http://placehold.it/350x150/5C6BC0/FFFFFF" alt="Owl Image"/></div>
-                <div class="item"><img src="http://placehold.it/350x150/42A5F5/FFFFFF" alt="Owl Image"/></div>
-                <div class="item"><img src="http://placehold.it/350x150/29B6F6/FFFFFF" alt="Owl Image"/></div>
-                <div class="item"><img src="http://placehold.it/350x150/5D4037/FFFFFF" alt="Owl Image"/></div>
-                <div class="item"><img src="http://placehold.it/350x150/00796B/FFFFFF" alt="Owl Image"/></div>
+              <div id="owl-demo" class="col-md-12 mt32" style="height: 600px;overflow: hidden;">
+                <div t-foreach="websites" t-as="odoo_website" class="item">
+                  <img t-attf-src="/website/image/odoo.website/#{odoo_website.id}/image" alt="Owl Image"/>
+                </div>
               </div>
-
             </div>
           </div>
         </section>

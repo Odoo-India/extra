@@ -11,16 +11,16 @@ class OdooWebsites(http.Controller):
 
     @http.route('/websites', auth='public', type='http', website=True)
     def index(self, search=False, category_obj=False, tag_obj=False, page=1, **post):
-        # website_obj = request.env['odoo.website']
+        website_obj = request.env['odoo.website']
 
         res_user = request.env.user
         public_user = request.website.user_id
 
-        # websites = website_obj.search([])
+        websites = website_obj.search([], limit=5)
         
         return request.render('odoo_website.websites', {
             'title': 'Websites build with Odoo CMS',
-            # 'websites': websites,
+            'websites': websites,
             'is_public_user': res_user == public_user
             # 'search': search,
             # 'pager': pager,

@@ -17,7 +17,7 @@ from openerp import models, fields, api, _
 class OdooWebsite(models.Model):
     _name = 'odoo.website'
     _inherit = ['mail.thread', 'website.seo.metadata']
-    _order = 'name'
+    _order = 'id desc'
 
     url = fields.Char('Website Url')
     image = fields.Binary(compute='_get_desktop_image', store=True, string='Image')
