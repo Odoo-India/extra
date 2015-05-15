@@ -43,8 +43,7 @@ class OdooWebsites(http.Controller):
             }
             website_inst = website_obj.search([('url','=',website)], limit=1)
             if not website_inst:
-                website_inst = website_obj.create(vals)
-                website_inst.verify_odoo()
+                website_inst = website_obj.sudo().create(vals)
 
             url = '/websites/view/%s' % (website_inst.id)
             return werkzeug.utils.redirect(url)

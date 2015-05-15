@@ -20,20 +20,13 @@
           <div class="container">
             <div class="row">
               <div class="col-md-6">
-                <img src="http://placehold.it/350x150/EF5350/FFFFFF" id="website_image" class="img img-responsive" style="width: 100%;"/>
+                <img t-attf-src="http://#{odoo_website.url}/logo.png" class="img img-responsive"/>
+                <h2 t-esc="odoo_website.name"/>
+                <p t-esc="odoo_website.description"/>
+                <p t-esc="odoo_website.version"/>
               </div>
               <div class="col-md-6">
-                <h2 t-esc="odoo_website.name" style="margin-top: 0px;"/>
-                <p t-esc="odoo_website.description"/>
-                <p t-esc="odoo_website.version_info"/>
-                <h4 class="o_default_snippet_text">
-                  Share
-                  <a target="_Blank" class="oe_share_facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Flocalhost%3A8069%2Fnetworks%2Fnetwork%2Fodoo-employees-1"><i class="fa fa-facebook-square"></i></a>
-                  <a target="_Blank" class="oe_share_twitter" href="https://twitter.com/intent/tweet?text=network_view %7C localhost&amp;url=http%3A%2F%2Flocalhost%3A8069%2Fnetworks%2Fnetwork%2Fodoo-employees-1"><i class="fa fa-twitter"></i></a>
-                  <a target="_Blank" class="oe_share_linkedin" href="http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Flocalhost%3A8069%2Fnetworks%2Fnetwork%2Fodoo-employees-1&amp;title=network_view %7C localhost&amp;"><i class="fa fa-linkedin"></i></a>
-                  <a target="_Blank" class="oe_share_google" href="https://plus.google.com/share?url=http%3A%2F%2Flocalhost%3A8069%2Fnetworks%2Fnetwork%2Fodoo-employees-1"><i class="fa fa-google-plus-square"></i></a>
-                  <a href="mailto:?body=http%3A%2F%2Flocalhost%3A8069%2Fnetworks%2Fnetwork%2Fodoo-employees-1&amp;subject=network_view %7C localhost"><i class="fa fa-envelope-o"></i></a>
-                </h4>
+                <img t-attf-src="/website/image/odoo.website/#{odoo_website.id}/image" class="img img-responsive" style="width: 100%;"/>
               </div>
             </div>
           </div>

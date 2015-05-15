@@ -26,8 +26,8 @@
                         <field name="image_mobile" widget="image"/>
                         <field name="description"/>
                         <field name="url"/>
-                        <field name="is_odoo"/>
-                        <field name="version_info"/>
+                        <field name="odoo"/>
+                        <field name="version"/>
                     </group>
                 </sheet>
                 <div class="oe_chatter">
