@@ -1,0 +1,132 @@
+<openerp>
+  <data>
+
+    <!-- frontend assets -->
+    <template id="assets_frontend" inherit_id="website.assets_frontend" name="Groupme">
+      <xpath expr="." position="inside">
+        <title>Websites build with Odoo CMS</title>
+        <link type="text/less" href="/odoo_website/static/src/less/odoo_website.less" rel="stylesheet" t-ignore="true"/>
+        <link type="text/less" href="/odoo_website/static/src/css/owl.carousel.css" rel="stylesheet"/>
+        <link type="text/less" href="/odoo_website/static/src/css/owl.theme.css" rel="stylesheet"/>
+
+        <script type="text/javascript" src="/odoo_website/static/src/js/odoo_website.js"></script>
+        <script type="text/javascript" src="/odoo_website/static/src/js/owl.carousel.js"></script>
+      </xpath>
+    </template>
+
+    <template id="new">
+      <t t-call="website.layout">
+        <section class="mt16">
+          <div class="container">
+            <div class="row">
+              <div class="col-md-6">
+                <img src="http://placehold.it/350x150/EF5350/FFFFFF" id="website_image" class="img img-responsive" style="width: 100%;"/>
+              </div>
+              <div class="col-md-6">
+                <h2 t-esc="odoo_website.name" style="margin-top: 0px;"/>
+                <p t-esc="odoo_website.description"/>
+                <p t-esc="odoo_website.version_info"/>
+                <h4 class="o_default_snippet_text">
+                  Share
+                  <a target="_Blank" class="oe_share_facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Flocalhost%3A8069%2Fnetworks%2Fnetwork%2Fodoo-employees-1"><i class="fa fa-facebook-square"></i></a>
+                  <a target="_Blank" class="oe_share_twitter" href="https://twitter.com/intent/tweet?text=network_view %7C localhost&amp;url=http%3A%2F%2Flocalhost%3A8069%2Fnetworks%2Fnetwork%2Fodoo-employees-1"><i class="fa fa-twitter"></i></a>
+                  <a target="_Blank" class="oe_share_linkedin" href="http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Flocalhost%3A8069%2Fnetworks%2Fnetwork%2Fodoo-employees-1&amp;title=network_view %7C localhost&amp;"><i class="fa fa-linkedin"></i></a>
+                  <a target="_Blank" class="oe_share_google" href="https://plus.google.com/share?url=http%3A%2F%2Flocalhost%3A8069%2Fnetworks%2Fnetwork%2Fodoo-employees-1"><i class="fa fa-google-plus-square"></i></a>
+                  <a href="mailto:?body=http%3A%2F%2Flocalhost%3A8069%2Fnetworks%2Fnetwork%2Fodoo-employees-1&amp;subject=network_view %7C localhost"><i class="fa fa-envelope-o"></i></a>
+                </h4>
+              </div>
+            </div>
+          </div>
+        </section>
+      </t>
+    </template>
+
+    <!-- display list of groups --> 
+    <template id="websites">
+      <t t-call="website.layout">
+
+        <section class="vertical-center" style="background-color:#EEE;">
+          <div class="container">
+            <div class="row">
+              <div class="col-md-8 col-md-offset-2">
+                <h3 class="text-center">
+                  <span class="o_logo"><span class="o_logo_main">odoo</span><span class="o_logo_app"> cms</span></span>
+                </h3>
+
+                <h3 class="text-muted text-center o_default_snippet_text">Submit a website built with odoo cms</h3>
+                <form method="post" action="/websites/new">
+                <div class="input-group col-md-12">
+                    <input type="text" name="website" class="form-control" placeholder="www.odoo.com"/>
+                    <span class="input-group-btn">
+                      <button class="btn btn-primary" type="submit"><i class="fa fa-arrow-right"></i> Submit</button>
+                    </span>
+                </div>
+                </form>
+                <div class="col-md-2">
+
+                </div>
+              </div>
+              <div class="col-md-8 col-md-offset-2 mt16">
+                <p class="small text-center">Submit a website build with odoo.com, it will be visible to users of odoowebsites.com. By clicking on submit button you accept the <a href="#">Terms and Conditions</a>.</p>
+                <p t-esc="status"/>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- <hr class="s_separator"/> -->
+
+        <section class="vertical-center mt16">
+          <div class="container">
+            <div class="row mb16">
+              <div class="col-md-12 col-xs-12">
+                <h1 class="text-center o_default_snippet_text">They use odoo cms in production </h1>
+                <h3 class="text-muted text-center o_default_snippet_text">thousands of beautiful websites</h3>
+              </div>
+
+              <div id="owl-demo" class="col-md-12 mt32">
+                <div class="item"><img src="http://placehold.it/350x150/EF5350/FFFFFF" alt="Owl Image"/></div>
+                <div class="item"><img src="http://placehold.it/350x150/EC407A/FFFFFF" alt="Owl Image"/></div>
+                <div class="item"><img src="http://placehold.it/350x150/AB47BC/FFFFFF" alt="Owl Image"/></div>
+                <div class="item"><img src="http://placehold.it/350x150/7E57C2/FFFFFF" alt="Owl Image"/></div>
+                <div class="item"><img src="http://placehold.it/350x150/5C6BC0/FFFFFF" alt="Owl Image"/></div>
+                <div class="item"><img src="http://placehold.it/350x150/42A5F5/FFFFFF" alt="Owl Image"/></div>
+                <div class="item"><img src="http://placehold.it/350x150/29B6F6/FFFFFF" alt="Owl Image"/></div>
+                <div class="item"><img src="http://placehold.it/350x150/5D4037/FFFFFF" alt="Owl Image"/></div>
+                <div class="item"><img src="http://placehold.it/350x150/00796B/FFFFFF" alt="Owl Image"/></div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- <section id="section-statistics" class="content bg-color-1">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="statistic">
+                <div class="number o_default_snippet_text">2780</div>
+                <div class="title o_default_snippet_text">Websites</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="statistic">
+                <div class="number o_default_snippet_text">2780</div>
+                <div class="title o_default_snippet_text">Stores</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="statistic">
+                <div class="number o_default_snippet_text">2780</div>
+                <div class="title o_default_snippet_text">Blogs</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section> -->
+
+      </t>
+    </template>
+
+  </data>
+</openerp>

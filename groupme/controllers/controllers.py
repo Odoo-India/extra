@@ -9,7 +9,6 @@ from openerp.tools.misc import ustr
 from openerp.addons.web.http import request
 from openerp.tools.mail import html2plaintext
 
-
 class GroupMe(http.Controller):
 
     _networks_per_page = 12

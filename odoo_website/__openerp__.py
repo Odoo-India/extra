@@ -20,18 +20,18 @@
 ##############################################################################
 
 {
-    'name': 'Odoo Website',
+    'name': 'Odoo Websites',
     'category': 'Website',
     'version': '1.0',
-    'description': """
-Odoo websites
+    'description': """Odoo websites
 =============
-
-        """,
+    """,
     'author': 'OpenERP SA',
     'depends': ['mail','website'],
     'data': [
-        'views/website_examples.xml',
+        'views/views.xml',
+        'views/templates.xml',
+        'security/ir.model.access.csv',
     ],
     'installable': True,
 }

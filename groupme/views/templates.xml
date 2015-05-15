@@ -43,28 +43,6 @@
                 <p class="lead">120k Messages</p>
               </div>
             </div>
-<!-- 
-            <div class="col-md-2 text-center">
-              <h1>40k</h1>
-              <div class="text">
-                <p class="lead">Groups</p>
-              </div>
-            </div>
-
-            <div class="col-md-2 text-center">
-              <h1>12k</h1>
-              <div class="text">
-                <p class="lead">Members</p>
-              </div>
-            </div>
-
-            <div class="col-md-2 text-center">
-              <h1>120k</h1>
-              <div class="text">
-                <p class="lead">Messages</p>
-              </div>
-            </div> -->
-
           </div>
         </div>
       </section>
@@ -111,33 +89,6 @@
       <t t-call="website.layout">
         <t t-call="groupme.state_counter"/>
         <div class="container">
-          <div class="row" style="border-bottom: 1px solid #eee;padding-bottom: 15px;">
-            <div class="col-md-8">
-                <t t-call="website.pager" style="margin: auto;"/>
-            </div>
-            <div class="col-md-4">
-              <form method="get" action="/networks">
-                <div class="input-group">
-                  <input type="text" class="form-control" name="search" t-attf-placeholder="Search for groups" t-att-value="search"/>
-                  <span class="input-group-btn">
-                    <a class="btn btn-danger" href="/networks" t-if="search">
-                      <i class="fa fa-times"></i>
-                    </a>
-
-                    <button class="btn btn-primary" type="submit">
-                      <i class="fa fa-search"></i>
-                    </button>
-                    <a class="btn btn-success oe_js_network_new" title="Create Group" t-if="not is_public_user">
-                      <i class="fa fa-plus"></i> Create
-                    </a>
-                    <t t-esc="is_public_user">is_public_user</t>
-                    <div id="userlevel" t-attf-data-userlevel=""></div>
-                  </span>
-                </div>
-              </form>
-            </div>
-          </div>
-          
           <div class="row">
             <div class="mt16">
               <div t-foreach="networks" t-as="network" class="col-sm-3 col-md-3">
@@ -183,7 +134,7 @@
 
     <!-- follower card -->
     <template id="follower_card">
-      <div class="row well" style="padding: 5px;margin-right: 1px;">
+      <div class="row panel" style="padding: 5px;margin-right: 1px;">
         <t t-if="network.author_id == user_id ">
           <i class="fa fa-times pull-right removeMember" t-attf-data-memberid="#{follower.id}" style="opacity:0.4"></i>
         </t>
@@ -376,7 +327,7 @@
                     <h4 class="text-muted" style="border-bottom: 1px solid #ccc;padding-bottom: 5px;"><span t-esc="len(comments)"/> Messages sent</h4>
 
                     <ul class="media-list mb8 oe-message-scroll">
-                      <li t-foreach="comments" t-as="message" class="media well" style="padding: 5px;">
+                      <li t-foreach="comments" t-as="message" class="media panel" style="padding: 5px;margin: 5px;">
                         <span class="pull-left" style="height:60px;width:60px;padding: 0px;overflow: hidden;">
                           <img class="img media-object"
                             t-att-src="'/website/image?model=mail.message&amp;field=author_avatar&amp;id='+str(message.id)"
