@@ -20,9 +20,18 @@ class OdooWebsite(models.Model):
     _order = 'id desc'
 
     url = fields.Char('Website Url')
-    image = fields.Binary(compute='_get_desktop_image', store=True, string='Image')
-    image_mobile = fields.Binary(compute='_get_mobile_image', store=True, string='Mobile Image')
-    
+    full_url = fields.Char(compute="_compute_urls", store=True, string='Website Full Url')
+    base_url = fields.Char(compute="_compute_urls", store=True, string='Base Url')
+    image = fields.Binary(string='Desktop Image')
+    image_laptop = fields.Binary(string='Laptop Image')
+    image_tablet = fields.Binary(string='Tablet Image')
+    image_mobile = fields.Binary(string='Mobile Image')
+
+    is_image = fields.Boolean(string='Desktop Image Generated')
+    is_image_laptop = fields.Boolean(string='Laptop Image Generated')
+    is_image_tablet = fields.Boolean(string='Tablet Image Generated')
+    is_image_mobile = fields.Boolean(string='Mobile Image Generated')
+
     name = fields.Char(compute='_copute_meta', store=True, string='Website Name')
     description = fields.Text(compute='_copute_meta', store=True, string='Description')
 
@@ -73,11 +82,12 @@ class OdooWebsite(models.Model):
         except URLError, e:
             self.is_odoo = False
 
-    def url_to_thumb(self, url, zoom=1, height=1000, width=1024):
+    def url_to_thumb(self, zoom=1, height=1000, width=1024):
+        full_url, base_url = self.get_urls()
         fd, path = tempfile.mkstemp(suffix='.png', prefix='website.thumb.')
         try:
             process = subprocess.Popen(
-                ['wkhtmltoimage', '--height', str(height), '--zoom', str(zoom),'--width',str(width), url, path], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+                ['wkhtmltoimage', '--height', str(height), '--zoom', str(zoom),'--width',str(width), full_url, path], stdout=subprocess.PIPE, stderr=subprocess.PIPE
             )
         except (OSError, IOError):
             return False
@@ -93,12 +103,7 @@ class OdooWebsite(models.Model):
 
     @api.one
     @api.depends('url')
-    def _get_desktop_image(self):
+    def _compute_urls(self):
         full_url, base_url = self.get_urls()
-        self.image =  self.url_to_thumb(full_url, zoom=0.9)
-
-    @api.one
-    @api.depends('url')
-    def _get_mobile_image(self):
-        full_url, base_url = self.get_urls()
-        self.image_mobile = self.url_to_thumb(full_url, width=400, height=600)
+        self.base_url = base_url
+        self.full_url = full_url

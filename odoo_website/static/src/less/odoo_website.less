@@ -100,3 +100,103 @@
     overflow: hidden;
     background-size: cover !important;
 }
+
+
+#o_responsive_mockup_screens {
+    position:relative;
+    width:100%;
+    margin: 15px;
+    .desktop {
+        .screen {
+            width: 82%;
+            margin-left: 14%;
+            margin-top: 6%;
+            z-index:2;
+            position:absolute;
+        }
+        .back {
+            width: 90%;
+            margin-left: 10%;
+            position: absolute;
+        }
+        img.img_loader{
+            position: absolute;
+            margin-top: 30%;
+            margin-left: 51%;
+            z-index: 200;
+        }
+    }
+    .mobile {
+        .screen {
+            width: 12%;
+            margin-left: 22.8%;
+            margin-top: 66%;
+            z-index: 10;
+            position: absolute;
+        }
+        .back {
+            width: 16%;
+            margin-top: 61%;
+            margin-left: 21%;
+            position: absolute;
+            z-index:9;
+        }
+        img.img_loader{
+            margin-left: 27%;
+            margin-top: 73%;
+            position: absolute;
+            z-index: 200;
+            width: 14px;
+        }
+    }
+    .tablet {
+        .screen {
+            width: 24.5%;
+            margin-left: 5.3%;
+            margin-top: 53%;
+            z-index: 5;
+            position: absolute;
+        }
+        .back {
+            width: 35%;
+            margin-top: 48%;
+            margin-left: 0%;
+            position: absolute;
+            z-index:4;
+        }
+        img.img_loader{
+            margin-left: 15.3%;
+            margin-top: 68%;
+            z-index: 9;
+            position: absolute;
+        }
+    }
+    .laptop {
+        .screen {
+            width: 56.2%;
+            margin-left: 64.3%;
+            margin-top: 52%;
+            z-index: 5;
+            position: absolute;
+        }
+        .back {
+            width: 75%;
+            margin-top: 48%;
+            margin-left: 55%;
+            position: absolute;
+            z-index:4;
+        }
+        img.img_loader{
+            margin-left: 88.3%;
+            margin-top: 69%;
+            z-index: 200;
+            position: absolute;
+        }
+    }
+    .back_spaceing{
+        visibility: hidden;
+        img{
+            width: 100%;
+        }
+    }
+}

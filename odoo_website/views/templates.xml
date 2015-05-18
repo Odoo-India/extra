@@ -45,8 +45,8 @@
         <section class="mt16">
           <div class="container">
             <div class="row">
-              <div class="col-md-6">
-                <img t-attf-src="http://#{odoo_website.url}/logo.png" class="img img-responsive"/>
+              <div class="col-md-6 col-xs-12">
+                <img t-attf-src="#{odoo_website.base_url}/logo.png" class="img img-responsive"/>
                 <h2 t-esc="odoo_website.name"/>
                 <p t-esc="odoo_website.description"/>
 
@@ -56,8 +56,43 @@
                 </div>
 
               </div>
-              <div class="col-md-6">
-                <img t-attf-src="/website/image/odoo.website/#{odoo_website.id}/image" class="img img-responsive" style="width: 100%;"/>
+              <div class="col-md-5 col-xs-9">
+                <!-- <img t-attf-src="/website/image/odoo.website/#{odoo_website.id}/image" class="img img-responsive" style="width: 100%;"/> -->
+                <div id="o_responsive_mockup_screens">
+                    <div class="desktop">
+                        <img class="back" src="/odoo_website/static/img/large-screen-optimised.png" />
+                        <img class="screen" t-att-src="odoo_website.is_image and '/website/image/odoo.website/' + str(odoo_website.id) + '/image' or '/odoo_website/static/img/desktop.png'" />
+                        <t t-if="not odoo_website.is_image">
+                          <img class="img_loader" src="/odoo_website/static/img/loader.gif" t-att-data-id="odoo_website.id" t-attf-data-src="/website/image/odoo.website/#{odoo_website.id}/image"/>
+                        </t>
+                    </div>
+                    <div class="mobile">
+                        <img class="back" src="/odoo_website/static/img/iphone-optimised.png" />
+                        <img class="screen" t-att-src="odoo_website.is_image_mobile and '/website/image/odoo.website/' + str(odoo_website.id) + '/image_mobile' or '/odoo_website/static/img/mobile.png'" />
+                        <t t-if="not odoo_website.is_image_mobile">
+                          <img class="img_loader" src="/odoo_website/static/img/loader.gif" t-att-data-id="odoo_website.id" t-attf-data-src="/website/image/odoo.website/#{odoo_website.id}/image_mobile"/>
+                        </t>
+                    </div>
+                    <div class="tablet">
+                        <img class="back" src="/odoo_website/static/img/ipad-optimised.png" />
+                        <img class="screen" t-att-src="odoo_website.is_image_tablet and '/website/image/odoo.website/' + str(odoo_website.id) + '/image_tablet' or '/odoo_website/static/img/tablet.png'" />
+                        <t t-if="not odoo_website.is_image_tablet">
+                          <img class="img_loader" src="/odoo_website/static/img/loader.gif" t-att-data-id="odoo_website.id" t-attf-data-src="/website/image/odoo.website/#{odoo_website.id}/image_tablet"/>
+                        </t>
+                    </div>  
+                    <div class="laptop">
+                        <img class="back" src="/odoo_website/static/img/laptop-screen-optimised.png" />
+                        <img class="screen" t-att-src="odoo_website.is_image_laptop and '/website/image/odoo.website/' + str(odoo_website.id) + '/image_laptop' or '/odoo_website/static/img/laptop.png'" />
+                        <t t-if="not odoo_website.is_image_laptop">
+                          <img class="img_loader" src="/odoo_website/static/img/loader.gif" t-att-data-id="odoo_website.id" t-attf-data-src="/website/image/odoo.website/#{odoo_website.id}/image_laptop"/>
+                        </t>
+                    </div>
+                    <div class="back_spaceing">
+                        <img class="back" src="http://ami.responsivedesign.is/images/large-screen-optimised.png" />
+                    </div>
+                </div>
+                <div class="col-md-1">
+                </div>
               </div>
             </div>
           </div>
@@ -107,10 +142,10 @@
                 <h1 class="text-center o_default_snippet_text">They use odoo cms in production </h1>
                 <h3 class="text-muted text-center o_default_snippet_text">thousands of beautiful websites</h3>
               </div>
-              <div id="owl-demo" class="col-md-12 mt32" style="height: 600px;overflow: hidden;">
+              <div id="owl-demo" class="col-md-12 mt32" style="overflow: hidden;">
                 <div t-foreach="websites" t-as="odoo_website" class="item">
                   <a t-attf-href="/websites/view/#{odoo_website.id}">
-                    <img t-attf-src="/website/image/odoo.website/#{odoo_website.id}/image" alt="Owl Image"/>
+                    <img t-attf-src="/website/image/odoo.website/#{odoo_website.id}/image" class="img img-responsive shadow" alt="Owl Image"/>
                   </a>
                 </div>
               </div>

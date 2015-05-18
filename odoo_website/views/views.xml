@@ -20,11 +20,25 @@
         <field name="arch" type="xml">
             <form string="Blog">
                 <sheet>
+                    <div>
+                        <h2><field name="name"/></h2>
+                        <h4 class="text-muted"><field name="description"/></h4>
+                    </div>
                     <group>
-                        <field name="name"/>
-                        <field name="image" widget="image"/>
-                        <field name="image_mobile" widget="image"/>
-                        <field name="description"/>
+                        <group>
+                            <field name="image" widget="image"/>
+                            <field name="is_image"/>
+                            <field name="image_laptop" widget="image"/>
+                            <field name="is_image_laptop"/>
+                        </group>
+                        <group>
+                            <field name="image_mobile" widget="image"/>
+                            <field name="is_image_mobile"/>
+                            <field name="image_tablet" widget="image"/>
+                            <field name="is_image_tablet"/>
+                        </group>
+                    </group>
+                    <group>
                         <field name="url"/>
                         <field name="odoo"/>
                         <field name="version"/>

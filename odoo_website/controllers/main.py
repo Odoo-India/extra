@@ -16,8 +16,8 @@ class OdooWebsites(http.Controller):
         res_user = request.env.user
         public_user = request.website.user_id
 
-        websites = website_obj.search([], limit=5)
-        
+        websites = website_obj.search([], limit=10)
+
         return request.render('odoo_website.websites', {
             'title': 'Websites build with Odoo CMS',
             'websites': websites,
@@ -61,3 +61,19 @@ class OdooWebsites(http.Controller):
         else:
             #TODO: error page
             pass
+
+    @http.route('/websites/genrate_screenshot/<model("odoo.website"):odoo_website>', auth='public', type='json', website=True)
+    def genrate_screenshot(self, odoo_website, type=None):
+        if type == 'desktop':
+            odoo_website.image = odoo_website.url_to_thumb(zoom=0.9, width=1350, height=850)
+            odoo_website.is_image = True
+        if type == 'mobile':
+            odoo_website.image_mobile = odoo_website.url_to_thumb(width=400, height=630)
+            odoo_website.is_image_mobile = True
+        if type == 'tablet':
+            odoo_website.image_tablet = odoo_website.url_to_thumb(width=820, height=1050)
+            odoo_website.is_image_tablet = True
+        if type == 'laptop':
+            odoo_website.image_laptop = odoo_website.url_to_thumb(width=1250, height=790)
+            odoo_website.is_image_laptop = True
+        return {'status': True}
