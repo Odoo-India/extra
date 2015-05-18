@@ -22,14 +22,25 @@ class OdooWebsites(http.Controller):
             'title': 'Websites build with Odoo CMS',
             'websites': websites,
             'is_public_user': res_user == public_user
-            # 'search': search,
-            # 'pager': pager,
-            # 'user_id': res_user
         })
+
+
+    @http.route('/websites/all', auth='public', type='http', website=True)
+    def website_list(self, **post):
+        website_obj = request.env['odoo.website']
+
+        res_user = request.env.user
+        public_user = request.website.user_id
+        websites = website_obj.search([], limit=5)
+        return request.render('odoo_website.website_list', {
+            'websites': websites,
+            'is_public_user': res_user == public_user
+        })
+
 
     @http.route('/websites/view/<model("odoo.website"):website_id>', auth='public', type='http', method='POST', website=True)
     def view(self, website_id, **post):
-       return request.render('odoo_website.new', {
+       return request.render('odoo_website.view', {
             'odoo_website': website_id
         })
 

@@ -107,7 +107,7 @@
         <a t-attf-href="/networks/network/#{network.id}">
           <div class="group-image" t-attf-style="background: url('/website/image/groupme.network/#{network.id}/image_thumb');">
           </div>
-         </a>
+        </a>
         <div class="caption">
           <h4 style="margin-top: 5px;" class="oe_textoverflow" t-att-title="network.name"><span t-field="network.name"/></h4>
           <p class="text-muted clearfix">

@@ -14,7 +14,33 @@
       </xpath>
     </template>
 
-    <template id="new">
+    <!-- display list of groups --> 
+    <template id="website_list">
+      <t t-call="website.layout">
+        <section>
+          <div class="oe_structure"/>
+          <div class="container mt16">
+            <div class="row">
+              <div t-foreach="websites" t-as="odoo_website" class="col-sm-3 col-md-3">
+                <div class="thumbnail">
+                  <a t-attf-href="/websites/view/#{odoo_website.id}">
+                    <div class="group-image" t-attf-style="background: url('/website/image/odoo.website/#{odoo_website.id}/image');">
+                    </div>
+                  </a>
+                  <div class="caption">
+                    <h4 t-esc="odoo_website.name" class="oe_textoverflow"/>
+                    <a t-attf-href="http://#{odoo_website.url}"><p t-esc="odoo_website.url"/></a>
+                    <!-- <p t-esc="odoo_website.description"/> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </t>
+    </template>
+ 
+    <template id="view">
       <t t-call="website.layout">
         <section class="mt16">
           <div class="container">
@@ -25,8 +51,7 @@
                 <p t-esc="odoo_website.description"/>
 
                 <div class="alert alert-info" role="alert">
-                  <i class="fa fa-info-circle"></i>
-                  <span class="sr-only">Information:</span>
+                  <i class="fa fa-info-circle fa-2x"></i>
                   We are processing your website for Google PageSpeed Insights, Please check after some times.
                 </div>
 
@@ -84,7 +109,9 @@
               </div>
               <div id="owl-demo" class="col-md-12 mt32" style="height: 600px;overflow: hidden;">
                 <div t-foreach="websites" t-as="odoo_website" class="item">
-                  <img t-attf-src="/website/image/odoo.website/#{odoo_website.id}/image" alt="Owl Image"/>
+                  <a t-attf-href="/websites/view/#{odoo_website.id}">
+                    <img t-attf-src="/website/image/odoo.website/#{odoo_website.id}/image" alt="Owl Image"/>
+                  </a>
                 </div>
               </div>
             </div>
