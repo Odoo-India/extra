@@ -18,7 +18,7 @@
         <field name="name">odoo.website.form</field>
         <field name="model">odoo.website</field>
         <field name="arch" type="xml">
-            <form string="Blog">
+            <form string="Website">
                 <sheet>
                     <div>
                         <h2><field name="name"/></h2>
@@ -42,7 +42,16 @@
                         <field name="url"/>
                         <field name="odoo"/>
                         <field name="version"/>
+                        <button type="object" name="compute_pagespeed" string="Get PageSpeed"/>
                     </group>
+
+                    <field name="pagespeed" colspan="4" nolabel="1" invisible="1"/>
+                    <field name="pagespeed_ids" colspan="4" nolabel="1">
+                        <tree string="Page Speed">
+                            <field name="name"/>
+                            <field name="create_date"/>
+                        </tree>
+                    </field>
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>

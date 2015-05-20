@@ -2,6 +2,7 @@
 
 import re
 import lxml
+import json
 import tempfile
 import requests
 import subprocess
@@ -19,7 +20,9 @@ class OdooWebsite(models.Model):
     _inherit = ['mail.thread', 'website.seo.metadata']
     _order = 'id desc'
 
+    fullurl = fields.Char('Full Url')
     url = fields.Char('Website Url')
+
     full_url = fields.Char(compute="_compute_urls", store=True, string='Website Full Url')
     base_url = fields.Char(compute="_compute_urls", store=True, string='Base Url')
     image = fields.Binary(string='Desktop Image')
@@ -40,6 +43,7 @@ class OdooWebsite(models.Model):
     active = fields.Boolean(compute='_verify_odoo', store=True, string='Active', default=False)
 
     pagespeed = fields.Text(compute='_compute_page_speed', store=True, string="Page Speed")
+    pagespeed_ids = fields.One2many('odoo.website.pagespeed', 'page_id', 'Page Speed')
 
     def get_urls(self):
         if self.url.startswith('http://') or self.url.startswith('https://'):
@@ -99,7 +103,76 @@ class OdooWebsite(models.Model):
     @api.one
     @api.depends('url')
     def _compute_page_speed(self):
-        self.pagespeed = ''
+        apikey = 'AIzaSyCNn6YxI47bWj4vzb-_dbcuOB9DGEW2VG0'
+        apiurl = "https://www.googleapis.com/pagespeedonline/v2/runPagespeed?url=http://%s&strategy=mobile&key=%s" % (self.url, apikey)
+        result = urlopen(apiurl).read()
+        jsonresult = json.loads(result)
+
+        if jsonresult.get('responseCode') == 200:
+            self.pagespeed = result
+    
+    @api.one
+    def compute_pagespeed(self):
+        self._compute_page_speed()
+
+        def lineformat(line, args):
+            for arg in args:
+                if arg.get('type') == 'HYPERLINK':
+                    key = "{{BEGIN_LINK}}"
+                    value = "<a href='%s'>" % arg.get('value')
+                    line = line.replace(key, value)
+
+                    key = "{{END_LINK}}"
+                    value = "</a>"
+                    line = line.replace(key, value)
+                else:
+                    key = '{{%s}}' % arg.get('key')
+                    line = line.replace(key, arg.get('value'))
+            return line
+
+        rule_obj = self.env['odoo.website.pagespeed.rules']
+        block_obj = self.env['odoo.website.pagespeed.rules.block']
+        url_obj = self.env['odoo.website.pagespeed.rules.block.url']
+
+        result = json.loads(self.pagespeed)
+        vals = {
+            'name': result.get('title'),
+            'version_major': result.get('version').get('major'),
+            'version_minor': result.get('version').get('minor'),
+            'speed_score': result.get('ruleGroups').get('SPEED').get('score'),
+            'usability_score': result.get('ruleGroups').get('USABILITY').get('score'),
+            'page_id': self.id,
+            'locale': result.get('formattedResults').get('locale'),
+            'pagespeed': self.pagespeed
+        }
+        for key in result.get('pageStats'):
+            vals[key.lower()] = result.get('pageStats').get(key)
+
+        entry_id = self.env['odoo.website.pagespeed'].create(vals)
+
+        for key, rule in result.get('formattedResults').get('ruleResults').iteritems():
+            entry = {
+                'entry_id': entry_id.id,
+                'name': rule.get('localizedRuleName'),
+                'ruleimpact': rule.get('ruleImpact'),
+                'group': rule.get('groups')[0],
+                'summary': lineformat(rule.get('summary', {}).get('format', ''), rule.get('summary',{}).get('args',[]))
+            }
+            rule_id = rule_obj.create(entry)
+            
+            for block in rule.get('urlBlocks', []):
+                block_val = {
+                    'rule_id': rule_id.id,
+                    'name': lineformat(block.get('header', {}).get('format', ''), block.get('header', {}).get('args', []))
+                }
+                block_id = block_obj.create(block_val)
+
+                for url in block.get('urls', []):
+                    vals = {
+                        'block_id': block_id.id,
+                        'name': lineformat(url.get('result', {}).get('format', ''), url.get('result', {}).get('args',[]))
+                    }
+                    url_obj.create(vals)
 
     @api.one
     @api.depends('url')
@@ -107,3 +180,66 @@ class OdooWebsite(models.Model):
         full_url, base_url = self.get_urls()
         self.base_url = base_url
         self.full_url = full_url
+
+
+class PageSpeedEntry(models.Model):
+    _name = 'odoo.website.pagespeed'
+    _description = 'Google PageSpeed Entry'
+
+    name = fields.Char('Name')
+    locale = fields.Char('Locale')
+    pagespeed = fields.Text("Page Speed")
+
+    version_major = fields.Integer('Major')
+    version_minor = fields.Integer('Minor')
+
+    speed_score = fields.Integer('Speed')
+    usability_score = fields.Integer('Usability')
+
+    page_id = fields.Many2one('odoo.website', 'Page')
+
+    numberresources = fields.Integer('# of Resource')
+    numberhosts = fields.Integer('# of Host')
+    totalrequestbytes = fields.Integer('# of RequestBytes')
+    numberstaticresources = fields.Integer('# of RequestBytes')
+    htmlresponsebytes = fields.Integer('# of RequestBytes')
+    textresponsebytes = fields.Integer('# of RequestBytes')
+    cssresponsebytes = fields.Integer('# of RequestBytes')
+    imageresponsebytes = fields.Integer('# of RequestBytes')
+    javascriptresponsebytes = fields.Integer('# of RequestBytes')
+    otherresponsebytes = fields.Integer('# of RequestBytes')
+
+    numberjsresources = fields.Integer('# of RequestBytes')
+    numbercssresources = fields.Integer('# of RequestBytes')
+    ruler_ids = fields.One2many('odoo.website.pagespeed.rules', 'entry_id')
+    create_date = fields.Datetime('Tested on ')
+    target = fields.Char('Target Device')
+
+
+class PageSpeedEntryRule(models.Model):
+    _name = 'odoo.website.pagespeed.rules'
+    _description = 'Google PageSpeed Entry'
+
+    name = fields.Char('Name')
+    entry_id = fields.Many2one('odoo.website.pagespeed', 'PageSpeed Entry')
+    ruleimpact = fields.Float('Impact')
+    summary = fields.Char('Summary')
+    group = fields.Char('Group')
+    urlblock_ids = fields.One2many('odoo.website.pagespeed.rules.block', 'rule_id', 'Urls')
+
+
+class PageSpeedEntryRule(models.Model):
+    _name = 'odoo.website.pagespeed.rules.block'
+    _description = 'Google PageSpeed Entry Url Block'
+
+    rule_id = fields.Many2one('odoo.website.pagespeed.rules')
+    name = fields.Char('Header')
+    url_ids = fields.One2many('odoo.website.pagespeed.rules.block.url', 'block_id', 'Urls')
+
+
+class PageSpeedEntryRuleUrls(models.Model):
+    _name = 'odoo.website.pagespeed.rules.block.url'
+    _description = 'Google PageSpeed Entry Ref. Urls'
+
+    name = fields.Char('Name')
+    block_id = fields.Many2one('odoo.website.pagespeed.rules.block')
