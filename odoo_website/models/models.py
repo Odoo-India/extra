@@ -42,7 +42,9 @@ class OdooWebsite(models.Model):
     version = fields.Char(compute='_verify_odoo', store=True, string='Version Info')
     active = fields.Boolean(compute='_verify_odoo', store=True, string='Active', default=False)
 
-    pagespeed = fields.Text(compute='_compute_page_speed', store=True, string="Page Speed")
+    pagespeed_mobile = fields.Text(compute='_compute_page_speed', store=True, string="Page Speed")
+    pagespeed_desktop = fields.Text(compute='_compute_page_speed', store=True, string="Page Speed")
+
     pagespeed_ids = fields.One2many('odoo.website.pagespeed', 'page_id', 'Page Speed')
 
     def get_urls(self):
@@ -100,20 +102,35 @@ class OdooWebsite(models.Model):
             png_file = open(path, 'r')
             return png_file.read().encode('base64')
 
+
+    def get_pagespeed(self, target='desktop'):
+        apikey = 'AIzaSyCNn6YxI47bWj4vzb-_dbcuOB9DGEW2VG0'
+        apiurl = "https://www.googleapis.com/pagespeedonline/v2/runPagespeed?url=http://%s&strategy=%s&key=%s" % (self.url, target, apikey)
+        result = urlopen(apiurl).read()
+        return result
+
     @api.one
     @api.depends('url')
     def _compute_page_speed(self):
-        apikey = 'AIzaSyCNn6YxI47bWj4vzb-_dbcuOB9DGEW2VG0'
-        apiurl = "https://www.googleapis.com/pagespeedonline/v2/runPagespeed?url=http://%s&strategy=mobile&key=%s" % (self.url, apikey)
-        result = urlopen(apiurl).read()
+        result = self.get_pagespeed()
         jsonresult = json.loads(result)
-
         if jsonresult.get('responseCode') == 200:
-            self.pagespeed = result
+            self.pagespeed_desktop = result
+
+        result = self.get_pagespeed(target='mobile')
+        jsonresult = json.loads(result)
+        if jsonresult.get('responseCode') == 200:
+            self.pagespeed_mobile = result
     
     @api.one
     def compute_pagespeed(self):
         self._compute_page_speed()
+        self.compute_pagespeed_target(pagespeed=self.pagespeed_desktop, target='desktop')
+        self.compute_pagespeed_target(pagespeed=self.pagespeed_mobile, target='mobile')
+
+    @api.one
+    def compute_pagespeed_target(self, pagespeed, target='desktop'):
+        result = json.loads(pagespeed)
 
         def lineformat(line, args):
             for arg in args:
@@ -134,16 +151,16 @@ class OdooWebsite(models.Model):
         block_obj = self.env['odoo.website.pagespeed.rules.block']
         url_obj = self.env['odoo.website.pagespeed.rules.block.url']
 
-        result = json.loads(self.pagespeed)
         vals = {
             'name': result.get('title'),
             'version_major': result.get('version').get('major'),
             'version_minor': result.get('version').get('minor'),
             'speed_score': result.get('ruleGroups').get('SPEED').get('score'),
-            'usability_score': result.get('ruleGroups').get('USABILITY').get('score'),
+            'usability_score': result.get('ruleGroups', {}).get('USABILITY', {}).get('score', 0),
             'page_id': self.id,
             'locale': result.get('formattedResults').get('locale'),
-            'pagespeed': self.pagespeed
+            'pagespeed': pagespeed,
+            'target': target
         }
         for key in result.get('pageStats'):
             vals[key.lower()] = result.get('pageStats').get(key)

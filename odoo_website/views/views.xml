@@ -45,7 +45,6 @@
                         <button type="object" name="compute_pagespeed" string="Get PageSpeed"/>
                     </group>
 
-                    <field name="pagespeed" colspan="4" nolabel="1" invisible="1"/>
                     <field name="pagespeed_ids" colspan="4" nolabel="1">
                         <tree string="Page Speed">
                             <field name="name"/>

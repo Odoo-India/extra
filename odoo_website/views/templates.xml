@@ -45,6 +45,7 @@
         <section class="mt16">
           <div class="container">
             <div class="row">
+
               <div class="col-md-6 col-xs-12">
                 <img t-attf-src="#{odoo_website.base_url}/logo.png" class="img img-responsive"/>
                 <h2 t-esc="odoo_website.name"/>
@@ -95,6 +96,14 @@
                 </div>
               </div>
             </div>
+
+            <div class="row">
+              <ul class="nav nav-tabs">
+                <li role="presentation" class="active"><a href="#"><i class="fa fa-mobile"></i> Mobile</a></li>
+                <li role="presentation"><a href="#"><i class="fa fa-desktop"></i> Desktop</a></li>
+              </ul>
+            </div>
+
           </div>
         </section>
       </t>
