@@ -140,6 +140,7 @@ class OdooWebsite(models.Model):
 
 
     def get_pagespeed(self, target='desktop'):
+        print 'going to get the ping for : ',self.full_url
         apikey = 'AIzaSyCNn6YxI47bWj4vzb-_dbcuOB9DGEW2VG0'
         apiurl = "https://www.googleapis.com/pagespeedonline/v2/runPagespeed?url=%s&strategy=%s&key=%s" % (self.full_url, target, apikey)
         result = urlopen(apiurl).read()

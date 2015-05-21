@@ -530,7 +530,7 @@
             </div>
 
             <div class="row mt16 mb16">
-              <div class="col-md-12">
+              <div class="col-md-12" t-if="related">
                 <h3>Related pages from <span t-esc="odoo_website.domain"/></h3>
                 <div id="owl-demo" style="overflow: hidden;">
                   <div t-foreach="related" t-as="odoo_website" class="item">
