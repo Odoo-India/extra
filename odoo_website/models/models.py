@@ -20,11 +20,12 @@ class OdooWebsite(models.Model):
     _inherit = ['mail.thread', 'website.seo.metadata']
     _order = 'id desc'
 
-    fullurl = fields.Char('Full Url')
-    url = fields.Char('Website Url')
+    url = fields.Char('Website Url', help="A url to webpage entered by user, i.e. https://www.odoo.com/page/point-of-sale")
+    domain = fields.Char(compute="_compute_urls", store=True, string='base url will be www.odoo.com')
+    full_url = fields.Char(compute="_compute_urls", store=True, string='full url will be https://www.odoo.com/page/point-of-sale')
+    base_url = fields.Char(compute="_compute_urls", store=True, string='base url will be https://www.odoo.com')
+    path = fields.Char(compute="_compute_urls", store=True, string='base url will be /page/point-of-sale')
 
-    full_url = fields.Char(compute="_compute_urls", store=True, string='Website Full Url')
-    base_url = fields.Char(compute="_compute_urls", store=True, string='Base Url')
     image = fields.Binary(string='Desktop Image')
     image_laptop = fields.Binary(string='Laptop Image')
     image_tablet = fields.Binary(string='Tablet Image')
@@ -35,7 +36,8 @@ class OdooWebsite(models.Model):
     is_image_tablet = fields.Boolean(string='Tablet Image Generated')
     is_image_mobile = fields.Boolean(string='Mobile Image Generated')
 
-    name = fields.Char(compute='_copute_meta', store=True, string='Website Name')
+    name = fields.Char('Website', default="Website powered by Odoo")
+    title = fields.Char(compute='_copute_meta', store=True, string='Website Name')
     description = fields.Text(compute='_copute_meta', store=True, string='Description')
 
     odoo = fields.Boolean(compute='_verify_odoo', store=True, string='Valid Odoo')
@@ -44,24 +46,59 @@ class OdooWebsite(models.Model):
 
     pagespeed_mobile = fields.Text(compute='_compute_page_speed', store=True, string="Page Speed")
     pagespeed_desktop = fields.Text(compute='_compute_page_speed', store=True, string="Page Speed")
-
     pagespeed_ids = fields.One2many('odoo.website.pagespeed', 'page_id', 'Page Speed')
 
-    def get_urls(self):
-        if self.url.startswith('http://') or self.url.startswith('https://'):
-            url = self.url.strip('/')
+    desktop = fields.Many2one('odoo.website.pagespeed', compute='_find_page_speed', string='Parent')
+    mobile = fields.Many2one('odoo.website.pagespeed', compute='_find_page_speed', string='Parent')
+
+    @api.one
+    @api.depends('pagespeed_ids')
+    def _find_page_speed(self):
+        speed_obj = self.env['odoo.website.pagespeed']
+        desktop = speed_obj.search([('page_id','=',self.id), ('target','=','desktop')], limit=1)
+        self.desktop = desktop.id
+
+        mobile = speed_obj.search([('page_id','=',self.id), ('target','=','mobile')], limit=1)
+        self.mobile = mobile.id
+
+        print desktop, mobile
+
+    # parent_id = fields.Many2one(compute='_compute_parent', relation='odoo.website', string='Parent')
+    # @api.depends('url')
+    # def _compute_parent(self):
+    #     for rec in self:
+    #         rec.parent_id = False 
+    #         if rec.path:
+    #             parent_id = self.search([('base_url','=',rec.base_url), ('path','=',False)], limit=1)
+    #             rec.parent_id = parent_id.id
+
+    @api.one
+    @api.depends('url')
+    def _compute_urls(self):
+        full_url = self.url
+        if self.url and not self.url.startswith('http'):
+            full_url = "http://%s" % (self.url)
+
+        if self.url:
+            url = urlparse(self.url)
+            self.domain = url.netloc or url.path
+            baseurl = "%s://%s" % (url.scheme or 'http', url.netloc or url.path)
+            self.base_url = baseurl
+
+            self.full_url = full_url
+            self.path = url.path or False
         else:
-            url = 'http://' + self.url.strip('/')
-        url_obj = urlparse(url)
-        base_url = re.sub(url_obj.path+'$', '', url)
-        return (url, base_url)
+            self.base_url = False
+            self.full_url = False
+            self.path = ''
+
+        print self.base_url, self.full_url, self.path, self.url
 
     @api.one
     @api.depends('url')
     def _copute_meta(self):
-        full_url, base_url = self.get_urls()
         try:
-            arch = lxml.html.parse(urlopen(full_url))
+            arch = lxml.html.parse(urlopen(self.full_url))
             self.name = arch.find(".//title") != None and arch.find(".//title").text or ""
             if arch.find(".//meta[@name='description']") != None:
                 self.description =  arch.find(".//meta[@name='description']").attrib.get('content','')
@@ -72,8 +109,7 @@ class OdooWebsite(models.Model):
     @api.one
     @api.depends('url')
     def _verify_odoo(self):
-        full_url, base_url = self.get_urls()
-        url = "%s/%s" % (base_url, "web/webclient/version_info")
+        url = "%s/%s" % (self.base_url, "web/webclient/version_info")
         self.active = False
         self.odoo = False
         try:
@@ -88,12 +124,12 @@ class OdooWebsite(models.Model):
         except URLError, e:
             self.is_odoo = False
 
+
     def url_to_thumb(self, zoom=1, height=1000, width=1024):
-        full_url, base_url = self.get_urls()
         fd, path = tempfile.mkstemp(suffix='.png', prefix='website.thumb.')
         try:
             process = subprocess.Popen(
-                ['wkhtmltoimage', '--height', str(height), '--zoom', str(zoom),'--width',str(width), full_url, path], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+                ['wkhtmltoimage', '--height', str(height), '--zoom', str(zoom),'--width',str(width), self.full_url, path], stdout=subprocess.PIPE, stderr=subprocess.PIPE
             )
         except (OSError, IOError):
             return False
@@ -105,9 +141,10 @@ class OdooWebsite(models.Model):
 
     def get_pagespeed(self, target='desktop'):
         apikey = 'AIzaSyCNn6YxI47bWj4vzb-_dbcuOB9DGEW2VG0'
-        apiurl = "https://www.googleapis.com/pagespeedonline/v2/runPagespeed?url=http://%s&strategy=%s&key=%s" % (self.url, target, apikey)
+        apiurl = "https://www.googleapis.com/pagespeedonline/v2/runPagespeed?url=%s&strategy=%s&key=%s" % (self.full_url, target, apikey)
         result = urlopen(apiurl).read()
         return result
+
 
     @api.one
     @api.depends('url')
@@ -122,11 +159,13 @@ class OdooWebsite(models.Model):
         if jsonresult.get('responseCode') == 200:
             self.pagespeed_mobile = result
     
+
     @api.one
     def compute_pagespeed(self):
         self._compute_page_speed()
         self.compute_pagespeed_target(pagespeed=self.pagespeed_desktop, target='desktop')
         self.compute_pagespeed_target(pagespeed=self.pagespeed_mobile, target='mobile')
+
 
     @api.one
     def compute_pagespeed_target(self, pagespeed, target='desktop'):
@@ -136,7 +175,7 @@ class OdooWebsite(models.Model):
             for arg in args:
                 if arg.get('type') == 'HYPERLINK':
                     key = "{{BEGIN_LINK}}"
-                    value = "<a href='%s'>" % arg.get('value')
+                    value = "<a href='%s' target='_new'>" % arg.get('value')
                     line = line.replace(key, value)
 
                     key = "{{END_LINK}}"
@@ -144,7 +183,12 @@ class OdooWebsite(models.Model):
                     line = line.replace(key, value)
                 else:
                     key = '{{%s}}' % arg.get('key')
-                    line = line.replace(key, arg.get('value'))
+                    value = "%s" % (arg.get('value'))
+
+                    if arg.get('type') != 'URL':
+                        value = "<b class='text-danger'>%s</b>" % (arg.get('value'))
+
+                    line = line.replace(key, value)
             return line
 
         rule_obj = self.env['odoo.website.pagespeed.rules']
@@ -191,13 +235,6 @@ class OdooWebsite(models.Model):
                     }
                     url_obj.create(vals)
 
-    @api.one
-    @api.depends('url')
-    def _compute_urls(self):
-        full_url, base_url = self.get_urls()
-        self.base_url = base_url
-        self.full_url = full_url
-
 
 class PageSpeedEntry(models.Model):
     _name = 'odoo.website.pagespeed'
@@ -236,6 +273,7 @@ class PageSpeedEntry(models.Model):
 class PageSpeedEntryRule(models.Model):
     _name = 'odoo.website.pagespeed.rules'
     _description = 'Google PageSpeed Entry'
+    _order = 'ruleimpact desc'
 
     name = fields.Char('Name')
     entry_id = fields.Many2one('odoo.website.pagespeed', 'PageSpeed Entry')

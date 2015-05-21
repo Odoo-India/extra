@@ -42,6 +42,8 @@
                         <field name="url"/>
                         <field name="odoo"/>
                         <field name="version"/>
+                        <field name="domain"/>
+                        <field name="path"/>
                         <button type="object" name="compute_pagespeed" string="Get PageSpeed"/>
                     </group>
 

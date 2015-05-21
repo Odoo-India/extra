@@ -16,7 +16,7 @@ class OdooWebsites(http.Controller):
         res_user = request.env.user
         public_user = request.website.user_id
 
-        websites = website_obj.search([], limit=10)
+        websites = website_obj.search([('path','=',False)], limit=10)
 
         return request.render('odoo_website.websites', {
             'title': 'Websites build with Odoo CMS',
@@ -40,8 +40,12 @@ class OdooWebsites(http.Controller):
 
     @http.route('/websites/view/<model("odoo.website"):website_id>', auth='public', type='http', method='POST', website=True)
     def view(self, website_id, **post):
-       return request.render('odoo_website.view', {
-            'odoo_website': website_id
+        website_obj = request.env['odoo.website']
+        related = website_obj.search([('domain','=',website_id.domain), ('id','!=',website_id.id)])
+
+        return request.render('odoo_website.view', {
+            'odoo_website': website_id,
+            'related': related
         })
 
     @http.route('/websites/new', auth='public', type='http', method='POST', website=True)
