@@ -21,7 +21,6 @@
           <div class="oe_structure"/>
           <div class="container mt16">
             <div class="row">
-              
               <div id="owl-demo" style="overflow: hidden;">
                 <div t-foreach="related" t-as="odoo_website" class="item">
                   <a t-attf-href="/websites/view/#{odoo_website.id}">
