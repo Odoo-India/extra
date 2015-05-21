@@ -30,9 +30,13 @@ class OdooWebsites(http.Controller):
 
         res_user = request.env.user
         public_user = request.website.user_id
-        websites = website_obj.search([], limit=5)
+        websites = website_obj.search([], limit=50)
+
+        related = website_obj.search([], limit=10)
+
         return request.render('odoo_website.website_list', {
             'websites': websites,
+            'related': related,
             'is_public_user': res_user == public_user
         })
 
@@ -44,6 +48,7 @@ class OdooWebsites(http.Controller):
 
         return request.render('odoo_website.view', {
             'odoo_website': website_id,
+            'title': website_id.name,
             'related': related
         })
 

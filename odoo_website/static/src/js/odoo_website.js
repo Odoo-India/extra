@@ -8,7 +8,8 @@ $(document).ready(function() {
 	    navigation : false, // Show next and prev buttons
         slideSpeed : 700,
         paginationSpeed : 600,
-	  });
+	});
+
     var $chart_target = $("#google_page_insite_chart");
     if($chart_target.length > 0){
         var nvd3_json = $chart_target.data("json");
