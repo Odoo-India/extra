@@ -39,6 +39,7 @@ class OdooWebsite(models.Model):
     name = fields.Char('Website', default="Website powered by Odoo")
     title = fields.Char(compute='_copute_meta', store=True, string='Website Name')
     description = fields.Text(compute='_copute_meta', store=True, string='Description')
+    email = fields.Char(string='Submitted by')
 
     odoo = fields.Boolean(compute='_verify_odoo', store=True, string='Valid Odoo')
     version = fields.Char(compute='_verify_odoo', store=True, string='Version Info')
@@ -163,7 +164,7 @@ class OdooWebsite(models.Model):
 
     @api.one
     def compute_pagespeed(self):
-        self._compute_page_speed()
+        # self._compute_page_speed()
         self.compute_pagespeed_target(pagespeed=self.pagespeed_desktop, target='desktop')
         self.compute_pagespeed_target(pagespeed=self.pagespeed_mobile, target='mobile')
 
@@ -210,6 +211,13 @@ class OdooWebsite(models.Model):
         for key in result.get('pageStats'):
             vals[key.lower()] = result.get('pageStats').get(key)
 
+        vals['nvd3_json'] = json.dumps([
+            {"label": "HTML", "value": vals['htmlresponsebytes']},
+            {"label": "CSS",  "value": vals['cssresponsebytes']},
+            {"label": "JavaScript", "value": vals['javascriptresponsebytes']},
+            {"label": "Image", "value": vals['imageresponsebytes']},
+            {"label": "Other", "value": vals['otherresponsebytes']}
+        ])
         entry_id = self.env['odoo.website.pagespeed'].create(vals)
 
         for key, rule in result.get('formattedResults').get('ruleResults').iteritems():
@@ -221,7 +229,7 @@ class OdooWebsite(models.Model):
                 'summary': lineformat(rule.get('summary', {}).get('format', ''), rule.get('summary',{}).get('args',[]))
             }
             rule_id = rule_obj.create(entry)
-            
+
             for block in rule.get('urlBlocks', []):
                 block_val = {
                     'rule_id': rule_id.id,
@@ -263,6 +271,7 @@ class PageSpeedEntry(models.Model):
     imageresponsebytes = fields.Integer('# of RequestBytes')
     javascriptresponsebytes = fields.Integer('# of RequestBytes')
     otherresponsebytes = fields.Integer('# of RequestBytes')
+    nvd3_json = fields.Text('Json data for nvd3')
 
     numberjsresources = fields.Integer('# of RequestBytes')
     numbercssresources = fields.Integer('# of RequestBytes')

@@ -16,7 +16,7 @@ class OdooWebsites(http.Controller):
         res_user = request.env.user
         public_user = request.website.user_id
 
-        websites = website_obj.search([('path','=',False)], limit=10)
+        websites = website_obj.search([], limit=10)
 
         return request.render('odoo_website.websites', {
             'title': 'Websites build with Odoo CMS',
@@ -66,8 +66,18 @@ class OdooWebsites(http.Controller):
             #TODO: error page
             pass
 
+    @http.route('/websites/submit_email/<model("odoo.website"):odoo_website>', auth='public', type='http', method='POST', website=True)
+    def submit_email(self, odoo_website, email_address=None):
+        if email_address and odoo_website:
+            odoo_website.sudo().email = email_address
+            odoo_website.sudo().compute_pagespeed()
+        url = '/websites/view/%s' % (odoo_website.id)
+        return werkzeug.utils.redirect(url)
+
+
     @http.route('/websites/genrate_screenshot/<model("odoo.website"):odoo_website>', auth='public', type='json', website=True)
     def genrate_screenshot(self, odoo_website, type=None):
+        odoo_website = odoo_website.sudo()
         if type == 'desktop':
             odoo_website.image = odoo_website.url_to_thumb(zoom=0.9, width=1350, height=850)
             odoo_website.is_image = True

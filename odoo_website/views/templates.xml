@@ -42,6 +42,11 @@
  
     <template id="view">
       <t t-call="website.layout">
+        <t t-set="head">
+            <link href="/web/static/lib/nvd3/nv.d3.css" rel="stylesheet" type="text/css"></link>
+            <script src="/web/static/lib/nvd3/d3.v3.js"></script>
+            <script src="/web/static/lib/nvd3/nv.d3.js"></script>
+        </t>
         <section class="mt16">
           <div class="container">
 
@@ -60,8 +65,20 @@
               <div class="col-md-7 col-xs-12">
                 <h2 t-esc="odoo_website.name"/>
                 <p t-esc="odoo_website.description"/>
-
-                <ul class="nav nav-tabs">
+                <div  t-if="not odoo_website.email">
+                    <form method="post" t-attf-action="/websites/submit_email/#{odoo_website.id}">
+                      <div class="input-group col-md-12">
+                          <span class="input-group-addon">
+                            @
+                          </span>
+                          <input type="email" name="email_address" class="form-control" placeholder="your email address"/>
+                          <span class="input-group-btn">
+                            <button class="btn btn-primary" type="submit"><i class="fa fa-arrow-right"></i> Generate PageSpeed Insights</button>
+                          </span>
+                      </div>
+                    </form>
+                </div>
+                <ul class="nav nav-tabs" t-if="odoo_website.email">
                   <li role="presentation" class="active">
                     <a href="#mobile" role="tab" data-toggle="tab">
                       <i class="fa fa-mobile"></i> Mobile
@@ -75,7 +92,7 @@
                   </li>
                 </ul>
 
-                <div class="tab-content">
+                <div class="tab-content" t-if="odoo_website.email">
                   <div class="active tab-pane" id="mobile" style="padding-top:8px;">
                     <h2>
                       <span t-attf-class="label pull-left #{odoo_website.mobile.speed_score > 60 and 'label-success' ''} #{odoo_website.mobile.speed_score &lt;= 60 and 'label-danger' ''}" style="font-size: 100%;">
@@ -433,8 +450,10 @@
                     </div>
                 </div>
 
-                <div id="right">
-                  place some information after this ?
+                <div id="right" t-if="odoo_website.email">
+                    <div id="google_page_insite_chart" t-att-data-json="odoo_website.desktop.nvd3_json">
+                      <svg></svg>
+                    </div>
                 </div>
               </div>
               <div class="col-md-1">
