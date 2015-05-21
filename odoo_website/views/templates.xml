@@ -30,7 +30,7 @@
               </div>
             </div>
 
-            <div class="row">
+            <div class="row mt16">
               <div t-foreach="websites" t-as="odoo_website" class="col-sm-3 col-md-3">
                 <div class="thumbnail">
                   <a t-attf-href="/websites/view/#{odoo_website.id}">
