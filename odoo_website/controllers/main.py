@@ -19,7 +19,6 @@ class OdooWebsites(http.Controller):
         websites = website_obj.search([], limit=10)
 
         return request.render('odoo_website.websites', {
-            'title': 'Websites build with Odoo CMS',
             'websites': websites,
             'is_public_user': res_user == public_user
         })
