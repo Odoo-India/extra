@@ -451,6 +451,7 @@
                 </div>
 
                 <div id="right" t-if="odoo_website.email">
+                    <p class="lead">Display a resource size breakdown</p>
                     <div id="google_page_insite_chart" t-att-data-json="odoo_website.desktop.nvd3_json">
                       <svg></svg>
                     </div>
