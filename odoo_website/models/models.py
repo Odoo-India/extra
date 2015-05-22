@@ -145,7 +145,6 @@ class OdooWebsite(models.Model):
 
 
     def get_pagespeed(self, target='desktop'):
-        print 'going to get the ping for : ',self.full_url
         apikey = 'AIzaSyCNn6YxI47bWj4vzb-_dbcuOB9DGEW2VG0'
         apiurl = "https://www.googleapis.com/pagespeedonline/v2/runPagespeed?url=%s&strategy=%s&key=%s" % (self.full_url, target, apikey)
         result = urlopen(apiurl).read()
@@ -179,8 +178,6 @@ class OdooWebsite(models.Model):
 
         def lineformat(line, args):
             for arg in args:
-                print arg.get('type'), arg.get('key'), arg.get('value')
-
                 if arg.get('type') == 'HYPERLINK':
                     key = "{{BEGIN_LINK}}"
                     value = "<a href='%s' target='_new'>" % arg.get('value')
