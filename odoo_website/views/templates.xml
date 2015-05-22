@@ -524,7 +524,7 @@
             <div class="row mb16">
               <div class="col-md-12 col-xs-12">
                 <h1 class="text-center o_default_snippet_text">They use odoo cms in production </h1>
-                <h3 class="text-muted text-center o_default_snippet_text">thousands of beautiful websites</h3>
+                <h3 class="text-muted text-center o_default_snippet_text">Lots of beautiful websites</h3>
               </div>
               <div id="owl-demo" class="col-md-12 mt32" style="overflow: hidden;">
                 <div t-foreach="websites" t-as="odoo_website" class="item">
