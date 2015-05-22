@@ -44,8 +44,9 @@ class OdooWebsite(models.Model):
     version = fields.Char(compute='_verify_odoo', store=True, string='Version Info')
     active = fields.Boolean(compute='_verify_odoo', store=True, string='Active', default=False)
 
-    pagespeed_mobile = fields.Text(compute='_compute_page_speed', store=True, string="Page Speed")
-    pagespeed_desktop = fields.Text(compute='_compute_page_speed', store=True, string="Page Speed")
+    pagespeed_mobile = fields.Text(string="Page Speed")
+    pagespeed_desktop = fields.Text(string="Page Speed")
+
     pagespeed_ids = fields.One2many('odoo.website.pagespeed', 'page_id', 'Page Speed')
 
     desktop = fields.Many2one('odoo.website.pagespeed', compute='_find_page_speed', string='Parent')
@@ -171,7 +172,7 @@ class OdooWebsite(models.Model):
 
     @api.one
     def compute_pagespeed(self):
-        # self._compute_page_speed()
+        self._compute_page_speed()
         self.compute_pagespeed_target(pagespeed=self.pagespeed_desktop, target='desktop')
         self.compute_pagespeed_target(pagespeed=self.pagespeed_mobile, target='mobile')
 
@@ -179,6 +180,7 @@ class OdooWebsite(models.Model):
     @api.one
     def compute_pagespeed_target(self, pagespeed, target='desktop'):
         result = json.loads(pagespeed)
+        print result
 
         def lineformat(line, args):
             for arg in args:
@@ -219,11 +221,11 @@ class OdooWebsite(models.Model):
             vals[key.lower()] = result.get('pageStats').get(key)
 
         vals['nvd3_json'] = json.dumps([
-            {"label": "HTML", "value": vals['htmlresponsebytes']},
-            {"label": "CSS",  "value": vals['cssresponsebytes']},
-            {"label": "JavaScript", "value": vals['javascriptresponsebytes']},
-            {"label": "Image", "value": vals['imageresponsebytes']},
-            {"label": "Other", "value": vals['otherresponsebytes']}
+            {"label": "HTML", "value": vals.get('htmlresponsebytes', 0)},
+            {"label": "CSS",  "value": vals.get('cssresponsebytes', 0)},
+            {"label": "JavaScript", "value": vals.get('javascriptresponsebytes', 0)},
+            {"label": "Image", "value": vals.get('imageresponsebytes', 0)},
+            {"label": "Other", "value": vals.get('otherresponsebytes', 0)}
         ])
         entry_id = self.env['odoo.website.pagespeed'].create(vals)
 
