@@ -57,7 +57,7 @@ class OdooWebsite(models.Model):
     @api.one
     @api.depends('url')
     def _compute_link(self):
-        self.link = 'websites/view/%s' % (self.id)
+        self.link = 'http://odoo.reviews/websites/view/%s' % (self.id)
 
     @api.one
     @api.depends('pagespeed_ids')
