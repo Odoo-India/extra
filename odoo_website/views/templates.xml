@@ -189,7 +189,7 @@
                 <div class="tab-content" t-if="odoo_website.email">
                   <div class="active tab-pane" id="mobile" style="padding-top:8px;">
                     <h2>
-                      <span t-attf-class="label pull-left #{odoo_website.mobile.speed_score > 86 and 'label-success' ''} #{odoo_website.mobile.speed_score >= 65 and odoo_website.mobile.speed_score &lt;=85 and 'label-warning' ''} #{odoo_website.mobile.speed_score &lt;= 60 and 'label-danger' ''}" style="font-size: 100%;">
+                      <span t-attf-class="label pull-left #{odoo_website.mobile.speed_score > 86 and 'label-success' ''} #{odoo_website.mobile.speed_score >= 65 and odoo_website.mobile.speed_score &lt;=85 and 'label-warning' ''} #{odoo_website.mobile.speed_score &lt;= 65 and 'label-danger' ''}" style="font-size: 100%;">
                           <span t-esc="odoo_website.mobile.speed_score"/> / 100
                         </span>
                         Speed
@@ -291,7 +291,7 @@
                     <hr/>
 
                     <h2>
-                      <span t-attf-class="label pull-left #{odoo_website.mobile.usability_score > 86 and 'label-success' ''} #{odoo_website.mobile.usability_score >= 65 and odoo_website.mobile.usability_score &lt;=85 and 'label-warning' ''} #{odoo_website.mobile.usability_score &lt;= 60 and 'label-danger' ''}" style="font-size: 100%;">
+                      <span t-attf-class="label pull-left #{odoo_website.mobile.usability_score > 86 and 'label-success' ''} #{odoo_website.mobile.usability_score >= 65 and odoo_website.mobile.usability_score &lt;=85 and 'label-warning' ''} #{odoo_website.mobile.usability_score &lt;= 65 and 'label-danger' ''}" style="font-size: 100%;">
                           <span t-esc="odoo_website.mobile.usability_score"/> / 100
                         </span>
                         User Experience
