@@ -36,8 +36,7 @@ class OdooWebsite(models.Model):
     is_image_tablet = fields.Boolean(string='Tablet Image Generated')
     is_image_mobile = fields.Boolean(string='Mobile Image Generated')
 
-    name = fields.Char('Website', default="Website powered by Odoo")
-    title = fields.Char(compute='_copute_meta', store=True, string='Website Name')
+    name = fields.Char(compute='_copute_meta', store=True, string='Website Name')
     description = fields.Text(compute='_copute_meta', store=True, string='Description')
     email = fields.Char(string='Submitted by')
 
