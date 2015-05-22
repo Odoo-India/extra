@@ -54,8 +54,34 @@
         </section>
 
         <section>
+           <div class="container mt16 mb16">
+            <div class="row">
+              <div class="col-md-6 pull-left">
+
+              </div>
+              <div class="col-md-6 pull-right">
+                <form method="get" action="/websites/all">
+                  <div class="input-group">
+                    <input type="search" class="form-control" name="search" t-attf-placeholder="Search for webeites" t-att-value="search"/>
+                    <span class="input-group-btn">
+                      <a class="btn btn-danger" href="/websites/all" t-if="search">
+                        <i class="fa fa-times"></i>
+                      </a>
+                      <button class="btn btn-primary" type="submit">
+                        <i class="fa fa-search"></i>
+                      </button>
+                    </span>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
           <div class="oe_structure"/>
           <div class="container mt16">
+
             <div class="row mt16">
               <div t-foreach="websites" t-as="odoo_website" class="col-sm-3 col-md-3">
                 <div class="thumbnail">

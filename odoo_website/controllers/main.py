@@ -26,7 +26,7 @@ class OdooWebsites(http.Controller):
 
 
     @http.route(['/websites/all', '/websites/all/page/<int:page>'], auth='public', type='http', website=True)
-    def website_list(self, page=1, **post):
+    def website_list(self, page=1, search=None, **post):
         website_obj = request.env['odoo.website']
 
         res_user = request.env.user
@@ -36,6 +36,9 @@ class OdooWebsites(http.Controller):
         pager_args = {}
 
         domain = []
+
+        if search:
+            domain += ['|', ('name','ilike',search), ('description','ilike',search)]
 
         pager_count = website_obj.search_count(domain)
         pager = request.website.pager(url=pager_url, total=pager_count, page=page,
@@ -50,7 +53,8 @@ class OdooWebsites(http.Controller):
             'related': related,
             'is_public_user': res_user == public_user,
             'pager': pager,
-            'title': 'Websites, built on Odoo CMS'
+            'title': 'Websites, built on Odoo CMS',
+            'search': search
         })
 
 
