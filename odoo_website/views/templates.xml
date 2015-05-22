@@ -89,7 +89,7 @@
           <meta property="og:title" t-att-content="odoo_website.name" />
           <meta property="og:type" content="website" />
           <meta property="og:url" t-att-content="odoo_website.link" />
-          <meta property="og:image" t-attf-content="#{request.httprequest.host_url}/website/image/odoo.website/#{odoo_website.id}/image?max_height=200"/>
+          <meta property="og:image" t-attf-content="http://odoo.reviews/website/image/odoo.website/#{odoo_website.id}/image?max_height=200'"/>
           <meta property="og:description" t-att-content="odoo_website.description" />
         </t>
 
