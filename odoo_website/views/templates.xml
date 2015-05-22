@@ -65,7 +65,7 @@
                   </a>
                   <div class="caption">
                     <h4 t-esc="odoo_website.name" class="oe_textoverflow"/>
-                    <a t-attf-href="http://#{odoo_website.url}"><p t-esc="odoo_website.url" class="oe_textoverflow"/></a>
+                    <a t-attf-href="#{odoo_website.full_url}"><p t-esc="odoo_website.url" class="oe_textoverflow"/></a>
                   </div>
                 </div>
               </div>
