@@ -447,7 +447,7 @@
 
               </div>
               <div class="col-md-4 col-xs-9">
-                
+
                 <div id="o_responsive_mockup_screens">
                     <div class="desktop">
                         <img class="back" src="/odoo_website/static/img/large-screen-optimised.png" />
@@ -478,7 +478,7 @@
                         </t>
                     </div>
                     <div class="back_spaceing">
-                        <img class="back" src="http://ami.responsivedesign.is/images/large-screen-optimised.png" />
+                        <img class="back" src="/odoo_website/static/img/desktop.png" />
                     </div>
                 </div>
 
