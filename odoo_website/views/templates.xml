@@ -212,7 +212,7 @@
 
                               <div t-foreach="rule.urlblock_ids" t-as="block" class="mt16">
                                 <p t-raw="block.name"/>
-                                <div style="max-height: 200px;overflow: auto;background-color: #FFF;" t-if="block.url_ids">
+                                <div style="max-height: 200px;overflow: auto;overflow-x: hidden;background-color: #FFF;" t-if="block.url_ids">
                                   <table class="table table-hover">
                                     <tr t-foreach="block.url_ids" t-as="url">
                                       <td><span t-raw="url.name"/></td>
