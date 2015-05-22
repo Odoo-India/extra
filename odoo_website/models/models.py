@@ -180,10 +180,11 @@ class OdooWebsite(models.Model):
     @api.one
     def compute_pagespeed_target(self, pagespeed, target='desktop'):
         result = json.loads(pagespeed)
-        print result
 
         def lineformat(line, args):
             for arg in args:
+                print arg.get('type'), arg.get('key'), arg.get('value')
+
                 if arg.get('type') == 'HYPERLINK':
                     key = "{{BEGIN_LINK}}"
                     value = "<a href='%s' target='_new'>" % arg.get('value')
@@ -196,8 +197,12 @@ class OdooWebsite(models.Model):
                     key = '{{%s}}' % arg.get('key')
                     value = "%s" % (arg.get('value'))
 
-                    if arg.get('type') != 'URL':
-                        value = "<b class='text-danger'>%s</b>" % (arg.get('value'))
+                    if arg.get('type') not in ('STRING_LITERAL', 'URL'):
+                        value = "<b class='code'>%s</b>" % (arg.get('value'))
+                    
+                    if arg.get('type') == 'STRING_LITERAL':
+
+                        value = "<code class='code'>%s</code>" % (arg.get('value').replace('<', '&lt;').replace('>', '&gt;'))
 
                     line = line.replace(key, value)
             return line
@@ -257,7 +262,8 @@ class OdooWebsite(models.Model):
 class PageSpeedEntry(models.Model):
     _name = 'odoo.website.pagespeed'
     _description = 'Google PageSpeed Entry'
-
+    _order = 'id desc'
+    
     name = fields.Char('Name')
     locale = fields.Char('Locale')
     pagespeed = fields.Text("Page Speed")
