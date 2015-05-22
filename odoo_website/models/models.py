@@ -70,8 +70,6 @@ class OdooWebsite(models.Model):
         mobile = speed_obj.search([('page_id','=',self.id), ('target','=','mobile')], limit=1)
         self.mobile = mobile.id
 
-        print desktop, mobile
-
     # parent_id = fields.Many2one(compute='_compute_parent', relation='odoo.website', string='Parent')
     # @api.depends('url')
     # def _compute_parent(self):
@@ -100,8 +98,6 @@ class OdooWebsite(models.Model):
             self.base_url = False
             self.full_url = False
             self.path = ''
-
-        print self.base_url, self.full_url, self.path, self.url
 
     @api.one
     @api.depends('url')
@@ -263,7 +259,7 @@ class PageSpeedEntry(models.Model):
     _name = 'odoo.website.pagespeed'
     _description = 'Google PageSpeed Entry'
     _order = 'id desc'
-    
+
     name = fields.Char('Name')
     locale = fields.Char('Locale')
     pagespeed = fields.Text("Page Speed")
