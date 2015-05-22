@@ -195,29 +195,33 @@
                         Speed
                     </h2>
 
-                    <h3 class="text-danger mt32"><i class="fa fa-exclamation-circle"></i> Should Fix:</h3>
-                    <div t-foreach="odoo_website.mobile.ruler_ids" t-as="rule">
-                      <div class="media">
-                        <div class="media-body mt4" t-if="rule.group == 'SPEED' and rule.ruleimpact > 10">
-                          <p class="media-heading" style="font-size: 15px;"><span t-esc="rule.name"/></p>
-                          <p>
-                            <i class="fa fa-caret-right"></i> 
-                            <a data-toggle="collapse" data-parent="#accordion" t-attf-href="#rule_#{rule.id}">Show how to fix</a>
-                          </p>
-                          <div t-attf-id="rule_#{rule.id}" class="panel-collapse collapse" style="background-color: #fafafa;">
-                            <div class="panel-body">
-                              <p>
-                                <b t-raw="rule.summary"/>
-                              </p>
+                    <t t-set="mobile_speed_score_should" t-value="odoo_website.mobile.ruler_ids.filtered(lambda r:(r.group == 'SPEED' and r.ruleimpact > 10))"/>
 
-                              <div t-foreach="rule.urlblock_ids" t-as="block" class="mt16">
-                                <p t-raw="block.name"/>
-                                <div style="max-height: 200px;overflow: auto;overflow-x: hidden;background-color: #FFF;" t-if="block.url_ids">
-                                  <table class="table table-hover">
-                                    <tr t-foreach="block.url_ids" t-as="url">
-                                      <td><span t-raw="url.name"/></td>
-                                    </tr>
-                                  </table>
+                    <div t-if="mobile_speed_score_should">
+                      <h3 class="text-danger mt32"><i class="fa fa-exclamation-circle"></i> Should Fix:</h3>
+                      <div t-foreach="mobile_speed_score_should" t-as="rule">
+                        <div class="media">
+                          <div class="media-body mt4">
+                            <p class="media-heading" style="font-size: 15px;"><span t-esc="rule.name"/></p>
+                            <p>
+                              <i class="fa fa-caret-right"></i> 
+                              <a data-toggle="collapse" data-parent="#accordion" t-attf-href="#rule_#{rule.id}">Show how to fix</a>
+                            </p>
+                            <div t-attf-id="rule_#{rule.id}" class="panel-collapse collapse" style="background-color: #fafafa;">
+                              <div class="panel-body">
+                                <p>
+                                  <b t-raw="rule.summary"/>
+                                </p>
+
+                                <div t-foreach="rule.urlblock_ids" t-as="block" class="mt16">
+                                  <p t-raw="block.name"/>
+                                  <div style="max-height: 200px;overflow: auto;overflow-x: hidden;background-color: #FFF;" t-if="block.url_ids">
+                                    <table class="table table-hover">
+                                      <tr t-foreach="block.url_ids" t-as="url">
+                                        <td><span t-raw="url.name"/></td>
+                                      </tr>
+                                    </table>
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -226,29 +230,33 @@
                       </div>
                     </div>
 
-                    <h3 class="text-warning"><i class="fa fa-exclamation-circle"></i> Consider Fixing:</h3>
-                    <div t-foreach="odoo_website.mobile.ruler_ids" t-as="rule">
-                      <div class="media">
-                        <div class="media-body mt4" t-if="rule.group == 'SPEED' and rule.ruleimpact &lt; 10 and rule.ruleimpact > 0">
-                          <p class="media-heading" style="font-size: 15px;"><span t-esc="rule.name"/></p>
-                          <p>
-                            <i class="fa fa-caret-right"></i> 
-                            <a data-toggle="collapse" data-parent="#accordion" t-attf-href="#rule_#{rule.id}">Show how to fix</a>
-                          </p>
-                          <div t-attf-id="rule_#{rule.id}" class="panel-collapse collapse" style="background-color: #fafafa;">
-                            <div class="panel-body">
-                              <p>
-                                <b t-raw="rule.summary"/>
-                              </p>
+                    <t t-set="mobile_speed_score_consider" t-value="odoo_website.mobile.ruler_ids.filtered(lambda r:(r.group == 'SPEED' and r.ruleimpact &lt; 10 and r.ruleimpact > 0))"/>
 
-                              <div t-foreach="rule.urlblock_ids" t-as="block" class="mt16">
-                                <p t-raw="block.name"/>
-                                <div style="max-height: 200px;overflow: auto;background-color: #FFF;" t-if="block.url_ids">
-                                  <table class="table table-hover">
-                                    <tr t-foreach="block.url_ids" t-as="url">
-                                      <td><span t-raw="url.name"/></td>
-                                    </tr>
-                                  </table>
+                    <div t-if="mobile_speed_score_consider">
+                      <h3 class="text-warning"><i class="fa fa-exclamation-circle"></i> Consider Fixing:</h3>
+                      <div t-foreach="mobile_speed_score_consider" t-as="rule">
+                        <div class="media">
+                          <div class="media-body mt4">
+                            <p class="media-heading" style="font-size: 15px;"><span t-esc="rule.name"/></p>
+                            <p>
+                              <i class="fa fa-caret-right"></i> 
+                              <a data-toggle="collapse" data-parent="#accordion" t-attf-href="#rule_#{rule.id}">Show how to fix</a>
+                            </p>
+                            <div t-attf-id="rule_#{rule.id}" class="panel-collapse collapse" style="background-color: #fafafa;">
+                              <div class="panel-body">
+                                <p>
+                                  <b t-raw="rule.summary"/>
+                                </p>
+
+                                <div t-foreach="rule.urlblock_ids" t-as="block" class="mt16">
+                                  <p t-raw="block.name"/>
+                                  <div style="max-height: 200px;overflow: auto;background-color: #FFF;" t-if="block.url_ids">
+                                    <table class="table table-hover">
+                                      <tr t-foreach="block.url_ids" t-as="url">
+                                        <td><span t-raw="url.name"/></td>
+                                      </tr>
+                                    </table>
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -257,22 +265,26 @@
                       </div>
                     </div>
 
-                    <h3 class="text-success"><i class="fa fa-check-square-o"></i> Passed Rules:</h3>
-                    <p>
-                      <i class="fa fa-caret-right"></i> 
-                      <a data-toggle="collapse" data-parent="#accordion" t-attf-href="#rule_passed_mobile">Show Details</a>
-                    </p>
 
-                    <div id="rule_passed_mobile" class="panel-collapse collapse" style="background-color: #fafafa;">
-                      <div style="background-color: #FFF;">
-                        <table class="table table-hover">
-                          <tr t-foreach="odoo_website.mobile.ruler_ids" t-as="rule">
-                            <td t-if="rule.group == 'SPEED' and rule.ruleimpact == 0">
-                              <b class="media-heading"><span t-raw="rule.name"/></b>
-                              <p t-raw="rule.summary"/>
-                            </td>
-                          </tr>
-                        </table>
+                    <t t-set="mobile_speed_score_pass" t-value="odoo_website.mobile.ruler_ids.filtered(lambda r:(r.group == 'SPEED' and r.ruleimpact == 0))"/>
+
+                    <div t-if="mobile_speed_score_pass">
+                      <h3 class="text-success"><i class="fa fa-check-square-o"></i> <span t-esc="len(mobile_speed_score_pass)"/> Passed Rules:</h3>
+                      <p>
+                        <i class="fa fa-caret-right"></i> 
+                        <a data-toggle="collapse" data-parent="#accordion" t-attf-href="#rule_passed_mobile">Show Details</a>
+                      </p>
+                      <div id="rule_passed_mobile" class="panel-collapse collapse" style="background-color: #fafafa;">
+                        <div style="background-color: #FFF;">
+                          <table class="table table-hover">
+                            <tr t-foreach="mobile_speed_score_pass" t-as="rule">
+                              <td>
+                                <b class="media-heading"><span t-raw="rule.name"/></b>
+                                <p t-raw="rule.summary"/>
+                              </td>
+                            </tr>
+                          </table>
+                        </div>
                       </div>
                     </div>
 
@@ -285,29 +297,33 @@
                         User Experience
                     </h2>
 
-                    <h3 class="text-danger mt32"><i class="fa fa-exclamation-circle"></i> Should Fix:</h3>
-                    <div t-foreach="odoo_website.mobile.ruler_ids" t-as="rule">
-                      <div class="media">
-                        <div class="media-body mt4"  t-if="rule.group == 'USABILITY' and rule.ruleimpact > 10">
-                          <p class="media-heading" style="font-size: 15px;"><span t-esc="rule.name"/></p>
-                          <p>
-                            <i class="fa fa-caret-right"></i> 
-                            <a data-toggle="collapse" data-parent="#accordion" t-attf-href="#rule_#{rule.id}">Show how to fix</a>
-                          </p>
-                          <div t-attf-id="rule_#{rule.id}" class="panel-collapse collapse" style="background-color: #fafafa;">
-                            <div class="panel-body">
-                              <p>
-                                <b t-raw="rule.summary"/>
-                              </p>
+                    <t t-set="mobile_usability_score_should" t-value="odoo_website.mobile.ruler_ids.filtered(lambda r:(r.group == 'USABILITY' and r.ruleimpact > 10))"/>
 
-                              <div t-foreach="rule.urlblock_ids" t-as="block" class="mt16">
-                                <p t-raw="block.name"/>
-                                <div style="max-height: 200px;overflow: auto;background-color: #FFF;" t-if="block.url_ids">
-                                  <table class="table table-hover">
-                                    <tr t-foreach="block.url_ids" t-as="url">
-                                      <td><span t-raw="url.name"/></td>
-                                    </tr>
-                                  </table>
+                    <div t-if="mobile_usability_score_should">
+                      <h3 class="text-danger mt32"><i class="fa fa-exclamation-circle"></i> Should Fix:</h3>
+                      <div t-foreach="mobile_usability_score_should" t-as="rule">
+                        <div class="media">
+                          <div class="media-body mt4">
+                            <p class="media-heading" style="font-size: 15px;"><span t-esc="rule.name"/></p>
+                            <p>
+                              <i class="fa fa-caret-right"></i> 
+                              <a data-toggle="collapse" data-parent="#accordion" t-attf-href="#rule_#{rule.id}">Show how to fix</a>
+                            </p>
+                            <div t-attf-id="rule_#{rule.id}" class="panel-collapse collapse" style="background-color: #fafafa;">
+                              <div class="panel-body">
+                                <p>
+                                  <b t-raw="rule.summary"/>
+                                </p>
+
+                                <div t-foreach="rule.urlblock_ids" t-as="block" class="mt16">
+                                  <p t-raw="block.name"/>
+                                  <div style="max-height: 200px;overflow: auto;background-color: #FFF;" t-if="block.url_ids">
+                                    <table class="table table-hover">
+                                      <tr t-foreach="block.url_ids" t-as="url">
+                                        <td><span t-raw="url.name"/></td>
+                                      </tr>
+                                    </table>
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -316,29 +332,34 @@
                       </div>
                     </div>
 
-                    <h3 class="text-warning"><i class="fa fa-exclamation-circle"></i> Consider Fixing:</h3>
-                    <div t-foreach="odoo_website.mobile.ruler_ids" t-as="rule">
-                      <div class="media">
-                        <div class="media-body mt4" t-if="rule.group == 'USABILITY' and rule.ruleimpact &lt; 10 and rule.ruleimpact > 0">
-                          <p class="media-heading" style="font-size: 15px;"><span t-esc="rule.name"/></p>
-                          <p>
-                            <i class="fa fa-caret-right"></i> 
-                            <a data-toggle="collapse" data-parent="#accordion" t-attf-href="#rule_#{rule.id}">Show how to fix</a>
-                          </p>
-                          <div t-attf-id="rule_#{rule.id}" class="panel-collapse collapse" style="background-color: #fafafa;">
-                            <div class="panel-body">
-                              <p>
-                                <b t-raw="rule.summary"/>
-                              </p>
 
-                              <div t-foreach="rule.urlblock_ids" t-as="block" class="mt16">
-                                <p t-raw="block.name"/>
-                                <div style="max-height: 200px;overflow: auto;background-color: #FFF;" t-if="block.url_ids">
-                                  <table class="table table-hover">
-                                    <tr t-foreach="block.url_ids" t-as="url">
-                                      <td><span t-raw="url.name"/></td>
-                                    </tr>
-                                  </table>
+                    <t t-set="mobile_usability_score_consider" t-value="odoo_website.mobile.ruler_ids.filtered(lambda r:(r.group == 'USABILITY' and r.ruleimpact &lt; 10 and r.ruleimpact > 0))"/>
+
+                    <div t-if="mobile_usability_score_consider">
+                      <h3 class="text-warning mt32"><i class="fa fa-exclamation-circle"></i> Consider Fixing:</h3>
+                      <div t-foreach="mobile_usability_score_consider" t-as="rule">
+                        <div class="media">
+                          <div class="media-body mt4">
+                            <p class="media-heading" style="font-size: 15px;"><span t-esc="rule.name"/></p>
+                            <p>
+                              <i class="fa fa-caret-right"></i> 
+                              <a data-toggle="collapse" data-parent="#accordion" t-attf-href="#rule_#{rule.id}">Show how to fix</a>
+                            </p>
+                            <div t-attf-id="rule_#{rule.id}" class="panel-collapse collapse" style="background-color: #fafafa;">
+                              <div class="panel-body">
+                                <p>
+                                  <b t-raw="rule.summary"/>
+                                </p>
+
+                                <div t-foreach="rule.urlblock_ids" t-as="block" class="mt16">
+                                  <p t-raw="block.name"/>
+                                  <div style="max-height: 200px;overflow: auto;background-color: #FFF;" t-if="block.url_ids">
+                                    <table class="table table-hover">
+                                      <tr t-foreach="block.url_ids" t-as="url">
+                                        <td><span t-raw="url.name"/></td>
+                                      </tr>
+                                    </table>
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -347,22 +368,26 @@
                       </div>
                     </div>
 
-                    <h3 class="text-success"><i class="fa fa-check-square-o"></i> Passed Rules:</h3>
-                    <p>
-                      <i class="fa fa-caret-right"></i> 
-                      <a data-toggle="collapse" data-parent="#accordion" t-attf-href="#rule_passed_usability_mobile">Show Details</a>
-                    </p>
+                    <t t-set="mobile_usability_score_pass" t-value="odoo_website.mobile.ruler_ids.filtered(lambda r:(r.group == 'USABILITY' and r.ruleimpact == 0))"/>
 
-                    <div id="rule_passed_usability_mobile" class="panel-collapse collapse" style="background-color: #fafafa;">
-                      <div style="background-color: #FFF;">
-                        <table class="table table-hover">
-                          <tr t-foreach="odoo_website.mobile.ruler_ids" t-as="rule">
-                            <td t-if="rule.group == 'USABILITY' and rule.ruleimpact == 0">
-                              <b class="media-heading"><span t-raw="rule.name"/></b>
-                              <p t-raw="rule.summary"/>
-                            </td>
-                          </tr>
-                        </table>
+                    <div t-if="mobile_usability_score_pass">
+                      <h3 class="text-success"><i class="fa fa-check-square-o"></i> <span t-esc="len(mobile_usability_score_pass)"/>  Passed Rules:</h3>
+                      <p>
+                        <i class="fa fa-caret-right"></i> 
+                        <a data-toggle="collapse" data-parent="#accordion" t-attf-href="#rule_passed_usability_mobile">Show Details</a>
+                      </p>
+
+                      <div id="rule_passed_usability_mobile" class="panel-collapse collapse" style="background-color: #fafafa;">
+                        <div style="background-color: #FFF;">
+                          <table class="table table-hover">
+                            <tr t-foreach="mobile_usability_score_pass" t-as="rule">
+                              <td>
+                                <b class="media-heading"><span t-raw="rule.name"/></b>
+                                <p t-raw="rule.summary"/>
+                              </td>
+                            </tr>
+                          </table>
+                        </div>
                       </div>
                     </div>
 
@@ -381,29 +406,33 @@
                         Speed
                     </h2>
 
-                    <h3 class="text-danger mt32"><i class="fa fa-exclamation-circle"></i> Should Fix:</h3>
-                    <div t-foreach="odoo_website.desktop.ruler_ids" t-as="rule">
-                      <div class="media">
-                        <div class="media-body mt4" t-if="rule.group == 'SPEED' and rule.ruleimpact > 10">
-                          <p class="media-heading" style="font-size: 15px;"><span t-esc="rule.name"/></p>
-                          <p>
-                            <i class="fa fa-caret-right"></i> 
-                            <a data-toggle="collapse" data-parent="#accordion" t-attf-href="#rule_#{rule.id}">Show how to fix</a>
-                          </p>
-                          <div t-attf-id="rule_#{rule.id}" class="panel-collapse collapse" style="background-color: #fafafa;">
-                            <div class="panel-body">
-                              <p>
-                                <b t-raw="rule.summary"/>
-                              </p>
+                    <t t-set="desktop_speed_score_should" t-value="odoo_website.desktop.ruler_ids.filtered(lambda r:(r.group == 'SPEED' and r.ruleimpact > 10))"/>
 
-                              <div t-foreach="rule.urlblock_ids" t-as="block" class="mt16">
-                                <p t-raw="block.name"/>
-                                <div style="max-height: 200px;overflow: auto;background-color: #FFF;" t-if="block.url_ids">
-                                  <table class="table table-hover">
-                                    <tr t-foreach="block.url_ids" t-as="url">
-                                      <td><span t-raw="url.name"/></td>
-                                    </tr>
-                                  </table>
+                    <div t-if="desktop_speed_score_should">
+                      <h3 class="text-danger mt32"><i class="fa fa-exclamation-circle"></i> Should Fix:</h3>
+                      <div t-foreach="desktop_speed_score_should" t-as="rule">
+                        <div class="media">
+                          <div class="media-body mt4">
+                            <p class="media-heading" style="font-size: 15px;"><span t-esc="rule.name"/></p>
+                            <p>
+                              <i class="fa fa-caret-right"></i> 
+                              <a data-toggle="collapse" data-parent="#accordion" t-attf-href="#rule_#{rule.id}">Show how to fix</a>
+                            </p>
+                            <div t-attf-id="rule_#{rule.id}" class="panel-collapse collapse" style="background-color: #fafafa;">
+                              <div class="panel-body">
+                                <p>
+                                  <b t-raw="rule.summary"/>
+                                </p>
+
+                                <div t-foreach="rule.urlblock_ids" t-as="block" class="mt16">
+                                  <p t-raw="block.name"/>
+                                  <div style="max-height: 200px;overflow: auto;background-color: #FFF;" t-if="block.url_ids">
+                                    <table class="table table-hover">
+                                      <tr t-foreach="block.url_ids" t-as="url">
+                                        <td><span t-raw="url.name"/></td>
+                                      </tr>
+                                    </table>
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -412,29 +441,33 @@
                       </div>
                     </div>
 
-                    <h3 class="text-warning"><i class="fa fa-exclamation-circle"></i> Consider Fixing:</h3>
-                    <div t-foreach="odoo_website.desktop.ruler_ids" t-as="rule">
-                      <div class="media">
-                        <div class="media-body mt4" t-if="rule.group == 'SPEED' and rule.ruleimpact &lt; 10 and rule.ruleimpact > 0">
-                          <p class="media-heading" style="font-size: 15px;"><span t-esc="rule.name"/></p>
-                          <p>
-                            <i class="fa fa-caret-right"></i> 
-                            <a data-toggle="collapse" data-parent="#accordion" t-attf-href="#rule_#{rule.id}">Show how to fix</a>
-                          </p>
-                          <div t-attf-id="rule_#{rule.id}" class="panel-collapse collapse" style="background-color: #fafafa;">
-                            <div class="panel-body">
-                              <p>
-                                <b t-raw="rule.summary"/>
-                              </p>
+                    <t t-set="desktop_speed_score_consider" t-value="odoo_website.desktop.ruler_ids.filtered(lambda r:(r.group == 'SPEED' and r.ruleimpact &lt; 10 and r.ruleimpact > 0))"/>
 
-                              <div t-foreach="rule.urlblock_ids" t-as="block" class="mt16">
-                                <p t-raw="block.name"/>
-                                <div style="max-height: 200px;overflow: auto;background-color: #FFF;" t-if="block.url_ids">
-                                  <table class="table table-hover">
-                                    <tr t-foreach="block.url_ids" t-as="url">
-                                      <td><span t-raw="url.name"/></td>
-                                    </tr>
-                                  </table>
+                    <div t-if="desktop_speed_score_consider">
+                      <h3 class="text-warning"><i class="fa fa-exclamation-circle"></i> Consider Fixing:</h3>
+                      <div t-foreach="desktop_speed_score_consider" t-as="rule">
+                        <div class="media">
+                          <div class="media-body mt4">
+                            <p class="media-heading" style="font-size: 15px;"><span t-esc="rule.name"/></p>
+                            <p>
+                              <i class="fa fa-caret-right"></i> 
+                              <a data-toggle="collapse" data-parent="#accordion" t-attf-href="#rule_#{rule.id}">Show how to fix</a>
+                            </p>
+                            <div t-attf-id="rule_#{rule.id}" class="panel-collapse collapse" style="background-color: #fafafa;">
+                              <div class="panel-body">
+                                <p>
+                                  <b t-raw="rule.summary"/>
+                                </p>
+
+                                <div t-foreach="rule.urlblock_ids" t-as="block" class="mt16">
+                                  <p t-raw="block.name"/>
+                                  <div style="max-height: 200px;overflow: auto;background-color: #FFF;" t-if="block.url_ids">
+                                    <table class="table table-hover">
+                                      <tr t-foreach="block.url_ids" t-as="url">
+                                        <td><span t-raw="url.name"/></td>
+                                      </tr>
+                                    </table>
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -443,24 +476,29 @@
                       </div>
                     </div>
 
-                    <h3 class="text-success"><i class="fa fa-check-square-o"></i> Passed Rules:</h3>
-                    <p>
-                      <i class="fa fa-caret-right"></i> 
-                      <a data-toggle="collapse" data-parent="#accordion" t-attf-href="#rule_passed_desktop">Show Details</a>
-                    </p>
+                    <t t-set="desktop_speed_score_pass" t-value="odoo_website.desktop.ruler_ids.filtered(lambda r:(r.group == 'SPEED' and r.ruleimpact == 0))"/>
 
-                    <div id="rule_passed_desktop" class="panel-collapse collapse" style="background-color: #fafafa;">
-                      <div style="background-color: #FFF;">
-                        <table class="table table-hover">
-                          <tr t-foreach="odoo_website.desktop.ruler_ids" t-as="rule">
-                            <td t-if="rule.group == 'SPEED' and rule.ruleimpact == 0">
-                              <b class="media-heading"><span t-raw="rule.name"/></b>
-                              <p t-raw="rule.summary"/>
-                            </td>
-                          </tr>
-                        </table>
+                    <div t-if="desktop_speed_score_pass">
+                      <h3 class="text-success"><i class="fa fa-check-square-o"></i> <span t-esc="len(desktop_speed_score_pass)" /> Passed Rules:</h3>
+                      <p>
+                        <i class="fa fa-caret-right"></i> 
+                        <a data-toggle="collapse" data-parent="#accordion" t-attf-href="#rule_passed_desktop">Show Details</a>
+                      </p>
+
+                      <div id="rule_passed_desktop" class="panel-collapse collapse" style="background-color: #fafafa;">
+                        <div style="background-color: #FFF;">
+                          <table class="table table-hover">
+                            <tr t-foreach="desktop_speed_score_pass" t-as="rule">
+                              <td>
+                                <b class="media-heading"><span t-raw="rule.name"/></b>
+                                <p t-raw="rule.summary"/>
+                              </td>
+                            </tr>
+                          </table>
+                        </div>
                       </div>
                     </div>
+
                     <p class="mt16">
                       Download optimized <a t-attf-href="https://developers.google.com/speed/pagespeed/insights/optimizeContents?url=#{odoo_website.full_url}&amp;strategy=desktop">image, JavaScript, and CSS resources</a> for this page.
                     </p>
