@@ -93,7 +93,7 @@
             <div class="row">
               <div class="col-md-7 col-xs-12">
                 <img t-attf-src="#{odoo_website.base_url}/logo.png" class="img img-responsive pull-left"/>
-                <t t-call="odoo_website.website_share" class="text-right"/>
+                <t t-call="odoo_website.website_share" class="text-right mt16"/>
               </div>
               <div class="col-md-5 col-xs-12">
                 <center>
