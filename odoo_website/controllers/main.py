@@ -41,6 +41,8 @@ class OdooWebsites(http.Controller):
             domain += ['|', ('name','ilike',search), ('description','ilike',search)]
 
         pager_count = website_obj.search_count(domain)
+        total_webeites = website_obj.search_count([])
+
         pager = request.website.pager(url=pager_url, total=pager_count, page=page,
                                       step=self._websites_per_page, scope=self._websites_per_page,
                                       url_args=pager_args)
@@ -54,7 +56,8 @@ class OdooWebsites(http.Controller):
             'is_public_user': res_user == public_user,
             'pager': pager,
             'title': 'Websites, built on Odoo CMS',
-            'search': search
+            'search': search,
+            'total_webeites':total_webeites
         })
 
 

@@ -54,12 +54,12 @@
         </section>
 
         <section>
-           <div class="container mt16 mb16">
+          <div class="container mt16 mb16">
             <div class="row">
-              <div class="col-md-6 pull-left">
-
+              <div class="col-md-6 mt4">
+                <h3 class="mt0"><i class="fa fa-globe"></i> <span t-esc="total_webeites"/> Websites found</h3>
               </div>
-              <div class="col-md-6 pull-right">
+              <div class="col-md-6">
                 <form method="get" action="/websites/all">
                   <div class="input-group">
                     <input type="search" class="form-control" name="search" t-attf-placeholder="Search for webeites" t-att-value="search"/>
