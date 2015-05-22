@@ -38,12 +38,14 @@
                             <field name="is_image_tablet"/>
                         </group>
                     </group>
+                    
                     <group>
                         <field name="url"/>
                         <field name="odoo"/>
                         <field name="version"/>
                         <field name="domain"/>
                         <field name="path"/>
+                        <field name="display"/>
                         <button type="object" name="compute_pagespeed" string="Get PageSpeed"/>
                     </group>
 

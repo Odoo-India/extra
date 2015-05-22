@@ -52,6 +52,14 @@ class OdooWebsite(models.Model):
     desktop = fields.Many2one('odoo.website.pagespeed', compute='_find_page_speed', string='Parent')
     mobile = fields.Many2one('odoo.website.pagespeed', compute='_find_page_speed', string='Parent')
 
+    display = fields.Boolean('Selected')
+    link = fields.Char(compute='_compute_link', string='Link')
+
+    @api.one
+    @api.depends('url')
+    def _compute_link(self):
+        self.link = 'websites/view/%s' % (self.id)
+
     @api.one
     @api.depends('pagespeed_ids')
     def _find_page_speed(self):

@@ -16,28 +16,41 @@ class OdooWebsites(http.Controller):
         res_user = request.env.user
         public_user = request.website.user_id
 
-        websites = website_obj.search([], limit=10)
+        websites = website_obj.search([('display','=',True)], limit=10)
 
         return request.render('odoo_website.websites', {
             'websites': websites,
+            'title': 'Websites, built on Odoo CMS',
             'is_public_user': res_user == public_user
         })
 
 
-    @http.route('/websites/all', auth='public', type='http', website=True)
-    def website_list(self, **post):
+    @http.route(['/websites/all', '/websites/all/page/<int:page>'], auth='public', type='http', website=True)
+    def website_list(self, page=1, **post):
         website_obj = request.env['odoo.website']
 
         res_user = request.env.user
         public_user = request.website.user_id
-        websites = website_obj.search([], limit=50)
 
-        related = website_obj.search([], limit=10)
+        pager_url = "/websites/all"
+        pager_args = {}
+
+        domain = []
+
+        pager_count = website_obj.search_count(domain)
+        pager = request.website.pager(url=pager_url, total=pager_count, page=page,
+                                      step=self._websites_per_page, scope=self._websites_per_page,
+                                      url_args=pager_args)
+
+        websites = website_obj.search(domain, limit=self._websites_per_page, offset=pager['offset'])
+        related = website_obj.search([('display','=',True)], limit=10)
 
         return request.render('odoo_website.website_list', {
             'websites': websites,
             'related': related,
-            'is_public_user': res_user == public_user
+            'is_public_user': res_user == public_user,
+            'pager': pager,
+            'title': 'Websites, built on Odoo CMS'
         })
 
 

@@ -14,11 +14,32 @@
       </xpath>
     </template>
 
-    <!-- display list of groups --> 
+
+    <template id='website_share' name="Slides Media Share">
+      <div class="form-group">
+          <a target="_Blank" t-attf-href="https://www.facebook.com/sharer/sharer.php?u=#{odoo_website.link}">
+              <i class="fa fa-facebook-square fa-2x"></i>
+          </a>
+          <a target="_Blank" t-attf-href="https://twitter.com/intent/tweet?text=#{odoo_website.name}&amp;url=#{odoo_website.link}">
+              <i class="fa fa-twitter-square fa-2x"></i>
+          </a>
+          <a target="_Blank" t-attf-href="http://www.linkedin.com/shareArticle?mini=true&amp;url=#{odoo_website.link}&amp;title=#{odoo_website.name}&amp;">
+              <i class="fa fa-linkedin-square fa-2x"></i>
+          </a>
+          <a target="_Blank" t-attf-href="https://plus.google.com/share?url=#{odoo_website.link}">
+              <i class="fa fa-google-plus-square fa-2x"></i>
+          </a>
+      </div>
+  </template>
+
+    <!-- display list of groups -->
     <template id="website_list">
       <t t-call="website.layout">
         <section>
           <div class="oe_structure"/>
+        </section>
+
+        <section style="background-color: #fafafa;padding-top: 20px;padding-bottom: 20px;">
           <div class="container mt16">
             <div class="row">
               <div id="owl-demo" style="overflow: hidden;">
@@ -29,7 +50,12 @@
                 </div>
               </div>
             </div>
+          </div>
+        </section>
 
+        <section>
+          <div class="oe_structure"/>
+          <div class="container mt16">
             <div class="row mt16">
               <div t-foreach="websites" t-as="odoo_website" class="col-sm-3 col-md-3">
                 <div class="thumbnail">
@@ -39,30 +65,35 @@
                   </a>
                   <div class="caption">
                     <h4 t-esc="odoo_website.name" class="oe_textoverflow"/>
-                    <a t-attf-href="http://#{odoo_website.url}"><p t-esc="odoo_website.url"/></a>
+                    <a t-attf-href="http://#{odoo_website.url}"><p t-esc="odoo_website.url" class="oe_textoverflow"/></a>
                     <!-- <p t-esc="odoo_website.description"/> -->
                   </div>
                 </div>
               </div>
             </div>
+
+            <div class="row text-center mt16 mb16">
+              <t t-call="website.pager"/>
+            </div>
           </div>
         </section>
       </t>
     </template>
- 
+
     <template id="view">
       <t t-call="website.layout">
         <t t-set="head">
-            <link href="/web/static/lib/nvd3/nv.d3.css" rel="stylesheet" type="text/css"></link>
-            <script src="/web/static/lib/nvd3/d3.v3.js"></script>
-            <script src="/web/static/lib/nvd3/nv.d3.js"></script>
+          <link href="/web/static/lib/nvd3/nv.d3.css" rel="stylesheet" type="text/css"></link>
+          <script src="/web/static/lib/nvd3/d3.v3.js"></script>
+          <script src="/web/static/lib/nvd3/nv.d3.js"></script>
         </t>
+
         <section class="mt16">
           <div class="container">
-
             <div class="row">
               <div class="col-md-7 col-xs-12">
-                <img t-attf-src="#{odoo_website.base_url}/logo.png" class="img img-responsive text-center" style="margin: auto;"/>
+                <img t-attf-src="#{odoo_website.base_url}/logo.png" class="img img-responsive pull-left"/>
+                <t t-call="odoo_website.website_share" class="text-right"/>
               </div>
               <div class="col-md-5 col-xs-12">
                 <center>
