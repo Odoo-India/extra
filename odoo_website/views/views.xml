@@ -25,12 +25,12 @@
                         <h4 class="text-muted"><field name="description"/></h4>
                     </div>
                     <group>
-                        <group>
+                        <!-- <group>
                             <field name="image" widget="image"/>
                             <field name="is_image"/>
                             <field name="image_laptop" widget="image"/>
                             <field name="is_image_laptop"/>
-                        </group>
+                        </group> -->
                         <group>
                             <field name="image_mobile" widget="image"/>
                             <field name="is_image_mobile"/>
