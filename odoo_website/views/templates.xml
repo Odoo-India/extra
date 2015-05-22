@@ -507,6 +507,31 @@
 
           </div>
         </section>
+
+        <section class="jumbotron s_button mb0">
+         <div class="container">
+          <div class="row">
+            <div class="text-muted col-md-9">
+              <p class="mb0">
+                <strong class="">Websites built with Odoo CMS.
+                </strong>
+              </p>
+              <p class="mb0">There are thousands of beautiful websites running on Odoo CMS.</p>
+            </div>
+            <div class="col-md-3">
+              <a href="/websites" class="btn btn-lg btn-success mt8 pull-right">
+                <i class="fa fa-arrow-right" style=""></i>Submit Website
+              </a>
+            </div>
+            <div class="col-md-3">
+              <a href="/websites/all" class="mt8 pull-right btn btn-info btn-lg">
+                <i class="fa fa-arrow-right" style=""></i> View Websites
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       </t>
     </template>
 
@@ -563,7 +588,8 @@
           </div>
         </section>
 
-        <section class="jumbotron s_button mb0">
+
+       <section class="jumbotron s_button mb0">
          <div class="container">
           <div class="row">
             <div class="text-muted col-md-9">
