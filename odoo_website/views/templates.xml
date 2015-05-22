@@ -40,7 +40,7 @@
         </section>
 
         <section style="background-color: #fafafa;padding-top: 20px;padding-bottom: 20px;">
-          <div class="container mt16">
+          <div class="container mt16 mb16">
             <div class="row">
               <div id="owl-demo" style="overflow: hidden;">
                 <div t-foreach="related" t-as="odoo_website" class="item">
@@ -65,7 +65,7 @@
                   </a>
                   <div class="caption">
                     <h4 t-esc="odoo_website.name" class="oe_textoverflow"/>
-                    <a t-attf-href="#{odoo_website.full_url}"><p t-esc="odoo_website.url" class="oe_textoverflow"/></a>
+                    <a t-attf-href="#{odoo_website.full_url}" target="_new"><p t-esc="odoo_website.url" class="oe_textoverflow"/></a>
                   </div>
                 </div>
               </div>
