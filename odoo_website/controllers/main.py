@@ -38,7 +38,7 @@ class OdooWebsites(http.Controller):
         domain = []
 
         if search:
-            domain += ['|', ('name','ilike',search), ('description','ilike',search)]
+            domain += ['|', ('name','ilike',search), ('description','ilike',search), ('url','ilike',search)]
 
         pager_count = website_obj.search_count(domain)
         total_webeites = website_obj.search_count([])
