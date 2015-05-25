@@ -18,7 +18,7 @@ from openerp import models, fields, api, _
 class OdooWebsite(models.Model):
     _name = 'odoo.website'
     _inherit = ['mail.thread', 'website.seo.metadata']
-    _order = 'id'
+    _order = 'id desc'
 
     url = fields.Char('Website Url', help="A url to webpage entered by user, i.e. https://www.odoo.com/page/point-of-sale")
     domain = fields.Char(compute="_compute_urls", store=True, string='base url will be www.odoo.com')
