@@ -1,0 +1,207 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <record model="ir.ui.view" id="view_event_survey_form">
+            <field name="name">event.survey.track.form</field>
+            <field name="model">event.track.custom</field>
+            <field name="arch" type="xml">
+                <form string="Event Tracks">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                            <label for="odoo_url" class="oe_edit_only"/>
+                            <h3>
+                                <field name="odoo_url" widget="url" readonly="1"/>
+                            </h3>
+                        </div>
+                        <field name="odoo_event_id" invisible="1"/>
+                        <group>
+                            <group>
+                                <field name="average_rating"/>
+                            </group>
+                            <group>
+                                <field name="number_of_feedback"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Feedbacks">
+                                <field name="feedback_ids"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+        
+        <record model="ir.ui.view" id="view_event_survey_tree">
+            <field name="name">event.survey.track.tree</field>
+            <field name="model">event.track.custom</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_event_track_graph">
+            <field name="name">event.track.custom.graph</field>
+            <field name="model">event.track.custom</field>
+            <field name="arch" type="xml">
+                <graph string="Track Ratings">
+                    <field name="name"/>
+                    <field name="average_rating" type="measure"/>
+                </graph>
+            </field>
+        </record>
+
+        <record id="view_event_custom_pivot" model="ir.ui.view">
+            <field name="name">event.track.custom.pivot</field>
+            <field name="model">event.track.custom</field>
+            <field name="arch" type="xml">
+                <pivot string="Track Statistics" >
+                    <field name="name" type="row"/>
+                    <field name="average_rating" type="measure"/>
+                </pivot>
+            </field>
+         </record>
+        <record model="ir.actions.act_window" id="view_event_survey_action">
+            <field name="name">Event Tracks</field>
+            <field name="res_model">event.track.custom</field>
+            <field name="view_mode">tree,form,graph,pivot</field>
+        </record>
+
+        <record model="ir.ui.view" id="view_event_survey_feedback_form">
+            <field name="name">event.track.feedback.tree</field>
+            <field name="model">event.track.feedback</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="track_id" />
+                            </group>
+                            <group>
+                                <field name="partner_id" />
+                            </group>
+                        </group>
+                        <group>
+                            <field name="overall_rating" widget="priority"/>
+                            <field name="content_rating"  widget="priority"/>
+                        </group>
+                        <notebook>
+                            <page string="Comment">
+                                <group>
+                                    <field name="comment" nolabel="1"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_event_survey_feedback_tree">
+            <field name="name">event.track.feedback.tree</field>
+            <field name="model">event.track.feedback</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="track_id" invisible="1"/>
+                    <field name="partner_id"/>
+                    <field name="overall_rating"/>
+                    <field name="content_rating"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="view_event_survey_feedback_search" model="ir.ui.view">
+            <field name="name">event.track.feedback.search</field>
+            <field name="model">event.track.feedback</field>
+            <field name="arch" type="xml">
+                <search string="Search ">
+                    <group expand="0" string="Group By">
+                        <filter string="Tracks" name="group_by_track" domain="[]" context="{'group_by':'track_id'}"/>
+                        <filter string="Overall Rating" name="overall_rating" domain="[]" context="{'group_by':'overall_rating'}"/>
+                        <filter string="Content Rating" name="content_rating" domain="[]" context="{'group_by':'content_rating'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        
+        <record model="ir.ui.view" id="view_event_feedback_graph">
+            <field name="name">event.track.feedback.graph</field>
+            <field name="model">event.track.feedback</field>
+            <field name="arch" type="xml">
+                <graph string="Track Ratings">
+                    <field name="track_id"/>
+                    <field name="overall_rating" type="sum"/>
+                </graph>
+            </field>
+        </record>
+
+        <record id="view_event_feedback_pivot" model="ir.ui.view">
+            <field name="name">event.track.feedback.pivot</field>
+            <field name="model">event.track.feedback</field>
+            <field name="arch" type="xml">
+                <pivot string="Track Statistics" >
+                    <field name="track_id" type="row"/>
+                    <field name="overall_rating" type="col"/>
+                </pivot>
+            </field>
+         </record>
+
+        <record model="ir.actions.act_window" id="view_event_survey_feedback_action">
+            <field name="name">Event Tracks Feedback</field>
+            <field name="res_model">event.track.feedback</field>
+            <field name="context" eval="{'search_default_group_by_track':1}"/>
+            <field name="view_mode">tree,form,graph,pivot</field>
+        </record>
+
+        <record model="ir.actions.act_window" id="view_event_survey_attendee_action">
+            <field name="name">Event Attendee</field>
+            <field name="res_model">res.partner</field>
+            <field name="domain">[('is_exp_user','=',True)]</field>
+            <field name="view_mode">tree,form,graph,pivot</field>
+        </record>
+
+        <menuitem id="menu_event_survey_main" name="Events survey"/>
+        <menuitem id="menu_event_survey_sub" parent="menu_event_survey_main" name="Events"/>
+        <menuitem action="view_event_survey_action" id="menu_event_survey_custom" parent="menu_event_survey_sub"/>
+        <menuitem action="view_event_survey_feedback_action" id="menu_event_survey_feedback" parent="menu_event_survey_sub"/>
+        <menuitem action="view_event_survey_attendee_action" id="menu_event_attendee_feedback" parent="menu_event_survey_sub"/>
+        
+
+        <template id="event_survey" name="test submit">
+            <form action="/event_survey/submit">
+                <input name="email"/>
+                <input name="user_name"/>
+                <select name="overall_rating">
+                    <option value="0"> Not Rated</option>
+                    <option value="1"> Not good at all</option>
+                    <option value="2"> Not so good</option>
+                    <option value="3"> Average</option>
+                    <option value="4"> Good</option>
+                    <option value="5"> Excellent</option>
+                </select>
+                <select name="content_rating">
+                    <option value="0"> Not Rated</option>
+                    <option value="1"> Not good at all</option>
+                    <option value="2"> Not so good</option>
+                    <option value="3"> Average</option>
+                    <option value="4"> Good</option>
+                    <option value="5"> Excellent</option>
+                </select>
+                <input name="track_id"/>
+                <input name="track_name"/>
+                <textarea name="comment"/>
+                <button type="submit">submit</button>
+            </form>
+        </template>
+    </data>
+</openerp>
