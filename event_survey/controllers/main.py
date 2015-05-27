@@ -9,14 +9,14 @@ class EventSurvey(http.Controller):
         partner_obj = request.env['res.partner'].sudo()
         track_obj = request.env['event.track.custom'].sudo()
         feedback_obj = request.env['event.track.feedback'].sudo()
-        track = track_obj.search([('odoo_event_id', '=', post.get("track_id"))])
+        track = track_obj.search([('odoo_event_id', '=', post.get("track_id"))], limit=1)
         if not track:
             track = track_obj.create({
                 'odoo_event_id': post.get("track_id"),
                 'name': post.get('track_name'),
                 'odoo_url': "https://www.odoo.com/event/304/track/%s" % (post.get("track_id"))
             })
-        partner = partner_obj.search([('email', '=', post.get("email"))])
+        partner = partner_obj.search([('email', '=', post.get("email"))], limit=1)
         if not partner:
             partner = partner_obj.create({'name': post.get("user_name"), "email": post.get("email"), "is_exp_user": True})
 
@@ -45,7 +45,7 @@ class EventSurvey(http.Controller):
     @http.route('/event_survey/add_attendee', type='json', auth='public')
     def add_atendee(self, **post):
         partner_obj = request.env['res.partner'].sudo()
-        partner = partner_obj.search([('email', '=', post.get("email"))])
+        partner = partner_obj.search([('email', '=', post.get("email"))], limit=1)
         if not partner:
             partner = partner_obj.create({'name': post.get("name"), "email": post.get("email"),'is_exp_user': True, "plus_img_url": post.get("image_url"), "plus_profile_url": post.get("gplus_url")})
         else:
