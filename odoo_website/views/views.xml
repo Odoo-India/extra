@@ -18,17 +18,45 @@
         <field name="name">odoo.website.form</field>
         <field name="model">odoo.website</field>
         <field name="arch" type="xml">
-            <form string="Blog">
+            <form string="Website">
                 <sheet>
+                    <div>
+                        <h2><field name="name"/></h2>
+                        <h4 class="text-muted"><field name="description"/></h4>
+                    </div>
                     <group>
-                        <field name="name"/>
-                        <field name="image" widget="image"/>
-                        <field name="image_mobile" widget="image"/>
-                        <field name="description"/>
+                        <group>
+                           <!--  <field name="image" widget="image"/> -->
+                            <field name="is_image"/>
+                            <!-- <field name="image_laptop" widget="image"/> -->
+                            <field name="is_image_laptop"/>
+                        </group>
+                        <group>
+                            <!-- <field name="image_mobile" widget="image"/> -->
+                            <field name="is_image_mobile"/>
+                            <!-- <field name="image_tablet" widget="image"/> -->
+                            <field name="is_image_tablet"/>
+                        </group>
+                    </group>
+
+                    <group>
                         <field name="url"/>
                         <field name="odoo"/>
                         <field name="version"/>
+                        <field name="domain"/>
+                        <field name="path"/>
+                        <field name="display"/>
+                        <field name="active"/>
+                        
+                        <button type="object" name="compute_pagespeed" string="Get PageSpeed"/>
                     </group>
+
+                    <field name="pagespeed_ids" colspan="4" nolabel="1">
+                        <tree string="Page Speed">
+                            <field name="name"/>
+                            <field name="create_date"/>
+                        </tree>
+                    </field>
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>

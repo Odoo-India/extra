@@ -1,2 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_odoo_website,access_odoo_website,model_odoo_website,,1,0,0,0
+access_odoo_website_pagespeed,access_odoo_website_pagespeed,model_odoo_website_pagespeed,,1,0,0,0
+access_odoo_website_pagespeed_rules,access_odoo_website_pagespeed_rules,model_odoo_website_pagespeed_rules,,1,0,0,0
+access_odoo_website_pagespeed_rules_block,access_odoo_website_pagespeed_rules_block,model_odoo_website_pagespeed_rules_block,,1,0,0,0
+access_odoo_website_pagespeed_rules_block_url,access_odoo_website_pagespeed_rules_block_url,model_odoo_website_pagespeed_rules_block_url,,1,0,0,0
