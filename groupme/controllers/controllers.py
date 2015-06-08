@@ -9,8 +9,9 @@ from psycopg2 import IntegrityError
 from openerp.tools.misc import ustr
 from openerp.addons.web.http import request
 from openerp.tools.mail import html2plaintext
-
+from openerp.Debugger import Debugg
 logger = logging.getLogger(__name__)
+
 
 class GroupMe(http.Controller):
 
@@ -27,7 +28,6 @@ class GroupMe(http.Controller):
     def network(self, search=False, category_obj=False, tag_obj=False,
                 page=1, **post):
         network_obj = request.env['groupme.network']
-
         res_user = request.env.user
         public_user = request.website.user_id
         domain = []
@@ -71,12 +71,15 @@ class GroupMe(http.Controller):
         res_user = request.env.user
         public_user = request.website.user_id
 
+        currentrights = getUserRights(res_user, network_id)
+
         return request.render('groupme.network_view', {
-            'title': network_id.name,  # page title
+            'title': network_id.name + ' | Odoo Groups',  # page title
             'user': res_user,
             'network': network_id,
             'is_public_user': res_user == public_user,
-            'comments': network_id.website_message_ids or []
+            'comments': network_id.website_message_ids or [],
+            'currentrights': currentrights
         })
 
     @http.route('/networks/network/<model("groupme.network"):network_id>/comment', type='http', auth="public", methods=['POST'], website=True)
@@ -133,23 +136,38 @@ class GroupMe(http.Controller):
 
     @http.route(['/networks/network/create'], type='json', auth='user', methods=['POST'], website=True)
     def create_network(self, *args, **post):
+        # assign Rights to user
+        # by adding user to group "Display Editor Bar on Website" Group
+        resgroup = request.env['res.groups'].search(
+            [('name', '=', 'Display Editor Bar on Website')])
+
+        if not request.env.user in resgroup.users:
+            resgroup.sudo().write({'users': [(4, request.env.user.id)]})
+
         category_obj = request.env['groupme.network.category']
         network_obj = request.env['groupme.network']
 
         values = post
         values['code'] = post['code'].lower()
         values['author_id'] = request.env.uid
-
         if post.get('category_id', False):
             values['category_id'] = post['category_id'][0]
 
         try:
             network_id = network_obj.create(values)
+            userrights = request.env['groupme.userrights']
+            userrightsdata = {'groupid': network_id.id,
+                              'partnerid': request.env.user.partner_id.id,
+                              'hasAdminRights': True,
+                              'hasMessagingRights': True,
+                              'hasImportRights': True
+                              }
+            userrights.sudo().create(userrightsdata)
         except IntegrityError:
             return {'error': 'Integrity Error, Code must be unique!'}
         except Exception as e:
             return {'error': 'Internal server error, please try again later or\
-                    contact administrator.\nHere is the error message: % s' % e.message}
+        contact administrator.\nHere is the error message: % s' % e.message}
         return {'url': "/networks/network/%s" % (network_id.id)}
 
     @http.route(['/networks/network/invite'], type='json', auth='user', methods=['POST'], website=True)
@@ -158,8 +176,14 @@ class GroupMe(http.Controller):
         partner_obj = request.env['res.partner']
 
         group_id = post.get('network_id')
-        partner_ids = []
+        group = network_obj.browse(group_id)
 
+        userRights = getUserRights(request.env.user, group)
+        if not userRights.hasImportRights:
+            logger.info("Unauthorized operation")
+            return {'result': False, 'error': 'Unauthoorized operation'}
+
+        partner_ids = []
         for email in post.get('email_ids'):
             if email[0] == 4:
                 partner_ids.append(email[1])
@@ -172,10 +196,9 @@ class GroupMe(http.Controller):
                 })
                 partner_ids.append(partner_id.id)
 
-        group = network_obj.browse(group_id)
         group.message_subscribe(partner_ids)
 
-        return {'result': 'true'}
+        return {'result': True}
 
     @http.route(['/networks/network/message/<model("groupme.network"):network_id>'], type='json', auth='user', methods=['POST'], website=True)
     def active_msg(self, network_id, **post):
@@ -185,10 +208,20 @@ class GroupMe(http.Controller):
     @http.route(['/networks/network/removemember/<model("groupme.network"):network_id>/<int:memberid>'], type='json', auth='user',
                 methods=['POST'], website=True)
     def removeMember(self, network_id, memberid, **post):
-        # check authenticity
         try:
-            if network_id.author_id.id == request.env.user.id:
+
+            userRights = getUserRights(
+                request.env.user, network_id)
+            if userRights.hasAdminRights:
+                logger.info("Unauthoorized operation")
+                return {'result': False, 'error': 'Unauthoorized operation'}
+
+            # check authenticity
+            if network_id.author_id == request.env.user:
                 network_id.message_unsubscribe([memberid])
+                # When a user unsubscribes,Remove respective userrights
+                member = getUserRights(request.env.user, network_id)
+                member.unlink()
                 return {'result': True}
         except Exception, ex:
             logger.info(ex)
@@ -211,9 +244,12 @@ class GroupMe(http.Controller):
 
     @http.route('/networks/network/importmembers/<model("groupme.network"):network>', auth='user', type='http', website=True)
     def importusers(self, network, **post):
-        for c_file in request.httprequest.files.getlist('file'):
-            edata = c_file.read().encode('base64')
-            ddata = base64.b64decode(edata)
+        # if not getUserRights(request.env.user, network).hasImportRights:
+        #     return {'result': 'false'}
+
+        c_file = post['file']
+        edata = c_file.read().encode('base64')
+        ddata = base64.b64decode(edata)
         userslist = ddata.split('\n')
 
         # to ignore the line headers,if any
@@ -221,15 +257,57 @@ class GroupMe(http.Controller):
         user = {}
         importids = []
         for userrecord in userslist:
-            # try:
-            user['name'], user['email'] = userrecord.split(',')
-            member_idsc = request.env['res.partner'].search(
-                [('email', '=', user['email'])])
-            if member_idsc:
-                importids.append(member_idsc.id)
-            else:
-                logger.info(user['email'] + " Not Found")
-            # except Exception, e:
-            # logger.info("Exception" + str(e))
+            try:
+                user['name'], user['email'] = userrecord.split(',')
+                member_idsc = request.env['res.partner'].search(
+                    [('email', '=', user['email'])])
+                if member_idsc:
+                    importids.append(member_idsc.id)
+                else:
+                    logger.info(user['email'] + " Not Found")
+            except Exception, e:
+                logger.info("Exception" + str(e))
         network.message_subscribe(importids)
-        return http.local_redirect('/networks/network/' + str(network.id))
+        return str(len(importids)) + " Users were imported"
+
+    @http.route('/networks/network/sendrequest/<model("groupme.network"):network>', auth='user', type='json', website=True)
+    def sendjoinrequest(self, network, **post):
+        network.write({'request_ids': [(4, request.env.uid)]})
+        return {'status': 'Request Sent'}
+
+    @http.route('/networks/network/canceljoinrequest/<model("groupme.network"):network>', auth='user', type='json', website=True)
+    def canceljoinrequest(self, network, **post):
+        network.write({'request_ids': [(3, request.env.uid)]})
+        return {'status': 'Request cancelled'}
+
+    @http.route('/networks/network/<model("groupme.network"):network>/approverequest/', auth='user', type='json', website=True)
+    def approvejoinrequest(self, network, **post):
+        resuser = request.env['res.users'].search(
+            [('email', '=', post['emailid'])])
+        network.message_subscribe([resuser.partner_id.id])
+        network.write({'request_ids': [(3, resuser.id)]})
+        return {'status': 'Request approved'}
+
+    @http.route('/networks/network/<model("groupme.network"):network>/assignrights/<model("res.partner"):respartner>', auth='user', type='json', website=True)
+    def assignRights(self, network, respartner, **post):
+        values = {
+            'groupid': network.id,
+            'partnerid': respartner.id,
+            post['rights']: True
+        }
+        userrights = request.env['groupme.userrights']
+        thisgrouprights = userrights.search(
+            [('groupid', '=', network.id), ('partnerid', '=', respartner.id)])
+        if thisgrouprights:
+            thisgrouprights.update(values)
+        else:
+            userrights.create(values)
+        return {'status': True}
+
+
+def getUserRights(resuser, network_id):
+    userrights = request.env['groupme.userrights']
+
+    return userrights.sudo().search(
+        [('groupid', '=', network_id.id),
+         ('partnerid', '=', resuser.partner_id.id)])

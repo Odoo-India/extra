@@ -71,7 +71,11 @@ class Network(models.Model):
             ('model', '=', self._name), ('type', '=', 'comment')],
         string='Website Messages', help="Website communication history")
     view_message = fields.Boolean('Message Visible', default=False)
-
+    request_ids = fields.Many2many(
+        'res.users', 'groupme_network_requests_rel',
+        'network_id', 'user_id', string='Requests')
+    userrights_ids = fields.One2many(
+        'groupme.userrights', 'groupid', 'UserRights')
     _sql_constraints = [
         ('unique_code', 'unique(code)', 'Code must be unique!')
     ]
@@ -109,3 +113,15 @@ class res_partner(models.Model):
     _inherit = 'res.partner'
 
     devicekey = fields.Char('Device Key')
+
+
+class UserRights(models.Model):
+    _name = "groupme.userrights"
+
+    groupid = fields.Many2one('groupme.network')
+    partnerid = fields.Many2one('res.partner')
+    hasAdminRights = fields.Boolean(default=False)
+    hasMessagingRights = fields.Boolean(
+        default=False)
+    hasImportRights = fields.Boolean(
+        default=False)

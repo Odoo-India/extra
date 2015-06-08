@@ -9,7 +9,7 @@
                         <h3 class="modal-title">Upload CSV File</h3>
                     </div>
                     <div class="oe_members_upload_loading text-center" style="display:none">
-                        <h4><i class='fa fa-spinner fa-spin'></i> Uploading CSV File...  </h4>
+                        <i class='fa fa-spinner fa-spin'></i><h4 id="importStatus"> Uploading CSV File...  </h4>
                     </div>
                     <div class="modal-body">
                         <form class="clearfix form-horizontal" enctype="multipart/form-data"  method="post" id="importmembersform">
@@ -26,7 +26,6 @@
                                 </div>
                             </div>
                         </form>
-                    </div>
                     <div class="table-responsive">
                       <table data-toggle="table" data-cache="false"  class="table table-hover hidden" data-click-to-select="true" data-height="299" data-select-item-name="radioName" id="tabledata" >
                         <thead>
@@ -46,6 +45,8 @@
                           </tr>
                         </thead>
                      </table>
+                    </div>
+                    <h5 class="text-muted">Only Existing Users will be Imported.</h5>
                     </div>
                     <div class="modal-footer">
                         <button type="button" data-loading-text="Loading..." class="btn btn-primary preview">Preview</button>
