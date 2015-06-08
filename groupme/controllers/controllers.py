@@ -9,7 +9,7 @@ from psycopg2 import IntegrityError
 from openerp.tools.misc import ustr
 from openerp.addons.web.http import request
 from openerp.tools.mail import html2plaintext
-from openerp.Debugger import Debugg
+
 logger = logging.getLogger(__name__)
 
 
