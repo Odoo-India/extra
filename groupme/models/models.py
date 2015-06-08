@@ -103,6 +103,15 @@ class Network(models.Model):
                 cr, uid, [wizard.res_id], new_follower_ids, context=context)
 
 
+class Status(models.Model):
+    _name = "groupme.message.status"
+    msg_id = fields.Many2one('mail.message')
+    partner_id = fields.Many2one('res.partner')
+    status = fields.Selection(
+        [('sent', 'Sent'), ('delivered', 'Delivered'), ('read', 'Read')],
+        string='State', default="sent")
+
+
 class MailMessage(models.Model):
     _inherit = 'mail.message'
 

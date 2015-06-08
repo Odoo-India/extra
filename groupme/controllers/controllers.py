@@ -5,6 +5,9 @@ import base64
 import logging
 from openerp import http
 # from openerp import SUPERUSER_ID
+import json
+import time
+# from time import gmtime, strftime
 from psycopg2 import IntegrityError
 from openerp.tools.misc import ustr
 from openerp.addons.web.http import request
@@ -25,7 +28,7 @@ class GroupMe(http.Controller):
         '/networks/tag/<model("groupme.network.tag"):tag_obj>',
         '/networks/tag/<model("groupme.network.tag"):tag_obj>/page/<int:page>'
     ], auth='public', type='http', website=True)
-    def network(self, search=False, category_obj=False, tag_obj=False,
+    def network(self, groups=False, search=False, category_obj=False, tag_obj=False,
                 page=1, **post):
         network_obj = request.env['groupme.network']
         res_user = request.env.user
@@ -33,7 +36,26 @@ class GroupMe(http.Controller):
         domain = []
 
         if public_user != res_user:
-            domain += [('author_id', '=', res_user.id)]
+            # Logged In
+
+            if groups:
+                if groups == "own":
+                    domain += [('author_id', '=', res_user.id)]
+                elif groups == "membership":
+                    # I am Member
+                    domain += ['&', '&', ('author_id', '!=', res_user.id),
+                               ('message_follower_ids',
+                                '=', res_user.partner_id.id),
+                               ('website_published', '=', True)]
+
+                elif groups == "other":
+                    # I am not a member nor author
+                    domain += ['&', '&', ('author_id', '!=', res_user.id),
+                               ('message_follower_ids', '!=',
+                                res_user.partner_id.id),
+                               ('website_published', '=', True)]
+            else:
+                domain += [('author_id', '=', res_user.id)]
         else:
             domain += [('website_published', '=', True)]
 
@@ -63,6 +85,7 @@ class GroupMe(http.Controller):
             'is_public_user': res_user == public_user,
             'search': search,
             'pager': pager,
+            'type': groups,
             'user_id': res_user
         })
 
@@ -144,7 +167,7 @@ class GroupMe(http.Controller):
         if not request.env.user in resgroup.users:
             resgroup.sudo().write({'users': [(4, request.env.user.id)]})
 
-        category_obj = request.env['groupme.network.category']
+        # category_obj = request.env['groupme.network.category']
         network_obj = request.env['groupme.network']
 
         values = post
@@ -303,6 +326,58 @@ class GroupMe(http.Controller):
         else:
             userrights.create(values)
         return {'status': True}
+
+    # JSON for Message Delivery Status Handler
+
+    @http.route(['/networks/network/message/<model("res.partner"):partner>/<model("mail.message"):msg>/status/<status>'], type='http', website=True)
+    def update_msg_status(self, partner=False, msg=False, status=False, **post):
+        msgStatus_obj = request.env['groupme.message.status']
+
+        if status == 'delivered':
+            if not msgStatus_obj.search(['&', ('msg_id', '=', msg.id), ('partner_id', '=', partner.id)]):
+                msgStatePost = {
+                    'msg_id': msg.id,
+                    'partner_id': partner.id,
+                    'status': status
+                }
+                msgStatus_obj.create(msgStatePost)
+        else:
+            msgStatus_obj.search([
+                '&', ('msg_id', '=', msg.id), ('partner_id', '=', partner.id)]).write({'status': 'read'})
+            msgStatus_obj.status
+
+        # return {"result", True}
+
+    # Show Delivery Report
+
+    @http.route('/networks/network/<model("groupme.network"):network>/message/<model("mail.message"):msg>/status', type='json', auth="public", methods=['POST'], website=True)
+    def group_msg_delivery_report(self, network=False, msg=False, **post):
+        msgStatus_obj = request.env['groupme.message.status'].sudo().search(
+            ['&', ('msg_id', '=', msg.id), ('status', '!=', '')])
+
+        # Fetch Records of "this" message from groupme.message.status
+        #       Status contains only either msg Delivered or Read
+
+        # Prepare return data
+        records = []
+        status_partner_ids = []
+        for msgState in msgStatus_obj:
+            row = {}
+            row['name'] = msgState.partner_id.name
+            row['status'] = msgState.status
+            records.append(row)
+
+            status_partner_ids.append(msgState.partner_id.id)
+
+        # Finding msg not delivered
+        # (All Members - Delivered or Read Members)
+        for follower in network.message_follower_ids:
+            if follower.id not in status_partner_ids:
+                row = {}
+                row['name'] = follower.name
+                row['status'] = 'sent'
+                records.append(row)
+        return records
 
 
 def getUserRights(resuser, network_id):

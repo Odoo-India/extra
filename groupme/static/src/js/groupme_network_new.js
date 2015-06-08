@@ -7,6 +7,7 @@ odoo.define('groupme.network.new', function(require) {
     var network = require('groupme.network');
 
     var _t = core._t;
+    var QWeb = core.qweb;
 
     $(document).ready(function() {
 
@@ -604,7 +605,7 @@ odoo.define('groupme.network.new', function(require) {
         var network_id = $('#oe_networkid').data('network_id');
         var invitedialog = false;
 
-        var approverequest = new AjaxJsonRPC($(".approveButton"), "/networks/network/" + network_id + "/approverequest/");
+        // var approverequest = new AjaxJsonRPC($(".approveButton"), "/networks/network/" + network_id + "/approverequest/");
         $("#sendrequest").on('click', function() {
             var that = this;
             return ajax.jsonRpc("/networks/network/sendrequest/" + network_id, 'call').then(function(data) {
@@ -731,6 +732,171 @@ odoo.define('groupme.network.new', function(require) {
                     $("#resultErrorMessage").text("No such User.").css("display", "block");
                 }
             });
+        });
+
+        var MessageAnalysis = Widget.extend({
+            template: 'groupme.msg_delivery_report',
+            events: {
+                'click a.js_msg_sort': 'listSortBy',
+                'keyup input.js_txt_search': 'searchByName',
+                'click li.next': 'go_next',
+                'click li.previous': 'go_previous',
+                'change .js_sel_records': 'changeMemberPerPage',
+                'click button[data-dismiss="modal"]': 'cancel',
+            },
+            init: function(el, msg_id, net_id) {
+                this.msg_id = msg_id;
+                this.network_id = net_id;
+                this.page =0;
+                this.index_content = "";
+                this.sortby = "all";
+                this.search = false;
+                this.MEMBERS_PER_PAGE = 10;
+            },
+            start: function() {
+                self = this;
+                this.$el.modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
+                $('.js_div_table').css({'max-height': $( window ).height()*0.5  , 'overflow-y': 'auto'});
+                $('.js_msg_loading').show();
+                $('.modal-body, .modal-footer').hide();
+                self.getRows();
+            },
+            searchByName: function(e){
+                var self = this;
+                var $e = $(e.currentTarget);
+                var search = $e.parent().find('.js_txt_search').val();  //text-transform:lowercase
+                self.search = search;
+                self.page = 0;
+                self.display_rows();
+            },
+            listSortBy: function(e){
+                var self = this;
+                var $e = $(e.currentTarget);
+                $('.js_msg_sort').css('font-weight', 'normal');
+                $e.css('font-weight', 'bold');
+                self.sortby = $e.data('sortby');
+                self.search = false;
+                self.page=0;
+                self.display_rows();
+            },
+            go_next: function(e){
+                var $e = $(e.currentTarget);
+                if($e.hasClass('disabled'))
+                {
+                    e.preventDefault();
+                    return false;
+                }
+                this.page += 1;
+                this.display_rows();
+            },
+            go_previous: function(e){
+                var $e = $(e.currentTarget);
+                if($e.hasClass('disabled'))
+                {
+                    e.preventDefault();
+                    return false;
+                }
+                if(this.page > 0)
+                    this.page -= 1;
+                this.display_rows();
+            },
+            styleToSearch: function(){
+                var $row;
+                var search=this.search;
+
+                $(".tblDeliveryReport tbody tr").each(function(index) {
+                    $row = $(this);
+                    if ($row.find("td:first").text() != ""){
+                        var thisValue = $row.find("td:first").text().toLowerCase();
+                        if (thisValue.indexOf(search) < 0) {
+                            $(this).hide();
+                        }
+                        else{
+                            var eleVal = $row.find("td:first").text();
+                            var str;
+                            if( (str = eleVal.substr(thisValue.search(search), search.length)) )
+                                $(this).find('td:first').html(eleVal.replace(str, '<kbd>' + str + '</kbd>'));
+                            else
+                                $(this).find('td:first').html(eleVal);
+                            $(this).show();
+                        }
+                    }
+                });
+            },
+            display_rows: function () {
+                var self = this;
+                var status = _.countBy(this.records, "status");
+
+                $(".msgSent").text((status.delivered || 0) + (status.read || 0) + (status.sent || 0));
+                // $(".msgDelivered").text((status.delivered || 0)  (status.read) || 0 );
+                $(".msgDelivered").text(status.delivered || 0);
+                $(".msgRead").text(status.read);
+                $(".msgNoStatus").text(status.sent);
+
+                var records;
+
+                if(self.sortby && self.sortby != 'all')
+                    records = _.where(this.records, {'status': self.sortby})
+                else
+                    records = self.records;
+
+                if(self.search)
+                {   // records : all/sent/deliveered/read any sortby is selected, search will be apply to that only
+                    records = _.filter(records, function(item){ return item.name.toLowerCase().indexOf(self.search) > -1});
+                }
+
+                var from = this.page * this.MEMBERS_PER_PAGE;
+
+                var upto = parseInt(from) + parseInt(this.MEMBERS_PER_PAGE);
+                $('.js_search_count').text(records.length);
+                var rows = _(records).chain()
+                    .slice(from, upto)
+                    .values()
+                    .value();
+
+                $('.tblDeliveryReport tbody').replaceWith(
+                    core.qweb.render(
+                        'groupme.message_status_record', {rows: rows}));
+                if(this.search)
+                    this.styleToSearch();
+
+                $('.pager')
+                    .find('li.previous').toggleClass('disabled', (from === 0)).end()
+                    .find('li.next').toggleClass('disabled', (from + this.MEMBERS_PER_PAGE >= records.length));
+            },
+            getRows: function($el) {
+                var self = this;
+                var url = "/networks/network/"+self.network_id+"/message/" + self.msg_id + "/status";
+
+                ajax.jsonRpc(url, 'call', {}).then(function(data) {
+                    self.records = data;
+                    $('.js_msg_loading').hide();
+                    $('.modal-body, .modal-footer').show();
+                    self.display_rows();
+                });
+            },
+            cancel: function() {
+                this.trigger("cancel");
+            }
+        });
+        var objMsgAnalysis = false;
+        $('.oe_msg_analysis').on('click', function(ev) {
+            var msg_id = $(this).data('msg_id');
+            var network_id = $(this).data('network_id');
+            // website.add_template_file('/groupme/static/src/xml/groupme_msg_delivery_report.xml');
+            if (!objMsgAnalysis) {
+                website.add_template_file('/groupme/static/src/xml/groupme_msg_delivery_report.xml').done(function() {
+                    objMsgAnalysis = new MessageAnalysis(self, msg_id, network_id);
+                    objMsgAnalysis.appendTo(document.body);
+                });
+            } else
+            {
+                objMsgAnalysis = new MessageAnalysis(self, msg_id, network_id);
+                objMsgAnalysis.appendTo(document.body);
+            }
         });
 
     });

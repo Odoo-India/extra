@@ -13,7 +13,6 @@
         <script type="text/javascript" src="/groupme/static/src/js/groupme_network.js"></script>
         <!-- Create Network (Manage Category, Tags)-->
         <script type="text/javascript" src="/groupme/static/src/js/groupme_network_new.js"></script>
-        <title>Group me</title>
       </xpath>
     </template>
 
@@ -90,29 +89,46 @@
         <t t-call="groupme.state_counter"/>
         <div class="container">
           <div class="row" style="border-bottom: 1px solid #eee;padding-bottom: 15px;">
-            <div class="col-md-8">
+            <div class="col-md-4">
                 <t t-call="website.pager" style="margin: auto;"/>
             </div>
-            <div class="col-md-4">
-              <form method="get" action="/networks">
-                <div class="input-group">
-                  <input type="text" class="form-control" name="search" t-attf-placeholder="Search for groups" t-att-value="search"/>
-                  <span class="input-group-btn">
-                    <a class="btn btn-danger" href="/networks" t-if="search">
-                      <i class="fa fa-times"></i>
-                    </a>
+            <div class="col-md-8">
+              <div class="col-md-6">
+              <div class="btn-group" data-toggle="buttons" t-if="not is_public_user">
+                <label t-attf-class="btn btn-primary #{'active' if type == '' or type=='own' or type==False else ''}">
+                  <input type="radio" name="grpType" class="js_group_type" id="optMyGroups" autocomplete="off" /> My Groups
+                </label>
+                <label t-attf-class="btn btn-primary #{'active' if type=='membership' else ''}">
+                  <input type="radio" name="grpType" class="js_group_type" id="optMembership" autocomplete="off" /> Membership
+                </label>
+                <label t-attf-class="btn btn-primary #{'active' if type=='other' else ''}">
+                  <input type="radio" name="grpType" t-attf-checked="#{'checked' if type=='other' else 'False'}" class="js_group_type" id="optAllGroups" autocomplete="off" /> All Other
+                </label>
+              </div>
 
-                    <button class="btn btn-primary" type="submit">
-                      <i class="fa fa-search"></i>
-                    </button>
-                    <a class="btn btn-success oe_js_network_new" title="Create Group" t-if="not is_public_user">
-                      <i class="fa fa-plus"></i> Create
-                    </a>
-                    <t t-esc="is_public_user">is_public_user</t>
-                    <div id="userlevel" t-attf-data-userlevel=""></div>
-                  </span>
-                </div>
-              </form>
+              </div>
+              <div class="col-md-6">
+                <form method="get" action="/networks">
+                  <div class="input-group">
+                    <input type="text" class="form-control" name="search" t-attf-placeholder="Search for groups" t-att-value="search"/>
+                    <input type="hidden" name="groups" t-att-value="type" t-if="type"/>
+                    <span class="input-group-btn">
+                      <a class="btn btn-danger" href="/networks" t-if="search">
+                        <i class="fa fa-times"></i>
+                      </a>
+
+                      <button class="btn btn-primary" type="submit">
+                        <i class="fa fa-search"></i>
+                      </button>
+                      <a class="btn btn-success oe_js_network_new" title="Create Group" t-if="not is_public_user">
+                        <i class="fa fa-plus"></i> Create
+                      </a>
+                      <t t-esc="is_public_user">is_public_user</t>
+                      <div id="userlevel" t-attf-data-userlevel=""></div>
+                    </span>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
           <div class="row">
@@ -145,6 +161,7 @@
             <a t-attf-href="/networks/category/#{network.category_id.id}">
               <span t-esc="network.category_id.name"/>
             </a>
+            <span class="pull-right"><span class="fa fa-user"></span> By <span t-esc="user_id.name if not is_public_user else 'You' if user_id.id == network.author_id.id else network.author_id.name" /></span>
           </p>
           <p t-if="network.tag_ids">
             <i class="fa fa-tags text-muted"></i>
@@ -369,7 +386,7 @@
                     <h4 class="text-muted" style="border-bottom: 1px solid #ccc;padding-bottom: 5px;"><span t-esc="len(comments)"/> Messages sent</h4>
 
                     <ul class="media-list mb8 oe-message-scroll">
-                      <li t-foreach="comments" t-as="message" class="media panel" style="padding: 5px;margin: 5px;">
+                      <li t-foreach="comments" t-as="message" class="media well" style="padding: 5px;margin: 5px;">
                         <span class="pull-left" style="height:60px;width:60px;padding: 0px;overflow: hidden;">
                           <img class="img media-object"
                             t-att-src="'/website/image?model=mail.message&amp;field=author_avatar&amp;id='+str(message.id)"
@@ -378,6 +395,7 @@
                         <div class="media-body">
                           <span t-field="message.author_id" style="display: inline-block;" t-field-options='{"widget": "contact", "fields": ["name"]}'/>
                           <span class="text-muted"> on <timeago class="timeago" t-att-datetime="message.date"/></span>
+                          <a class="pull-right oe_msg_analysis" href="#" t-attf-data-msg_id="#{message.id}"  t-attf-data-network_id="#{network.id}"><span class="fa fa-search-plus"></span> Delivery Report</a>
                           <div t-field="message.body" class="discussion_scroll_post"></div>
                         </div>
                       </li>

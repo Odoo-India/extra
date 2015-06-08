@@ -1,0 +1,93 @@
+<templates id="template_msg_delivery_report" xml:space="preserve">
+    <t t-name="groupme.msg_delivery_report">
+        <div class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <a class="close" data-dismiss="modal" aria-hidden="true">
+                            <span class="fa fa-times"></span>
+                        </a>
+                        <h3 class="modal-title">Message Delivery Report</h3>
+                    </div>
+                    <div class="js_msg_loading text-center" style="display:none">
+                        <h4><i class='fa fa-spinner fa-spin'></i> Loading...  </h4>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-xs-6 js_base_links" style="margin:0px;padding:0px 0px 0px 5px;">
+                                <div class="col-xs-6">
+                                    <a class="js_msg_sort" data-sortBy="all" href="#"><span class="fa fa-envelope"></span> <span class="msgSent">0</span> Sent</a>
+                                    <br />
+                                    <a class="js_msg_sort" data-sortBy="sent" href="#"><span class="fa fa-clock-o"></span> <span class="msgNoStatus">0</span> No Status</a>
+                                </div>
+                                <div class="col-xs-6">
+                                    <a class="js_msg_sort"  data-sortBy="read" href="#"><span class="fa fa-check"></span> <span class="msgRead">0</span> Read</a>
+                                    <br />
+                                    <a class="js_msg_sort" data-sortBy="delivered" href="#"><span class="fa fa-share"></span> <span class="msgDelivered">0</span> Delivered</a>
+                                </div>
+                            </div> 
+                            <div class="col-xs-6 js_base_links">
+                                <div class="row" style="margin:5px 0px;">
+                                    <input type="search" class="form-control js_txt_search" name="search" required="required" placeholder="Search By Name" autocomplete="off" style="display:inline;text-transform: lowercase;" value=""/>
+                                    <span class="pull-right"><span class="js_search_count" style="font-weight:bold;">0</span> Records Found.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive js_div_table">
+                            <table class="table tblDeliveryReport" style="">
+                                <thead>
+                                    <tr>
+                                        <th class="col-md-10">Members</th>
+                                        <th class="col-md-1">Delivered</th>
+                                        <th class="col-md-1">Read</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="#" data-dismiss="modal" aria-hidden="true">Discard</a>
+                        <div class="pull-right">
+                            <ul class="pager mb0 mt0">
+                                <li class="previous disabled"><a href="#">← Previous</a></li>
+                                <li class="next disabled"><a href="#">Next →</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+    <t t-name="groupme.message_status_record">
+        <tbody>
+            <t t-foreach="rows" t-as="row">
+                <t t-js="ctx">
+                    var classNm="", iconDelivered="clock-o", iconRead="clock-o";
+
+                    if (ctx.row.status =="read"){
+                    classNm = "success";
+                    iconDelivered = "check-circle";
+                    iconRead = "check-circle";
+                    }
+                    else if (ctx.row.status == "delivered"){
+                    classNm = "warning";
+                    iconDelivered = "check-circle";
+                    iconRead = "clock-o";
+                    }
+                    ctx.classNm = classNm;
+                    ctx.iconDelivered = iconDelivered;
+                    ctx.iconRead = iconRead;
+                </t>
+                <tr t-att-class="classNm" >
+                    <td class="col-md-10"><span t-esc="row.name" /></td>
+                    <td class="col-md-1" align="center"><span t-attf-class="fa fa-{{ iconDelivered }} fa-lg"></span></td>
+                    <td class="col-md-1" align="center"><span t-attf-class="fa fa-{{ iconRead }} fa-lg"></span></td>
+                </tr>
+            </t>
+        </tbody>
+    </t>
+</templates>
