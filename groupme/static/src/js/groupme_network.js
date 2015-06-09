@@ -63,6 +63,19 @@ odoo.define('groupme.network', function(require) {
                   else
                         $("#counter").css("color", "inherit");
             });
+            $('.js_group_type').on('change', function(e) {
+                  var type;
+                  if(this.id == 'optMyGroups'){
+                      type = "own";
+                  }
+                  else if(this.id == 'optMembership'){
+                      type = "membership";
+                  }
+                  else if(this.id == 'optAllGroups'){
+                      type = "other";
+                  }
+                  window.location= "/networks?groups="+type;
+            });
       });
 
       return {

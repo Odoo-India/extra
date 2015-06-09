@@ -5,7 +5,7 @@
     <menuitem id="menu_mobile_dashboard" parent="menu_mobile" name="Dashboard" sequence="1"/>
     <menuitem id="menu_mobile_messaging" parent="menu_mobile" name="Users" sequence="5"/>
     <menuitem id="menu_mobiles" parent="menu_mobile" name="Statistics" sequence="10"/>
-
+    
     <record id="view_groupme_network_form" model="ir.ui.view">
       <field name="name">groupme.network.form</field>
       <field name="model">groupme.network</field>
@@ -48,13 +48,58 @@
       </field>
     </record>
 
+    <record id="view_groupme_userrights" model="ir.ui.view">
+      <field name="name">groupme.userrights.form</field>
+      <field name="model">groupme.userrights</field>
+      <field name="arch" type="xml">
+        <form string="Network">
+          <sheet>
+            <div class="oe_title oe_left">
+                <div class="oe_edit_only">
+                <h1>
+                  <label for="groupid"/>  
+                </h1>
+                </div>
+
+                <h1>
+                  <field name='groupid'/>
+                </h1>
+                <div class="oe_edit_only">
+                    <label for="partnerid"/>
+                </div>
+                <field name="partnerid"/>
+            </div>
+            
+            <group>
+              <group>
+                <field name="groupid"/>
+                <field name="partnerid"/>
+                <field name="hasAdminRights"/>
+                <field name="hasMessagingRights"/>
+                <field name="hasImportRights"/>
+              </group>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
     <record id="action_groupme_network" model="ir.actions.act_window">
       <field name="name">Networks</field>
       <field name="res_model">groupme.network</field>
       <field name="view_type">form</field>
       <field name="view_mode">tree,form</field>
     </record>
+    
+    <record id="action_groupme_userrights" model="ir.actions.act_window">
+      <field name="name">Userrights</field>
+      <field name="res_model">groupme.userrights</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
     <menuitem id="menu_action_odoo_mobile_application" parent="menu_mobile_dashboard" action="action_groupme_network"/>
+    <menuitem id="menu_actionUserrights" parent="menu_mobile_dashboard" action="action_groupme_userrights"/>
 
     <record id="menu_groups" model="website.menu">
       <field name="name">Groups</field>

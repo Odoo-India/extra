@@ -12,7 +12,6 @@
         <script type="text/javascript" src="/web/static/lib/select2/select2.js"></script>
         <script type="text/javascript" src="/groupme/static/src/js/groupme_network.js"></script>
         <script type="text/javascript" src="/groupme/static/src/js/groupme_network_new.js"></script>
-        <title>Group me</title>
       </xpath>
     </template>
 
@@ -88,6 +87,49 @@
       <t t-call="website.layout">
         <t t-call="groupme.state_counter"/>
         <div class="container">
+          <div class="row" style="border-bottom: 1px solid #eee;padding-bottom: 15px;">
+            <div class="col-md-4">
+                <t t-call="website.pager" style="margin: auto;"/>
+            </div>
+            <div class="col-md-8">
+              <div class="col-md-6">
+              <div class="btn-group" data-toggle="buttons" t-if="not is_public_user">
+                <label t-attf-class="btn btn-primary #{'active' if type == '' or type=='own' or type==False else ''}">
+                  <input type="radio" name="grpType" class="js_group_type" id="optMyGroups" autocomplete="off" /> My Groups
+                </label>
+                <label t-attf-class="btn btn-primary #{'active' if type=='membership' else ''}">
+                  <input type="radio" name="grpType" class="js_group_type" id="optMembership" autocomplete="off" /> Membership
+                </label>
+                <label t-attf-class="btn btn-primary #{'active' if type=='other' else ''}">
+                  <input type="radio" name="grpType" t-attf-checked="#{'checked' if type=='other' else 'False'}" class="js_group_type" id="optAllGroups" autocomplete="off" /> All Other
+                </label>
+              </div>
+
+              </div>
+              <div class="col-md-6">
+                <form method="get" action="/networks">
+                  <div class="input-group">
+                    <input type="text" class="form-control" name="search" t-attf-placeholder="Search for groups" t-att-value="search"/>
+                    <input type="hidden" name="groups" t-att-value="type" t-if="type"/>
+                    <span class="input-group-btn">
+                      <a class="btn btn-danger" href="/networks" t-if="search">
+                        <i class="fa fa-times"></i>
+                      </a>
+
+                      <button class="btn btn-primary" type="submit">
+                        <i class="fa fa-search"></i>
+                      </button>
+                      <a class="btn btn-success oe_js_network_new" title="Create Group" t-if="not is_public_user">
+                        <i class="fa fa-plus"></i> Create
+                      </a>
+                      <t t-esc="is_public_user">is_public_user</t>
+                      <div id="userlevel" t-attf-data-userlevel=""></div>
+                    </span>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
           <div class="row">
             <div class="mt16">
               <div t-foreach="networks" t-as="network" class="col-sm-3 col-md-3">
@@ -118,6 +160,7 @@
             <a t-attf-href="/networks/category/#{network.category_id.id}">
               <span t-esc="network.category_id.name"/>
             </a>
+            <span class="pull-right"><span class="fa fa-user"></span> By <span t-esc="user_id.name if not is_public_user else 'You' if user_id.id == network.author_id.id else network.author_id.name" /></span>
           </p>
           <p t-if="network.tag_ids">
             <i class="fa fa-tags text-muted"></i>
@@ -133,9 +176,25 @@
 
     <!-- follower card -->
     <template id="follower_card">
-      <div class="row panel" style="padding: 5px;margin-right: 1px;">
-        <t t-if="network.author_id == user_id ">
-          <i class="fa fa-times pull-right removeMember" t-attf-data-memberid="#{follower.id}" style="opacity:0.4"></i>
+      <div class="row well follower_card" name="follower_card" style="padding: 5px;margin-right: 1px;">
+        <!-- Display Follower_card with Assign Rights Panel if
+            1."logged in user owns the group(the one who can modify rights)"
+            2."follower card != authors card"(because author already has all the rights,no question of assigning him rights
+            3."logged in user is given the rights to do administration"-->
+        <t t-if="(user_id == network.author_id and network.author_id.partner_id != follower) or currentrights.hasAdminRights">
+          <div class="hidden dropdown pull-right">
+            <i class="dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+              <span class="fa fa-bars pull-right"></span>
+            </i>
+            <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu1">
+              <li ><a class="rights" t-attf-data-memberid="#{follower.id}" data-rights="hasAdminRights" role="menuitem" tabindex="-1" href="#">Assign Admin Rights
+              </a></li>
+              <li ><a class="rights" t-attf-data-memberid="#{follower.id}" data-rights="hasMessagingRights" role="menuitem" tabindex="-1" href="#">Allow Posting Messages</a></li>
+              <li ><a class="rights" t-attf-data-memberid="#{follower.id}" data-rights="hasImportRights" role="menuitem" tabindex="-1" href="#">Allow Adding Members</a></li>
+              <li class="divider"></li>
+              <li ><a class="removeMember" role="menuitem" tabindex="-1" href="#" t-attf-data-memberid="#{follower.id}">Remove</a></li>
+            </ul>
+          </div>
         </t>
         <div class="col-xs-3" style="height:60px;width:60px;padding: 0px;overflow: hidden;">
           <img class="img img-avatar" t-attf-src="/website/image/res.partner/#{follower.id}/image" style="padding: 0px;width:100%"/>
@@ -154,6 +213,14 @@
             </div>
           </div>
         </div>
+        <t t-if="network.author_id.partner_id != follower and currentrights.hasAdminRights">
+        <div class="pull-right userrights" style="visibility:hidden">
+            <a><i class="fa fa-user rights" title="Admin Rights" t-attf-data-memberid="#{follower.id}" data-rights="hasAdminRights"></i></a>
+            <a><i class="fa fa-share rights" title="Posting Message Rights" t-attf-data-memberid="#{follower.id}" data-rights="hasMessagingRights"></i></a>
+            <a><i class="fa fa-edit rights" title="Add Members Rights" t-attf-data-memberid="#{follower.id}" data-rights="hasImportRights"></i></a>
+            <a><i class="fa fa-remove removeMember" t-attf-data-memberid="#{follower.id}"></i></a>
+        </div>
+      </t>
       </div> 
     </template>
 
@@ -168,9 +235,18 @@
               </div>
               <small class="text-muted" t-if="not is_public_user">Required image resolution is 250px X 200px</small>
               <h3><span t-field="network.name"/></h3>
+              By <small><t t-esc="network.author_id.name"/></small>
                 <p style="border-bottom: 1px solid #eee;padding-bottom: 5px;">
                   <code class="strong"><strong t-esc="network.code"/> </code>
-                  <button class="btn btn-success btn-xs pull-right joingroup" id="joingroup" type="button" t-if="network.visibility!='private'" t-attf-data-network_id="#{network.id}">Join Group</button>
+                  <t t-if="network.visibility=='public' and network.author_id != user_id"><button class="btn btn-success btn-xs pull-right joingroup" id="joingroup" type="button" t-if="network.visibility!='private'" t-attf-data-network_id="#{network.id}">Join Group</button></t>
+                  <t t-if="network.visibility=='private' and user_id">
+                    <t t-if="not user.partner_id in network.message_follower_ids and user not in network.request_ids">
+                      <button class="btn btn-primary btn-xs pull-right sendrequest loading" style="margin-right:7px;" id="sendrequest" type="button" t-attf-data-network_id="#{network.id}">Send Request</button>
+                    </t>
+                    <t t-if="user in network.request_ids">
+                      <button class="btn btn-primary btn-xs pull-right cancelrequest" style="margin-right:7px;" id="cancelrequest" type="button" t-attf-data-network_id="#{network.id}">Cancel request</button>
+                    </t>
+                  </t>
                 </p>
 
               <p t-if="network.visibility=='private'">
@@ -181,13 +257,13 @@
               <p><i class="fa fa-globe text-muted"></i> <a t-attf-href="network.sudo().author_id.website" target="_new"><span t-field="network.sudo().author_id.website"/></a><t t-if='not network.sudo().author_id.website'>Not available</t></p>
               <p><i class="fa fa-clock-o text-muted"></i> <timeago class="timeago" t-att-datetime="network.create_date"/></p>
               <input type="hidden" id="oe_networkid" t-attf-data-network_id="#{network.id}"/>
-              <t t-if="network.author_id == user_id">
+              <t t-if="network.author_id == user_id or currentrights.hasImportRights">
                 <p>
                   <a href="#members" role="tab" data-toggle="tab">
                     <i class="fa fa-users text-muted"></i> <span t-esc="len(network.sudo().message_follower_ids)"/> members
                   </a>
-                  <a class="btn btn-success btn-xs pull-right oe_js_invite" type="button" t-if="not is_public_user">Invite</a>
-                  <a class="btn btn-success btn-xs pull-right importbutton" type="button" t-if="not is_public_user" style="margin-right:7px;">Import</a>
+                    <a class="btn btn-success btn-xs pull-right oe_js_invite" type="button" t-if="not is_public_user" title="Add Users">Add</a>
+                    <a class="btn btn-success btn-xs pull-right importbutton" type="button" t-if="not is_public_user" style="margin-right:7px;" title="Import users from CSV file">Import Users</a>
                 </p>
               </t>
               <p style="border-bottom: 1px solid #eee;padding-bottom: 5px;"><i class="fa fa-comments-o text-muted"></i> <span t-esc="network.message_per_day"/> message / day</p>
@@ -238,8 +314,15 @@
                     <i class="fa fa-comments-o"></i> Messages
                   </a>
                 </li>
-
-                <li role="presentation" class="pull-right" t-if="not is_public_user">
+                <t t-if="network.author_id==user_id">
+                  <li>
+                    <a href="#requests" role="tab" data-toggle="tab">
+                      <i class="fa fa-level-down"></i>  New Requests  <span class="badge"> <t t-esc="len(network.request_ids)"/></span>
+                    </a>
+                  </li>
+                </t>
+                <t t-if="network.author_id == user_id">
+                <li class="pull-right" t-if="not is_public_user">
                   <div>
                     <button type="submit" class="btn btn-default" data-action="edit"> <i class="fa fa-pencil"></i> Edit Group</button>
                     &amp;nbsp;
@@ -249,6 +332,7 @@
                     </t>
                   </div>
                 </li>
+              </t>
               </ul>
 
               <div class="tab-content" style="padding-top:8px;">
@@ -257,33 +341,7 @@
                 </div>
 
                 <div class="tab-pane" id="members">
-                  <!-- <div class="row mb16">
-                    <div class="col-md-6">
-
-                    </div>
-                    <div class="col-md-6">
-                      <form method="get" action="/networks">
-                        <div class="input-group">
-                          <input type="search" class="form-control" name="search" t-attf-placeholder="Search for members" t-att-value="search"/>
-                          <span class="input-group-btn">
-                            <a class="btn btn-danger" href="/networks" t-if="search">
-                              <i class="fa fa-times"></i>
-                            </a>
-
-                            <button class="btn btn-primary" type="submit">
-                              <i class="fa fa-search"></i>
-                            </button>
-                            <a class="btn btn-success oe_js_network_new" title="Invite Members">
-                              <i class="fa fa-plus"></i> Invite
-                            </a>
-                          </span>
-                        </div>
-                      </form>
-                    </div>
-                  </div> -->
-
                   <div class="col-xs-4" t-foreach="network.sudo().message_follower_ids" t-as="follower">
-
                     <t t-call="groupme.follower_card"/>
                   </div>
                 </div>
@@ -292,12 +350,12 @@
                   <div id="falseMsgLabel" class="alert alert-danger alert-dismissable mb16" t-attf-style="display: #{'block' if not network.view_message else 'none'}">
                      <p>We do not store any message sent by you or any of your group members in our system, without your permission. <a href="#" class='js_active_msg' data-active_msg="false" t-att-data-network_id="network.id">Click here</a> to enable to track all message sent in this group.
                      </p>
-                   </div>
+                  </div>
                   <div id="trueMsgLabel" class="alert alert-success alert-dismissable mb16" t-attf-style="display: #{'block' if network.view_message else 'none'}">
                      <p>Message history is currently enabled. <a href="#" class='js_active_msg' data-active_msg="true" t-att-data-network_id="network.id">Click here</a> to disable message tracking for this group.
                      </p>
-                   </div>
-
+                  </div>
+                  <t t-if="currentrights.hasMessagingRights">
                   <div class="mb16">
                     <form id="comment" t-attf-action="/networks/network/#{network.id}/comment" method="POST" t-attf-style="display:#{'block' if network.website_published else 'none'}">
                       <div class="media">
@@ -322,11 +380,12 @@
                       </div>
                     </form>
                   </div>
+                </t>
                   <div class="oe_network_messages mt16" t-if="comments">
                     <h4 class="text-muted" style="border-bottom: 1px solid #ccc;padding-bottom: 5px;"><span t-esc="len(comments)"/> Messages sent</h4>
 
                     <ul class="media-list mb8 oe-message-scroll">
-                      <li t-foreach="comments" t-as="message" class="media panel" style="padding: 5px;margin: 5px;">
+                      <li t-foreach="comments" t-as="message" class="media well" style="padding: 5px;margin: 5px;">
                         <span class="pull-left" style="height:60px;width:60px;padding: 0px;overflow: hidden;">
                           <img class="img media-object"
                             t-att-src="'/website/image?model=mail.message&amp;field=author_avatar&amp;id='+str(message.id)"
@@ -335,12 +394,33 @@
                         <div class="media-body">
                           <span t-field="message.author_id" style="display: inline-block;" t-field-options='{"widget": "contact", "fields": ["name"]}'/>
                           <span class="text-muted"> on <timeago class="timeago" t-att-datetime="message.date"/></span>
+                          <a class="pull-right oe_msg_analysis" href="#" t-attf-data-msg_id="#{message.id}"  t-attf-data-network_id="#{network.id}"><span class="fa fa-search-plus"></span> Delivery Report</a>
                           <div t-field="message.body" class="discussion_scroll_post"></div>
                         </div>
                       </li>
                     </ul>
                   </div>
                 </div>
+                <div class="tab-pane" id="requests" >
+                  <t t-if="len(network.request_ids) == 0">
+                    <h1 style="padding-left:50px">No New Requests...</h1>
+                  </t>
+                <table class="table table-condensed" id="tblRequests">
+                  <tbody>
+                    <t t-foreach="network.request_ids" t-as="requester">
+                    <tr>
+                      <td class="col-xs-1" t-esc="requester.name" />
+                      <td class="col-xs-2">
+                        <div id="divControl">
+                          <button type="button" data-loading-text="Loading..." t-attf-data-userid="#{requester.id}" t-attf-data-emailid="#{requester.email}" class="btn btn-primary approveButton" autocomplete="off"><span class='fa fa-check'></span></button>
+                          <button type="button" data-loading-text="Loading..." t-attf-data-userid="#{requester.id}" t-attf-data-emailid="#{requester.email}" class="btn btn-primary ignoreButton" autocomplete="off"><i class='fa fa-times'></i></button>
+                        </div>
+                      </td>
+                    </tr>
+                    </t>
+                  </tbody>
+                </table>
+              </div>
               </div>
             </div>
           </div>
