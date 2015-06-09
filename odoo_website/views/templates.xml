@@ -14,7 +14,6 @@
       </xpath>
     </template>
 
-
     <template id='website_share' name="Slides Media Share">
       <div class="form-group">
           <a target="_Blank" t-attf-href="https://www.facebook.com/sharer/sharer.php?u=#{odoo_website.link}">
@@ -32,20 +31,19 @@
       </div>
   </template>
 
-    <!-- display list of groups -->
-    <template id="website_list">
-      <t t-call="website.layout">
-        <section>
-          <div class="oe_structure"/>
-        </section>
-
-        <section style="background-color: #fafafa;padding-top: 20px;padding-bottom: 20px;">
-          <div class="container mt16 mb16">
-            <div class="row">
-              <div id="owl-demo" style="overflow: hidden;">
-                <div t-foreach="related" t-as="odoo_website" class="item">
-                  <a t-attf-href="/websites/view/#{odoo_website.id}">
-                    <img t-attf-src="/website/image/odoo.website/#{odoo_website.id}/image?max_height=250" class="img img-responsive shadow" alt="Owl Image"/>
+  <template id="website_list">
+    <t t-call="website.layout">
+      <section>
+        <div class="oe_structure"/>
+      </section>
+      <section style="background-color: #fafafa;padding-top: 20px;padding-bottom: 20px;">
+        <div class="container mt16 mb16">
+          <div class="row">
+            <div id="owl-demo" style="overflow: hidden;">
+              <div t-foreach="related" t-as="odoo_website" class="item">
+                <a t-attf-href="/websites/view/#{odoo_website.id}">
+                  <img t-attf-src="/website/image/odoo.website/#{odoo_website.id}/image?max_height=250" 
+                    class="img img-responsive shadow" alt="Owl Image"/>
                   </a>
                 </div>
               </div>
@@ -86,8 +84,6 @@
               <div t-foreach="websites" t-as="odoo_website" class="col-sm-3 col-md-3">
                 <div class="thumbnail">
                   <a t-attf-href="/websites/view/#{odoo_website.id}">
-                    <!-- <div class="group-image" t-attf-style="background: url(');">
-                    </div> -->
                     <img t-attf-src="/website/image/odoo.website/#{odoo_website.id}/image?max_height=200" class="img img-responsive"/>
                   </a>
                   <div class="caption">

@@ -8,10 +8,9 @@
         <link type="text/less" href="/groupme/static/src/less/groupme.less" rel="stylesheet" t-ignore="true"/>
         <link rel="stylesheet" href="/web/static/lib/select2/select2.css"/>
         <link rel="stylesheet" href="/website/static/lib/select2-bootstrap-css/select2-bootstrap.css"/>
+
         <script type="text/javascript" src="/web/static/lib/select2/select2.js"></script>
-        <!-- Calculating time ( ** time ago) -->
         <script type="text/javascript" src="/groupme/static/src/js/groupme_network.js"></script>
-        <!-- Create Network (Manage Category, Tags)-->
         <script type="text/javascript" src="/groupme/static/src/js/groupme_network_new.js"></script>
         <title>Group me</title>
       </xpath>

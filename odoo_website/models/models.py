@@ -15,6 +15,14 @@ from urlparse import urlparse
 
 from openerp import models, fields, api, _
 
+class WebsiteTags(models.Model):
+    _name = 'odoo.website.tags'
+    _description = 'Tags'
+
+    name = fields.Char('Name')
+    url = fiels.Char('URL')
+
+
 class OdooWebsite(models.Model):
     _name = 'odoo.website'
     _inherit = ['mail.thread', 'website.seo.metadata']
@@ -54,7 +62,14 @@ class OdooWebsite(models.Model):
 
     display = fields.Boolean('Selected')
     link = fields.Char(compute='_compute_link', string='Link')
+    
+    tags = fields.Many2many(compute='_compute_tags', string='Tags', relations='odoo.website.tags')
 
+    @api.one
+    @api.depends('url')
+    def _compute_tags(self):
+        self.tags = False
+    
     @api.one
     @api.depends('url')
     def _compute_link(self):
@@ -69,15 +84,6 @@ class OdooWebsite(models.Model):
 
         mobile = speed_obj.search([('page_id','=',self.id), ('target','=','mobile')], limit=1)
         self.mobile = mobile.id
-
-    # parent_id = fields.Many2one(compute='_compute_parent', relation='odoo.website', string='Parent')
-    # @api.depends('url')
-    # def _compute_parent(self):
-    #     for rec in self:
-    #         rec.parent_id = False 
-    #         if rec.path:
-    #             parent_id = self.search([('base_url','=',rec.base_url), ('path','=',False)], limit=1)
-    #             rec.parent_id = parent_id.id
 
     @api.one
     @api.depends('url')
@@ -102,32 +108,38 @@ class OdooWebsite(models.Model):
     @api.one
     @api.depends('url')
     def _copute_meta(self):
-        try:
-            arch = lxml.html.parse(urlopen(self.full_url))
-            self.name = arch.find(".//title") != None and arch.find(".//title").text or ""
-            if arch.find(".//meta[@name='description']") != None:
-                self.description =  arch.find(".//meta[@name='description']").attrib.get('content','')
-        except URLError:
-            self.name = 'Unknown Website'
-            self.description = 'Unknown Website'
+        self.name = 'Unknown Website'
+        self.description = 'Unknown Website'
+
+        if self.full_url:
+            try:
+                arch = lxml.html.parse(urlopen(self.full_url))
+                self.name = arch.find(".//title") != None and arch.find(".//title").text or ""
+                if arch.find(".//meta[@name='description']") != None:
+                    self.description =  arch.find(".//meta[@name='description']").attrib.get('content','')
+            except URLError:
+                #TODO: log an error to the console
+                pass
 
     @api.one
     @api.depends('url')
     def _verify_odoo(self):
-        url = "%s/%s" % (self.base_url, "web/webclient/version_info")
         self.active = False
         self.odoo = False
-        try:
-            req = Request(url, 
-                data='{"jsonrpc":"2.0","method":"call","params":{},"id":1}', 
-                headers= {'content-type': 'application/json'})
-            content = urlopen(req)
-            if content.code == 200:
-                self.odoo = True
-                self.active = True
-                self.version = content.read()
-        except URLError, e:
-            self.is_odoo = False
+
+        if self.base_url:
+            url = "%s/%s" % (self.base_url, "web/webclient/version_info")
+            try:
+                req = Request(url, 
+                    data='{"jsonrpc":"2.0","method":"call","params":{},"id":1}', 
+                    headers= {'content-type': 'application/json'})
+                content = urlopen(req)
+                if content.code == 200:
+                    self.odoo = True
+                    self.active = True
+                    self.version = content.read()
+            except URLError, e:
+                self.is_odoo = False
 
 
     def url_to_thumb(self, zoom=1, height=1000, width=1024):
